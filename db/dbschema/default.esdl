@@ -3,17 +3,30 @@ module default {
         using (cal::date_get(local_date, "year"));
 
     type Date {
-        day: int16;
-        month: int16;
-        year: int16;
+        day: int16 {
+            constraint min_value(1);
+            constraint max_value(31);
+        };
+        month: int16 {
+            constraint min_value(1);
+            constraint max_value(12);
+        };
+        year: int32;
+
+        property display := {
+            to_str([<str>.year, <str>.month, <str>.day], "-")
+        };
+        property local_date := {
+            cal::to_local_date(.year, .month, .day)
+        };
     }
 
     type Person {
         first_name: str;
         last_name: str;
         aliases: array<str>;
-        birth_date: cal::local_date;
-        death_date: cal::local_date;
+        birth_date: Date;
+        death_date: Date;
         is_alive: bool {
             rewrite insert, update using (
                 __subject__.is_alive ?? not exists __subject__.death_date
@@ -29,9 +42,9 @@ module default {
         );
         property age := (
             with latest_date := (
-                .death_date
+                .death_date.local_date
                 ?? cal::to_local_date(datetime_of_statement(), "UTC")
-            ) select get_year(latest_date) - get_year(.birth_date)
+            ) select get_year(latest_date) - get_year(.birth_date.local_date)
         );
         multi link instruments := (
             with id := .id

@@ -1,4 +1,4 @@
-CREATE MIGRATION m1pvkwsgdaecs6yt5pune3thpw6gx6if5mcyls7keoai4uevebqytq
+CREATE MIGRATION m1laqdjo7anc3ruhdaxsvknyd73puptmvvur4rcap75lqwoo7htdpq
     ONTO initial
 {
   CREATE FUNCTION default::get_year(local_date: cal::local_date) ->  std::float64 USING (cal::date_get(local_date, 'year'));
@@ -8,37 +8,16 @@ CREATE MIGRATION m1pvkwsgdaecs6yt5pune3thpw6gx6if5mcyls7keoai4uevebqytq
       CREATE PROPERTY accidental: default::Accidental;
       CREATE PROPERTY name: default::NoteName;
   };
-  CREATE TYPE default::Person {
-      CREATE PROPERTY birth_date: cal::local_date;
-      CREATE PROPERTY death_date: cal::local_date;
-      CREATE PROPERTY age := (WITH
-          latest_date := 
-              (.death_date ?? cal::to_local_date(std::datetime_of_statement(), 'UTC'))
-      SELECT
-          (default::get_year(latest_date) - default::get_year(.birth_date))
-      );
-      CREATE PROPERTY aliases: array<std::str>;
-      CREATE PROPERTY is_alive: std::bool {
-          CREATE REWRITE
-              INSERT 
-              USING ((__subject__.is_alive ?? NOT (EXISTS (__subject__.death_date))));
-          CREATE REWRITE
-              UPDATE 
-              USING ((__subject__.is_alive ?? NOT (EXISTS (__subject__.death_date))));
-      };
-      CREATE PROPERTY first_name: std::str;
-      CREATE PROPERTY last_name: std::str;
-      CREATE PROPERTY full_name := ((((.first_name ++ ' ') IF (.first_name != '') ELSE '') ++ .last_name));
+  CREATE TYPE default::Album {
+      CREATE PROPERTY title: std::str;
   };
   CREATE TYPE default::Artist {
-      CREATE MULTI LINK members: default::Person;
       CREATE PROPERTY name: std::str;
       CREATE PROPERTY year_end: cal::local_date;
       CREATE PROPERTY year_start: cal::local_date;
   };
-  CREATE TYPE default::Album {
+  ALTER TYPE default::Album {
       CREATE MULTI LINK artist: default::Artist;
-      CREATE PROPERTY title: std::str;
   };
   CREATE TYPE default::Track {
       CREATE PROPERTY duration: std::duration;
@@ -51,6 +30,16 @@ CREATE MIGRATION m1pvkwsgdaecs6yt5pune3thpw6gx6if5mcyls7keoai4uevebqytq
   };
   ALTER TYPE default::Album {
       CREATE MULTI LINK tracks: default::Track;
+  };
+  CREATE TYPE default::Person {
+      CREATE PROPERTY is_alive: std::bool;
+      CREATE PROPERTY aliases: array<std::str>;
+      CREATE PROPERTY first_name: std::str;
+      CREATE PROPERTY last_name: std::str;
+      CREATE PROPERTY full_name := ((((.first_name ++ ' ') IF (.first_name != '') ELSE '') ++ .last_name));
+  };
+  ALTER TYPE default::Artist {
+      CREATE MULTI LINK members: default::Person;
   };
   CREATE SCALAR TYPE default::Mode EXTENDING enum<major, minor>;
   CREATE TYPE default::Key {
@@ -84,9 +73,28 @@ CREATE MIGRATION m1pvkwsgdaecs6yt5pune3thpw6gx6if5mcyls7keoai4uevebqytq
       CREATE MULTI LINK compositions: default::Composition;
   };
   CREATE TYPE default::Date {
-      CREATE PROPERTY day: std::int16;
-      CREATE PROPERTY month: std::int16;
-      CREATE PROPERTY year: std::int16;
+      CREATE PROPERTY day: std::int16 {
+          CREATE CONSTRAINT std::max_value(31);
+          CREATE CONSTRAINT std::min_value(1);
+      };
+      CREATE PROPERTY month: std::int16 {
+          CREATE CONSTRAINT std::max_value(12);
+          CREATE CONSTRAINT std::min_value(1);
+      };
+      CREATE PROPERTY year: std::int32;
+      CREATE PROPERTY display := ({((<std::str>.year ++ <std::str>.month) ++ <std::str>.day)});
+  };
+  ALTER TYPE default::Person {
+      CREATE LINK birth_date: default::Date;
+      CREATE LINK death_date: default::Date;
+      ALTER PROPERTY is_alive {
+          CREATE REWRITE
+              INSERT 
+              USING ((__subject__.is_alive ?? NOT (EXISTS (__subject__.death_date))));
+          CREATE REWRITE
+              UPDATE 
+              USING ((__subject__.is_alive ?? NOT (EXISTS (__subject__.death_date))));
+      };
   };
   CREATE TYPE default::Player {
       CREATE LINK instrument: default::Instrument;
