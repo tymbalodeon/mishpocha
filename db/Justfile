@@ -29,20 +29,27 @@ config := "edgedb-config"
 # Show the DSN for the database.
 dsn: _create
     #!/usr/bin/env zsh
-    if [ -z "$(just _is_running)" ]; then
-        edgedb instance credentials --insecure-dsn --instance {{instance}}
+    if just running >/dev/null 2>&1; then
+        base_dsn=$(
+            docker run \
+                --interactive \
+                --link {{image}} \
+                --net default \
+                --rm \
+                --tty \
+                --volume {{config}}:/.config/edgedb \
+                edgedb/edgedb-cli \
+                    instance credentials \
+                        --insecure-dsn \
+                        --instance {{instance}}
+        )
     else
-        docker run \
-            --interactive \
-            --link {{image}} \
-            --net default \
-            --rm \
-            --tty \
-            --volume {{config}}:/.config/edgedb \
-            edgedb/edgedb-cli \
-                instance credentials \
-                    --insecure-dsn \
-                    --instance {{instance}}
+        base_dsn=$(
+            edgedb instance credentials \
+                --insecure-dsn \
+                --instance {{instance}}
+        )
+    echo "${base_dsn}&tls_security=insecure"
     fi
 
 # Connect to the database locally, optionally via the edgedb "--ui".
