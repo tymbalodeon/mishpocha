@@ -29,7 +29,7 @@ config := "edgedb-config"
 # Show the DSN for the database.
 dsn: _create
     #!/usr/bin/env zsh
-    if just running >/dev/null 2>&1; then
+    if [ -n "$(just running)" ]; then
         base_dsn=$(
             docker run \
                 --interactive \
@@ -67,27 +67,16 @@ migrate: _create
     edgedb migration create --instance {{instance}}
     edgedb migrate --instance {{instance}}
 
-_is_running:
-    #!/usr/bin/env zsh
-    if pgrep -q docker; then
-        printf "$( \
-            docker ps \
-                --filter "name={{image}}" \
-                --filter "status=running" \
-                --quiet \
-            )"
-    fi
-
 # Show if the container is running.
 running:
     #!/usr/bin/env zsh
-    if pgrep -q docker; then
+    if ps | grep docker | grep -v grep; then
         docker container ls --filter name={{image}}
     fi
 
 _build:
     #!/usr/bin/env zsh
-    if [ -z "$(just _is_running)" ]; then \
+    if [ -z "$(just running)" ]; then \
         docker build --tag {{image}} .
     fi
 
@@ -130,7 +119,7 @@ data := "db-config"
 # Stop the Docker container.
 stop:
     #!/usr/bin/env zsh
-    if [ -n "$(just _is_running)" ]; then
+    if [ -n "$(just running)" ]; then
         docker kill {{image}}
         if docker volume list | grep -q {{config}}; then
             docker volume remove {{config}}
@@ -146,14 +135,14 @@ clean:
 # Show the Docker logs.
 logs tail="20":
     #!/usr/bin/env zsh
-    if [ -n "$(just _is_running)" ]; then
+    if [ -n "$(just running)" ]; then
         docker logs {{image}} --tail {{tail}}
     fi
 
 # Log into the interactive shell in Docker.
 shell:
     #!/usr/bin/env zsh
-    if [ -z "$(just _is_running)" ]; then
+    if [ -z "$(just running)" ]; then
         just start
     fi
     docker run \
@@ -168,6 +157,7 @@ shell:
 # Drop the persisted database.
 drop: stop
     #!/usr/bin/env zsh
-    if docker volume list | grep -q {{data}}; then
+    if [ -n "$(just running)" ] \
+        && docker volume list | grep -q {{data}}; then
         docker volume remove {{data}}
     fi
