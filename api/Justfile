@@ -1,0 +1,11 @@
+@_help:
+    just --list
+
+# Run the server.
+@run:
+    env EDGEDB_DSN="$( \
+        edgedb instance credentials \
+            --insecure-dsn \
+            --instance mishpocha \
+        )?tls_security=insecure" \
+    cargo run

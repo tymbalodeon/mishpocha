@@ -1,0 +1,166 @@
+set fallback
+
+_help *_from-main:
+    #!/usr/bin/env zsh
+    if [ -z "{{_from-main}}" ]; then
+        just --list
+    else
+        just --list --list-heading $'\nDB: [`just db <COMMAND>`]\n'
+    fi
+
+# Install dependencies.
+install *_from-main:
+    #!/usr/bin/env zsh
+    if [ -z "{{_from-main}}" ]; then
+        ../install_dependencies.sh --db
+    fi
+
+image := "mishpocha-db"
+instance := replace(image, "-", "_")
+
+_create:
+    #!/usr/bin/env zsh
+    if ! edgedb instance list | grep -q {{instance}}; then
+        edgedb instance create {{instance}}
+    fi
+
+config := "edgedb-config"
+
+# Show the DSN for the database.
+dsn: _create
+    #!/usr/bin/env zsh
+    if [ -z "$(just _is_running)" ]; then
+        edgedb instance credentials --insecure-dsn --instance {{instance}}
+    else
+        docker run \
+            --interactive \
+            --link {{image}} \
+            --net default \
+            --rm \
+            --tty \
+            --volume {{config}}:/.config/edgedb \
+            edgedb/edgedb-cli \
+                instance credentials \
+                    --insecure-dsn \
+                    --instance {{instance}}
+    fi
+
+# Connect to the database locally, optionally via the edgedb "--ui".
+local *ui: _create
+    #!/usr/bin/env zsh
+    if [ "{{ui}}" = "--ui" ]; then
+        edgedb ui --instance {{instance}}
+    else
+        edgedb --instance {{instance}}
+    fi
+
+# Migrate the database.
+migrate: _create
+    #!/usr/bin/env zsh
+    edgedb migration create --instance {{instance}}
+    edgedb migrate --instance {{instance}}
+
+_is_running:
+    #!/usr/bin/env zsh
+    if pgrep -q docker; then
+        printf "$( \
+            docker ps \
+                --filter "name={{image}}" \
+                --filter "status=running" \
+                --quiet \
+            )"
+    fi
+
+# Show if the container is running.
+running:
+    #!/usr/bin/env zsh
+    if pgrep -q docker; then
+        docker container ls --filter name={{image}}
+    fi
+
+_build:
+    #!/usr/bin/env zsh
+    if [ -z "$(just _is_running)" ]; then \
+        docker build --tag {{image}} .
+    fi
+
+port := "5656"
+
+# Open the application in the browser.
+@open:
+    open "http://localhost:{{port}}/ui"
+
+@_link:
+    docker run \
+        --interactive \
+        --link {{image}} \
+        --rm \
+        --tty \
+        --volume {{config}}:/.config/edgedb \
+        edgedb/edgedb-cli \
+            --host {{image}} \
+            instance link {{instance}} \
+                --non-interactive \
+                --trust-tls-cert \
+                --overwrite
+
+data := "db-config"
+
+# Run the Docker container.
+@start *open: stop _build
+    docker run \
+        --detach \
+        --env EDGEDB_SERVER_SECURITY=insecure_dev_mode \
+        --env EDGEDB_SERVER_ADMIN_UI=enabled \
+        --name {{image}} \
+        --publish {{port}}:{{port}} \
+        --rm \
+        --volume {{data}}:/var/lib/edgedb/data \
+        {{image}}
+    just _link
+    {{ if open =~ "--open" { "just open" } else { "" } }}
+
+# Stop the Docker container.
+stop:
+    #!/usr/bin/env zsh
+    if [ -n "$(just _is_running)" ]; then
+        docker kill {{image}}
+        if docker volume list | grep -q {{config}}; then
+            docker volume remove {{config}}
+        fi
+    fi
+
+# Remove the Docker image.
+clean:
+    #!/usr/bin/env zsh
+    docker rmi {{image}} >/dev/null 2>&1
+    exit 0
+
+# Show the Docker logs.
+logs tail="20":
+    #!/usr/bin/env zsh
+    if [ -n "$(just _is_running)" ]; then
+        docker logs {{image}} --tail {{tail}}
+    fi
+
+# Log into the interactive shell in Docker.
+shell:
+    #!/usr/bin/env zsh
+    if [ -z "$(just _is_running)" ]; then
+        just start
+    fi
+    docker run \
+        --interactive \
+        --link {{image}} \
+        --rm \
+        --tty \
+        --volume {{config}}:/.config/edgedb \
+        edgedb/edgedb-cli \
+            --instance {{instance}}
+
+# Drop the persisted database.
+drop: stop
+    #!/usr/bin/env zsh
+    if docker volume list | grep -q {{data}}; then
+        docker volume remove {{data}}
+    fi

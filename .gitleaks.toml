@@ -1,0 +1,6 @@
+[allowlist]
+description = "global allow list"
+paths = [
+  '''ui/package-lock.json''',
+  '''ui/pnpm-lock.json'''
+]

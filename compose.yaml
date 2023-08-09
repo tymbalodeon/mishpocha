@@ -1,0 +1,26 @@
+services:
+  api:
+    build: ./api
+    container_name: mishpocha-api
+    environment:
+      CORS_ALLOW_ORIGINS: '["http://ui:3000"]'
+      EDGEDB_DSN: edgedb://edgedb:password@db:5656?database=edgedb&tls_security=insecure
+    ports:
+      - 8000:80
+  db:
+    build: ./db
+    container_name: mishpocha-db
+    environment:
+      EDGEDB_SERVER_PASSWORD: password
+      EDGEDB_SERVER_SECURITY: insecure_dev_mode
+    volumes:
+      - db:/var/lib/edgedb/data
+  ui:
+    build: ./ui
+    container_name: mishpocha-ui
+    environment:
+      API_DOMAIN: api:80
+    ports:
+      - 3000:3000
+volumes:
+  db:
