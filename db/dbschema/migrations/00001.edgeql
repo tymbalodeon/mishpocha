@@ -1,4 +1,4 @@
-CREATE MIGRATION m1yk5ojssvmn54d6wlweqtdpdoifcnvkxtxphhroepoowvfopu7pka
+CREATE MIGRATION m1twkh3l62ybyh7ge4qw4znbs754l4qhu5mhdz2bdsoieb7ihzwk2a
     ONTO initial
 {
   CREATE FUNCTION default::get_date_element(local_date: cal::local_date, element: std::str) ->  std::float64 USING (cal::date_get(local_date, element));
@@ -105,6 +105,14 @@ CREATE MIGRATION m1yk5ojssvmn54d6wlweqtdpdoifcnvkxtxphhroepoowvfopu7pka
       CREATE PROPERTY arrangement_date: cal::local_date;
       CREATE PROPERTY title: std::str;
   };
+  ALTER TYPE default::Person {
+      CREATE MULTI LINK compositions := (.<composers[IS default::Composition]);
+  };
+  ALTER TYPE default::Date {
+      CREATE MULTI LINK compositions := (.<composition_date[IS default::Composition]);
+      CREATE MULTI LINK birthdays := (.<birth_date[IS default::Person]);
+      CREATE MULTI LINK deathdays := (.<death_date[IS default::Person]);
+  };
   CREATE TYPE default::Instrument {
       CREATE LINK tuning: default::Note;
       CREATE PROPERTY aliases: array<std::str>;
@@ -156,10 +164,6 @@ CREATE MIGRATION m1yk5ojssvmn54d6wlweqtdpdoifcnvkxtxphhroepoowvfopu7pka
       CREATE PROPERTY year_mixed: cal::local_date;
       CREATE PROPERTY year_recorded: cal::local_date;
       CREATE PROPERTY year_released: cal::local_date;
-  };
-  ALTER TYPE default::Date {
-      CREATE MULTI LINK birthdays := (.<birth_date[IS default::Person]);
-      CREATE MULTI LINK deathdays := (.<death_date[IS default::Person]);
   };
   ALTER TYPE default::Disc {
       CREATE MULTI LINK tracks: default::Track;

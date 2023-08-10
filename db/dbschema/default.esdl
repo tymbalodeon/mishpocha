@@ -28,6 +28,7 @@ module default {
 
         multi link birthdays := .<birth_date[is Person];
         multi link deathdays := .<death_date[is Person];
+        multi link compositions := .<composition_date[is Composition];
     }
 
     type Person {
@@ -80,6 +81,7 @@ module default {
             )
             in .players
         );
+        multi link compositions := .<composers[is Composition]
     }
 
     scalar type NoteName extending enum<C, D, E, F, G, A, B>;
