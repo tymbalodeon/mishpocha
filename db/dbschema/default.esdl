@@ -1,6 +1,8 @@
 module default {
-    function get_year(local_date: cal::local_date) -> float64
-        using (cal::date_get(local_date, "year"));
+    function get_date_element(
+        local_date: cal::local_date, element: str
+    ) -> float64
+        using (cal::date_get(local_date, element));
 
     type Date {
         day: int16 {
@@ -41,10 +43,26 @@ module default {
             ) ++ .last_name
         );
         property age := (
-            with latest_date := (
-                .death_date.local_date
-                ?? cal::to_local_date(datetime_of_statement(), "UTC")
-            ) select get_year(latest_date) - get_year(.birth_date.local_date)
+            with current_date := (
+                cal::to_local_date(datetime_of_statement(), "UTC")
+            ), current_year := (
+                get_date_element(current_date, "year")
+            ), current_month := (
+                get_date_element(current_date, "month")
+            ), current_day := (
+                get_date_element(current_date, "day")
+            ), latest_year := (
+                .death_date.year ?? current_year
+            ), latest_month := (
+                .death_date.month ?? current_month
+            ), latest_day := (
+                .death_date.day ?? current_day
+            ), age := (
+                latest_year - .birth_date.year
+            ) select age
+                if latest_month >= .birth_date.month
+                and latest_day >= .birth_date.day
+                else age - 1
         );
         multi link instruments := (
             with id := .id
