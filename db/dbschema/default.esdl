@@ -15,12 +15,17 @@ module default {
         };
         year: int32;
 
+        constraint exclusive on ((.day, .month, .year));
+
         property display := {
             to_str([<str>.year, <str>.month, <str>.day], "-")
         };
         property local_date := {
             cal::to_local_date(.year, .month, .day)
         };
+
+        multi link birthdays := .<birth_date[is Person];
+        multi link deathdays := .<death_date[is Person];
     }
 
     type Person {
