@@ -114,9 +114,9 @@ module default {
 
     type Composition {
         title: str;
-        multi composer: Person;
-        multi lyricist: Person;
-        multi arranger: Person;
+        multi composers: Person;
+        multi lyricists: Person;
+        multi arrangers: Person;
         composition_date: cal::local_date;
         arrangement_date: cal::local_date;
         multi instrumentation: Instrument;
@@ -146,11 +146,23 @@ module default {
         year_mixed: cal::local_date;
         number: int16;
         duration: duration;
-  }
+    }
+
+    type Disc {
+        title: str;
+        number: int16 {
+            constraint min_value(1);
+        };
+        multi tracks: Track;
+    }
 
     type Album {
         title: str;
-        multi artist: Artist;
-        multi tracks: Track;
+        multi artists: Artist;
+        multi discs: Disc;
+
+        property disc_total := (
+            count(.discs)
+        );
     }
 };

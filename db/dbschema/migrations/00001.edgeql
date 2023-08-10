@@ -1,4 +1,4 @@
-CREATE MIGRATION m1af5ir6evyjrosc6rylkjvyj2uxye2siiuiecc2xecd7ow3nngbsq
+CREATE MIGRATION m1qwwexkpirbrohp3y37xxb4urous7v7m5oeilev72iqgpcqzk672q
     ONTO initial
 {
   CREATE FUNCTION default::get_date_element(local_date: cal::local_date, element: std::str) ->  std::float64 USING (cal::date_get(local_date, element));
@@ -72,20 +72,18 @@ CREATE MIGRATION m1af5ir6evyjrosc6rylkjvyj2uxye2siiuiecc2xecd7ow3nngbsq
       CREATE PROPERTY year_start: cal::local_date;
   };
   CREATE TYPE default::Album {
-      CREATE MULTI LINK artist: default::Artist;
+      CREATE MULTI LINK artists: default::Artist;
       CREATE PROPERTY title: std::str;
   };
-  CREATE TYPE default::Track {
-      CREATE PROPERTY duration: std::duration;
-      CREATE PROPERTY number: std::int16;
+  CREATE TYPE default::Disc {
+      CREATE PROPERTY number: std::int16 {
+          CREATE CONSTRAINT std::min_value(1);
+      };
       CREATE PROPERTY title: std::str;
-      CREATE PROPERTY year_mastered: cal::local_date;
-      CREATE PROPERTY year_mixed: cal::local_date;
-      CREATE PROPERTY year_recorded: cal::local_date;
-      CREATE PROPERTY year_released: cal::local_date;
   };
   ALTER TYPE default::Album {
-      CREATE MULTI LINK tracks: default::Track;
+      CREATE MULTI LINK discs: default::Disc;
+      CREATE PROPERTY disc_total := (std::count(.discs));
   };
   CREATE SCALAR TYPE default::Mode EXTENDING enum<major, minor>;
   CREATE TYPE default::Key {
@@ -98,10 +96,10 @@ CREATE MIGRATION m1af5ir6evyjrosc6rylkjvyj2uxye2siiuiecc2xecd7ow3nngbsq
       CREATE PROPERTY numerator: std::int16;
   };
   CREATE TYPE default::Composition {
-      CREATE MULTI LINK arranger: default::Person;
-      CREATE MULTI LINK composer: default::Person;
+      CREATE MULTI LINK arrangers: default::Person;
+      CREATE MULTI LINK composers: default::Person;
       CREATE LINK key: default::Key;
-      CREATE MULTI LINK lyricist: default::Person;
+      CREATE MULTI LINK lyricists: default::Person;
       CREATE LINK time_signature: default::TimeSignature;
       CREATE PROPERTY arrangement_date: cal::local_date;
       CREATE PROPERTY composition_date: cal::local_date;
@@ -115,16 +113,27 @@ CREATE MIGRATION m1af5ir6evyjrosc6rylkjvyj2uxye2siiuiecc2xecd7ow3nngbsq
   ALTER TYPE default::Composition {
       CREATE MULTI LINK instrumentation: default::Instrument;
   };
-  ALTER TYPE default::Track {
+  CREATE TYPE default::Player {
+      CREATE LINK instrument: default::Instrument;
+      CREATE LINK person: default::Person;
+  };
+  CREATE TYPE default::Track {
       CREATE MULTI LINK compositions: default::Composition;
+      CREATE MULTI LINK players: default::Player;
+      CREATE PROPERTY duration: std::duration;
+      CREATE PROPERTY number: std::int16;
+      CREATE PROPERTY title: std::str;
+      CREATE PROPERTY year_mastered: cal::local_date;
+      CREATE PROPERTY year_mixed: cal::local_date;
+      CREATE PROPERTY year_recorded: cal::local_date;
+      CREATE PROPERTY year_released: cal::local_date;
   };
   ALTER TYPE default::Date {
       CREATE MULTI LINK birthdays := (.<birth_date[IS default::Person]);
       CREATE MULTI LINK deathdays := (.<death_date[IS default::Person]);
   };
-  CREATE TYPE default::Player {
-      CREATE LINK instrument: default::Instrument;
-      CREATE LINK person: default::Person;
+  ALTER TYPE default::Disc {
+      CREATE MULTI LINK tracks: default::Track;
   };
   ALTER TYPE default::Instrument {
       CREATE MULTI LINK players := (.<instrument[IS default::Player]);
@@ -142,8 +151,5 @@ CREATE MIGRATION m1af5ir6evyjrosc6rylkjvyj2uxye2siiuiecc2xecd7ow3nngbsq
               (.person.id = id)
           ) IN .players)
       );
-  };
-  ALTER TYPE default::Track {
-      CREATE MULTI LINK players: default::Player;
   };
 };
