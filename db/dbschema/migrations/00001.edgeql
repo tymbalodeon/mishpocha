@@ -1,23 +1,79 @@
-CREATE MIGRATION m1laqdjo7anc3ruhdaxsvknyd73puptmvvur4rcap75lqwoo7htdpq
+CREATE MIGRATION m1af5ir6evyjrosc6rylkjvyj2uxye2siiuiecc2xecd7ow3nngbsq
     ONTO initial
 {
-  CREATE FUNCTION default::get_year(local_date: cal::local_date) ->  std::float64 USING (cal::date_get(local_date, 'year'));
+  CREATE FUNCTION default::get_date_element(local_date: cal::local_date, element: std::str) ->  std::float64 USING (cal::date_get(local_date, element));
+  CREATE TYPE default::Date {
+      CREATE PROPERTY day: std::int16 {
+          CREATE CONSTRAINT std::max_value(31);
+          CREATE CONSTRAINT std::min_value(1);
+      };
+      CREATE PROPERTY month: std::int16 {
+          CREATE CONSTRAINT std::max_value(12);
+          CREATE CONSTRAINT std::min_value(1);
+      };
+      CREATE PROPERTY year: std::int32;
+      CREATE CONSTRAINT std::exclusive ON ((.day, .month, .year));
+      CREATE PROPERTY display := ({std::to_str([<std::str>.year, <std::str>.month, <std::str>.day], '-')});
+      CREATE PROPERTY local_date := ({cal::to_local_date(.year, .month, .day)});
+  };
   CREATE SCALAR TYPE default::Accidental EXTENDING enum<flat, natrual, sharp>;
   CREATE SCALAR TYPE default::NoteName EXTENDING enum<C, D, E, F, G, A, B>;
   CREATE TYPE default::Note {
       CREATE PROPERTY accidental: default::Accidental;
       CREATE PROPERTY name: default::NoteName;
   };
-  CREATE TYPE default::Album {
-      CREATE PROPERTY title: std::str;
+  CREATE TYPE default::Person {
+      CREATE LINK birth_date: default::Date;
+      CREATE LINK death_date: default::Date;
+      CREATE PROPERTY age := (WITH
+          current_date := 
+              cal::to_local_date(std::datetime_of_statement(), 'UTC')
+          ,
+          current_year := 
+              default::get_date_element(current_date, 'year')
+          ,
+          current_month := 
+              default::get_date_element(current_date, 'month')
+          ,
+          current_day := 
+              default::get_date_element(current_date, 'day')
+          ,
+          latest_year := 
+              (.death_date.year ?? current_year)
+          ,
+          latest_month := 
+              (.death_date.month ?? current_month)
+          ,
+          latest_day := 
+              (.death_date.day ?? current_day)
+          ,
+          age := 
+              (latest_year - .birth_date.year)
+      SELECT
+          (age IF ((latest_month >= .birth_date.month) AND (latest_day >= .birth_date.day)) ELSE (age - 1))
+      );
+      CREATE PROPERTY is_alive: std::bool {
+          CREATE REWRITE
+              INSERT 
+              USING ((__subject__.is_alive ?? NOT (EXISTS (__subject__.death_date))));
+          CREATE REWRITE
+              UPDATE 
+              USING ((__subject__.is_alive ?? NOT (EXISTS (__subject__.death_date))));
+      };
+      CREATE PROPERTY aliases: array<std::str>;
+      CREATE PROPERTY first_name: std::str;
+      CREATE PROPERTY last_name: std::str;
+      CREATE PROPERTY full_name := ((((.first_name ++ ' ') IF (.first_name != '') ELSE '') ++ .last_name));
   };
   CREATE TYPE default::Artist {
+      CREATE MULTI LINK members: default::Person;
       CREATE PROPERTY name: std::str;
       CREATE PROPERTY year_end: cal::local_date;
       CREATE PROPERTY year_start: cal::local_date;
   };
-  ALTER TYPE default::Album {
+  CREATE TYPE default::Album {
       CREATE MULTI LINK artist: default::Artist;
+      CREATE PROPERTY title: std::str;
   };
   CREATE TYPE default::Track {
       CREATE PROPERTY duration: std::duration;
@@ -30,16 +86,6 @@ CREATE MIGRATION m1laqdjo7anc3ruhdaxsvknyd73puptmvvur4rcap75lqwoo7htdpq
   };
   ALTER TYPE default::Album {
       CREATE MULTI LINK tracks: default::Track;
-  };
-  CREATE TYPE default::Person {
-      CREATE PROPERTY is_alive: std::bool;
-      CREATE PROPERTY aliases: array<std::str>;
-      CREATE PROPERTY first_name: std::str;
-      CREATE PROPERTY last_name: std::str;
-      CREATE PROPERTY full_name := ((((.first_name ++ ' ') IF (.first_name != '') ELSE '') ++ .last_name));
-  };
-  ALTER TYPE default::Artist {
-      CREATE MULTI LINK members: default::Person;
   };
   CREATE SCALAR TYPE default::Mode EXTENDING enum<major, minor>;
   CREATE TYPE default::Key {
@@ -72,29 +118,9 @@ CREATE MIGRATION m1laqdjo7anc3ruhdaxsvknyd73puptmvvur4rcap75lqwoo7htdpq
   ALTER TYPE default::Track {
       CREATE MULTI LINK compositions: default::Composition;
   };
-  CREATE TYPE default::Date {
-      CREATE PROPERTY day: std::int16 {
-          CREATE CONSTRAINT std::max_value(31);
-          CREATE CONSTRAINT std::min_value(1);
-      };
-      CREATE PROPERTY month: std::int16 {
-          CREATE CONSTRAINT std::max_value(12);
-          CREATE CONSTRAINT std::min_value(1);
-      };
-      CREATE PROPERTY year: std::int32;
-      CREATE PROPERTY display := ({((<std::str>.year ++ <std::str>.month) ++ <std::str>.day)});
-  };
-  ALTER TYPE default::Person {
-      CREATE LINK birth_date: default::Date;
-      CREATE LINK death_date: default::Date;
-      ALTER PROPERTY is_alive {
-          CREATE REWRITE
-              INSERT 
-              USING ((__subject__.is_alive ?? NOT (EXISTS (__subject__.death_date))));
-          CREATE REWRITE
-              UPDATE 
-              USING ((__subject__.is_alive ?? NOT (EXISTS (__subject__.death_date))));
-      };
+  ALTER TYPE default::Date {
+      CREATE MULTI LINK birthdays := (.<birth_date[IS default::Person]);
+      CREATE MULTI LINK deathdays := (.<death_date[IS default::Person]);
   };
   CREATE TYPE default::Player {
       CREATE LINK instrument: default::Instrument;
