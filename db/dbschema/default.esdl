@@ -3,7 +3,9 @@ module default {
         local_date: cal::local_date, element: str
     ) -> float64
         using (cal::date_get(local_date, element));
+}
 
+module default {
     type Date {
         day: int16 {
             constraint min_value(1);
