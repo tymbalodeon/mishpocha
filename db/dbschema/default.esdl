@@ -117,7 +117,7 @@ module default {
         multi composers: Person;
         multi lyricists: Person;
         multi arrangers: Person;
-        composition_date: cal::local_date;
+        composition_date: Date;
         arrangement_date: cal::local_date;
         multi instrumentation: Instrument;
         key: Key;
@@ -137,7 +137,17 @@ module default {
     }
 
     type Track {
-        title: str;
+        title: str {
+            rewrite insert, update using (
+                __subject__.title
+                ?? to_str(
+                    array_agg((
+                    with track := (select Track limit 1)
+                    select Composition.title
+                    filter contains(array_agg(track.compositions), Composition))
+                    ), ",")
+            )
+        };
         multi compositions: Composition;
         multi players: Player;
         year_recorded: cal::local_date;

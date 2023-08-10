@@ -1,4 +1,4 @@
-CREATE MIGRATION m1qwwexkpirbrohp3y37xxb4urous7v7m5oeilev72iqgpcqzk672q
+CREATE MIGRATION m1yk5ojssvmn54d6wlweqtdpdoifcnvkxtxphhroepoowvfopu7pka
     ONTO initial
 {
   CREATE FUNCTION default::get_date_element(local_date: cal::local_date, element: std::str) ->  std::float64 USING (cal::date_get(local_date, element));
@@ -98,11 +98,11 @@ CREATE MIGRATION m1qwwexkpirbrohp3y37xxb4urous7v7m5oeilev72iqgpcqzk672q
   CREATE TYPE default::Composition {
       CREATE MULTI LINK arrangers: default::Person;
       CREATE MULTI LINK composers: default::Person;
+      CREATE LINK composition_date: default::Date;
       CREATE LINK key: default::Key;
       CREATE MULTI LINK lyricists: default::Person;
       CREATE LINK time_signature: default::TimeSignature;
       CREATE PROPERTY arrangement_date: cal::local_date;
-      CREATE PROPERTY composition_date: cal::local_date;
       CREATE PROPERTY title: std::str;
   };
   CREATE TYPE default::Instrument {
@@ -119,10 +119,39 @@ CREATE MIGRATION m1qwwexkpirbrohp3y37xxb4urous7v7m5oeilev72iqgpcqzk672q
   };
   CREATE TYPE default::Track {
       CREATE MULTI LINK compositions: default::Composition;
+      CREATE PROPERTY title: std::str {
+          CREATE REWRITE
+              INSERT 
+              USING ((__subject__.title ?? std::to_str(std::array_agg((WITH
+                  track := 
+                      (SELECT
+                          default::Track 
+                      LIMIT
+                          1
+                      )
+              SELECT
+                  default::Composition.title
+              FILTER
+                  std::contains(std::array_agg(track.compositions), default::Composition)
+              )), ',')));
+          CREATE REWRITE
+              UPDATE 
+              USING ((__subject__.title ?? std::to_str(std::array_agg((WITH
+                  track := 
+                      (SELECT
+                          default::Track 
+                      LIMIT
+                          1
+                      )
+              SELECT
+                  default::Composition.title
+              FILTER
+                  std::contains(std::array_agg(track.compositions), default::Composition)
+              )), ',')));
+      };
       CREATE MULTI LINK players: default::Player;
       CREATE PROPERTY duration: std::duration;
       CREATE PROPERTY number: std::int16;
-      CREATE PROPERTY title: std::str;
       CREATE PROPERTY year_mastered: cal::local_date;
       CREATE PROPERTY year_mixed: cal::local_date;
       CREATE PROPERTY year_recorded: cal::local_date;
