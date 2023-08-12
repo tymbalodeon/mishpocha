@@ -160,9 +160,15 @@ module default {
         duration: duration;
     }
 
+    type Series {
+        name: str;
+        label: Label;
+    }
+
     type Label {
         name: str;
 
+        multi link series := .<label[is Series];
         multi link albums := .<label[is Album];
         multi link artists := (
             with albums := .albums,

@@ -1,4 +1,4 @@
-CREATE MIGRATION m15gstjtv2gnbxaqvv7f2xvthhpqvtlyj7kgqyftty4lhumrc6d25a
+CREATE MIGRATION m1yx3z2onf6jiotbyzlssit25nb2nnu4uegfb4cdix257c4jdn4uoq
     ONTO initial
 {
   CREATE FUNCTION default::get_date_element(local_date: cal::local_date, element: std::str) ->  std::float64 USING (cal::date_get(local_date, element));
@@ -206,5 +206,12 @@ CREATE MIGRATION m15gstjtv2gnbxaqvv7f2xvthhpqvtlyj7kgqyftty4lhumrc6d25a
               (.person.id = id)
           ) IN .players)
       );
+  };
+  CREATE TYPE default::Series {
+      CREATE LINK label: default::Label;
+      CREATE PROPERTY name: std::str;
+  };
+  ALTER TYPE default::Label {
+      CREATE MULTI LINK series := (.<label[IS default::Series]);
   };
 };
