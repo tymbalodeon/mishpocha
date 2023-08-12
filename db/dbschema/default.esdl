@@ -160,6 +160,17 @@ module default {
         duration: duration;
     }
 
+    type Label {
+        name: str;
+
+        multi link albums := .<label[is Album];
+        multi link artists := (
+            with albums := .albums,
+            albums := (select Album filter Album in albums),
+            select albums.artists
+        );
+    }
+
     type Disc {
         title: str;
         number: int16 {
@@ -172,6 +183,7 @@ module default {
         title: str;
         multi artists: Artist;
         multi discs: Disc;
+        label: Label;
 
         property disc_total := (
             count(.discs)

@@ -1,4 +1,4 @@
-CREATE MIGRATION m1twkh3l62ybyh7ge4qw4znbs754l4qhu5mhdz2bdsoieb7ihzwk2a
+CREATE MIGRATION m15gstjtv2gnbxaqvv7f2xvthhpqvtlyj7kgqyftty4lhumrc6d25a
     ONTO initial
 {
   CREATE FUNCTION default::get_date_element(local_date: cal::local_date, element: std::str) ->  std::float64 USING (cal::date_get(local_date, element));
@@ -74,6 +74,28 @@ CREATE MIGRATION m1twkh3l62ybyh7ge4qw4znbs754l4qhu5mhdz2bdsoieb7ihzwk2a
   CREATE TYPE default::Album {
       CREATE MULTI LINK artists: default::Artist;
       CREATE PROPERTY title: std::str;
+  };
+  CREATE TYPE default::Label {
+      CREATE PROPERTY name: std::str;
+  };
+  ALTER TYPE default::Album {
+      CREATE LINK label: default::Label;
+  };
+  ALTER TYPE default::Label {
+      CREATE MULTI LINK albums := (.<label[IS default::Album]);
+      CREATE MULTI LINK artists := (WITH
+          albums := 
+              .albums
+          ,
+          albums := 
+              (SELECT
+                  default::Album
+              FILTER
+                  (default::Album IN albums)
+              )
+      SELECT
+          albums.artists
+      );
   };
   CREATE TYPE default::Disc {
       CREATE PROPERTY number: std::int16 {
