@@ -190,6 +190,7 @@ module default {
         multi artists: Artist;
         multi discs: Disc;
         label: Label;
+        series: Series;
 
         property disc_total := (
             count(.discs)

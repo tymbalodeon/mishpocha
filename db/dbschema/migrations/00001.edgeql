@@ -1,4 +1,4 @@
-CREATE MIGRATION m1yx3z2onf6jiotbyzlssit25nb2nnu4uegfb4cdix257c4jdn4uoq
+CREATE MIGRATION m1irmcerix4jt7xxfr535hzop3g7o5kn7k53pq5ri2kjxobrha6u6q
     ONTO initial
 {
   CREATE FUNCTION default::get_date_element(local_date: cal::local_date, element: std::str) ->  std::float64 USING (cal::date_get(local_date, element));
@@ -107,6 +107,13 @@ CREATE MIGRATION m1yx3z2onf6jiotbyzlssit25nb2nnu4uegfb4cdix257c4jdn4uoq
       CREATE MULTI LINK discs: default::Disc;
       CREATE PROPERTY disc_total := (std::count(.discs));
   };
+  CREATE TYPE default::Series {
+      CREATE LINK label: default::Label;
+      CREATE PROPERTY name: std::str;
+  };
+  ALTER TYPE default::Album {
+      CREATE LINK series: default::Series;
+  };
   CREATE SCALAR TYPE default::Mode EXTENDING enum<major, minor>;
   CREATE TYPE default::Key {
       CREATE LINK root: default::Note;
@@ -206,10 +213,6 @@ CREATE MIGRATION m1yx3z2onf6jiotbyzlssit25nb2nnu4uegfb4cdix257c4jdn4uoq
               (.person.id = id)
           ) IN .players)
       );
-  };
-  CREATE TYPE default::Series {
-      CREATE LINK label: default::Label;
-      CREATE PROPERTY name: std::str;
   };
   ALTER TYPE default::Label {
       CREATE MULTI LINK series := (.<label[IS default::Series]);
