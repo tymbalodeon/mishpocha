@@ -179,7 +179,7 @@ module default {
 
     type Disc {
         title: str;
-        number: int16 {
+        number: int32 {
             constraint min_value(1);
         };
         multi tracks: Track;
@@ -188,9 +188,12 @@ module default {
     type Album {
         title: str;
         multi artists: Artist;
+        multi producers: Person;
         multi discs: Disc;
         label: Label;
         series: Series;
+        series_number: int32;
+        date_released: Date;
 
         property disc_total := (
             count(.discs)
