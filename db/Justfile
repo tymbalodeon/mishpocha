@@ -22,6 +22,7 @@ _create:
     #!/usr/bin/env zsh
     if ! edgedb instance list | grep -q {{instance}}; then
         edgedb instance create {{instance}}
+        edgedb migrate --instance {{instance}}
     fi
 
 config := "edgedb-config"
