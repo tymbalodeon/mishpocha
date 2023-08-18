@@ -146,8 +146,10 @@ module default {
                     array_agg((
                     with track := (select Track limit 1)
                     select Composition.title
-                    filter contains(array_agg(track.compositions), Composition))
-                    ), ",")
+                    filter contains(
+                        array_agg(track.compositions), Composition
+                    ))
+                ), ",")
             )
         };
         multi compositions: Composition;
