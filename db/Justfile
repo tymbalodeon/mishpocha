@@ -155,10 +155,17 @@ shell:
         edgedb/edgedb-cli \
             --instance {{instance}}
 
-# Drop the persisted database.
-drop: stop
+# Drop the persisted database in docker, or "--local", or "--both".
+drop *args: stop
     #!/usr/bin/env zsh
-    if [ -n "$(just running)" ] \
-        && docker volume list | grep -q {{data}}; then
-        docker volume remove {{data}}
+    if [[ "{{args}}" =~ "(--local|--both)" ]]; then
+        edgedb instance destroy --instance {{instance}} --force >/dev/null 2>&1
+    fi
+    if [[ "{{args}}" != "--local" ]]; then
+        volumes=("$(docker volume list --quiet --filter name={{data}})")
+        if [ -n "${volumes}" ]; then
+            for volume in "${volumes}"; do
+                docker volume remove "${volume}"
+            done
+        fi
     fi
