@@ -1,4 +1,4 @@
-CREATE MIGRATION m17ghc26duvra3p72izqi3xmod6udjzgym4kyyllfltgpgs2zkzqfa
+CREATE MIGRATION m1xgruvexzyyu6se5les7ubmnvj2fpx56d3rxz7pigjz7vhw7qlz3a
     ONTO initial
 {
   CREATE FUNCTION default::get_date_element(local_date: cal::local_date, element: std::str) ->  std::float64 USING (cal::date_get(local_date, element));
@@ -21,6 +21,7 @@ CREATE MIGRATION m17ghc26duvra3p72izqi3xmod6udjzgym4kyyllfltgpgs2zkzqfa
   CREATE TYPE default::Note {
       CREATE PROPERTY accidental: default::Accidental;
       CREATE PROPERTY name: default::NoteName;
+      CREATE CONSTRAINT std::exclusive ON ((.name, .accidental));
   };
   CREATE TYPE default::Person {
       CREATE LINK birth_date: default::Date;
@@ -65,18 +66,20 @@ CREATE MIGRATION m17ghc26duvra3p72izqi3xmod6udjzgym4kyyllfltgpgs2zkzqfa
       CREATE PROPERTY last_name: std::str;
       CREATE PROPERTY full_name := ((((.first_name ++ ' ') IF (.first_name != '') ELSE '') ++ .last_name));
   };
+  CREATE TYPE default::Album {
+      CREATE LINK date_released: default::Date;
+      CREATE MULTI LINK producers: default::Person;
+      CREATE PROPERTY series_number: std::int32;
+      CREATE PROPERTY title: std::str;
+  };
   CREATE TYPE default::Artist {
       CREATE MULTI LINK members: default::Person;
       CREATE PROPERTY name: std::str;
       CREATE PROPERTY year_end: cal::local_date;
       CREATE PROPERTY year_start: cal::local_date;
   };
-  CREATE TYPE default::Album {
+  ALTER TYPE default::Album {
       CREATE MULTI LINK artists: default::Artist;
-      CREATE LINK date_released: default::Date;
-      CREATE MULTI LINK producers: default::Person;
-      CREATE PROPERTY series_number: std::int32;
-      CREATE PROPERTY title: std::str;
   };
   CREATE TYPE default::Label {
       CREATE PROPERTY name: std::str;
@@ -100,6 +103,9 @@ CREATE MIGRATION m17ghc26duvra3p72izqi3xmod6udjzgym4kyyllfltgpgs2zkzqfa
           albums.artists
       );
   };
+  ALTER TYPE default::Artist {
+      CREATE MULTI LINK albums := (.<artists[IS default::Album]);
+  };
   CREATE TYPE default::Disc {
       CREATE PROPERTY number: std::int32 {
           CREATE CONSTRAINT std::min_value(1);
@@ -117,15 +123,20 @@ CREATE MIGRATION m17ghc26duvra3p72izqi3xmod6udjzgym4kyyllfltgpgs2zkzqfa
   ALTER TYPE default::Album {
       CREATE LINK series: default::Series;
   };
+  ALTER TYPE default::Person {
+      CREATE MULTI LINK groups := (.<members[IS default::Artist]);
+  };
   CREATE SCALAR TYPE default::Mode EXTENDING enum<major, minor>;
   CREATE TYPE default::Key {
       CREATE LINK root: default::Note;
       CREATE PROPERTY mode: default::Mode;
+      CREATE CONSTRAINT std::exclusive ON ((.root, .mode));
   };
   CREATE SCALAR TYPE default::Denominator EXTENDING enum<`1`, `2`, `4`, `8`, `16`, `32`, `64`>;
   CREATE TYPE default::TimeSignature {
       CREATE PROPERTY denominator: default::Denominator;
       CREATE PROPERTY numerator: std::int16;
+      CREATE CONSTRAINT std::exclusive ON ((.numerator, .denominator));
   };
   CREATE TYPE default::Composition {
       CREATE MULTI LINK arrangers: default::Person;
@@ -138,7 +149,12 @@ CREATE MIGRATION m17ghc26duvra3p72izqi3xmod6udjzgym4kyyllfltgpgs2zkzqfa
       CREATE PROPERTY title: std::str;
   };
   ALTER TYPE default::Person {
+      CREATE MULTI LINK arrangements := (.<arrangers[IS default::Composition]);
+      CREATE PROPERTY is_arranger := ((std::count(.arrangements) > 0));
       CREATE MULTI LINK compositions := (.<composers[IS default::Composition]);
+      CREATE PROPERTY is_composer := ((std::count(.compositions) > 0));
+      CREATE MULTI LINK lyrics := (.<lyricists[IS default::Composition]);
+      CREATE PROPERTY is_lyricist := ((std::count(.lyrics) > 0));
   };
   ALTER TYPE default::Date {
       CREATE MULTI LINK compositions := (.<composition_date[IS default::Composition]);
@@ -147,8 +163,9 @@ CREATE MIGRATION m17ghc26duvra3p72izqi3xmod6udjzgym4kyyllfltgpgs2zkzqfa
   };
   CREATE TYPE default::Instrument {
       CREATE LINK tuning: default::Note;
-      CREATE PROPERTY aliases: array<std::str>;
       CREATE PROPERTY name: std::str;
+      CREATE CONSTRAINT std::exclusive ON ((.name, .tuning));
+      CREATE PROPERTY aliases: array<std::str>;
   };
   ALTER TYPE default::Composition {
       CREATE MULTI LINK instrumentation: default::Instrument;
@@ -156,6 +173,7 @@ CREATE MIGRATION m17ghc26duvra3p72izqi3xmod6udjzgym4kyyllfltgpgs2zkzqfa
   CREATE TYPE default::Player {
       CREATE LINK instrument: default::Instrument;
       CREATE LINK person: default::Person;
+      CREATE CONSTRAINT std::exclusive ON ((.person, .instrument));
   };
   CREATE TYPE default::Track {
       CREATE MULTI LINK compositions: default::Composition;
@@ -216,6 +234,7 @@ CREATE MIGRATION m17ghc26duvra3p72izqi3xmod6udjzgym4kyyllfltgpgs2zkzqfa
               (.person.id = id)
           ) IN .players)
       );
+      CREATE PROPERTY is_player := ((std::count(.<person[IS default::Player]) > 0));
   };
   ALTER TYPE default::Label {
       CREATE MULTI LINK series := (.<label[IS default::Series]);

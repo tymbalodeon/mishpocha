@@ -72,6 +72,13 @@ module default {
                 and latest_day >= .birth_date.day
                 else age - 1
         );
+        multi link compositions := .<composers[is Composition];
+        multi link arrangements := .<arrangers[is Composition];
+        multi link lyrics := .<lyricists[is Composition];
+        property is_composer := count(.compositions) > 0;
+        property is_arranger := count(.arrangements) > 0;
+        property is_lyricist := count(.lyrics) > 0;
+        property is_player := count(.<person[is Player]) > 0;
         multi link instruments := (
             with id := .id
             select Instrument
@@ -81,7 +88,7 @@ module default {
             )
             in .players
         );
-        multi link compositions := .<composers[is Composition]
+        multi link groups := .<members[is Artist];
     }
 
     scalar type NoteName extending enum<C, D, E, F, G, A, B>;
@@ -90,12 +97,16 @@ module default {
     type Note {
         name: NoteName;
         accidental: Accidental;
+
+        constraint exclusive on ((.name, .accidental));
     }
 
     type Instrument {
         name: str;
         aliases: array<str>;
         tuning: Note;
+
+        constraint exclusive on ((.name, .tuning));
 
         multi link players := .<instrument[is Player];
     }
@@ -105,6 +116,8 @@ module default {
     type Key {
         root: Note;
         mode: Mode;
+
+        constraint exclusive on ((.root, .mode));
     }
 
     scalar type Denominator extending enum<1, 2, 4, 8, 16, 32, 64>;
@@ -112,6 +125,8 @@ module default {
     type TimeSignature {
         numerator: int16;
         denominator: Denominator;
+
+        constraint exclusive on ((.numerator, .denominator));
     }
 
     type Composition {
@@ -129,6 +144,8 @@ module default {
     type Player {
         person: Person;
         instrument: Instrument;
+
+        constraint exclusive on ((.person, .instrument));
     }
 
     type Artist {
@@ -136,6 +153,7 @@ module default {
         multi members: Person;
         year_start: cal::local_date;
         year_end: cal::local_date;
+        multi link albums := .<artists[is Album];
     }
 
     type Track {
