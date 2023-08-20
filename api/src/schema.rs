@@ -8,9 +8,9 @@ pub struct Date {
     pub year: Option<Vec<i32>>,
     pub display: Option<String>,
     pub local_date: Option<LocalDate>,
-    pub birhtdays: Option<Vec<Person>>,
-    pub deathdays: Option<Vec<Person>>,
-    pub compositions: Option<Vec<Composition>>,
+    // pub birhtdays: Option<Vec<Person>>,
+    // pub deathdays: Option<Vec<Person>>,
+    // pub compositions: Option<Vec<Composition>>,
 }
 
 #[derive(Debug, Queryable)]
@@ -23,14 +23,14 @@ pub struct Person {
     pub is_alive: Option<bool>,
     pub full_name: Option<String>,
     pub age: Option<i32>,
-    pub compositions: Option<Composition>,
-    pub arrangements: Option<Composition>,
-    pub lyrics: Option<Composition>,
+    // pub compositions: Option<Composition>,
+    // pub arrangements: Option<Composition>,
+    // pub lyrics: Option<Composition>,
     pub is_composer: Option<bool>,
     pub is_arranger: Option<bool>,
     pub is_lyricist: Option<bool>,
     pub is_player: Option<bool>,
-    pub instruments: Option<Vec<Instrument>>,
+    // pub instruments: Option<Vec<Instrument>>,
 }
 
 #[derive(Debug, Queryable)]
@@ -62,7 +62,7 @@ pub struct Instrument {
     pub name: Option<String>,
     pub aliases: Option<Vec<String>>,
     pub tuning: Option<Note>,
-    pub players: Option<Player>,
+    // pub players: Option<Player>,
 }
 
 #[derive(Debug, Queryable)]
