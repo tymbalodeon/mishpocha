@@ -13,7 +13,20 @@ async fn get_person() -> impl Responder {
     let client = edgedb_tokio::create_client()
         .await
         .expect("Failed to connect to database");
-    let query = "select Person {*};";
+    let query = "select Person {
+        first_name,
+        last_name,
+        aliases,
+        birth_date,
+        death_date,
+        is_alive,
+        full_name,
+        age,
+        is_composer,
+        is_arranger,
+        is_lyricist,
+        is_player,
+    };";
     let person: Vec<Person> = client
         .query(query, &())
         .await
