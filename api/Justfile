@@ -6,6 +6,6 @@
     env EDGEDB_DSN="$( \
         edgedb instance credentials \
             --insecure-dsn \
-            --instance mishpocha \
+            --instance mishpocha_db \
         )?tls_security=insecure" \
     cargo run

@@ -1,17 +1,11 @@
+mod schema;
+
 use actix_web::{get, App, HttpResponse, HttpServer, Responder};
-use edgedb_derive::Queryable;
-use serde::Deserialize;
+use schema::{Instrument, Person};
 
 #[get("/")]
 async fn welcome() -> impl Responder {
     HttpResponse::Ok().body("Welcome to the Mishpocha database!")
-}
-
-#[derive(Debug, Deserialize, Queryable)]
-pub struct Person {
-    pub full_name: Option<String>,
-    pub last_name: Option<String>,
-    pub aliases: Option<Vec<String>>,
 }
 
 #[get("/person")]
@@ -23,7 +17,7 @@ async fn get_person() -> impl Responder {
     select Person {
         full_name,
         last_name,
-        aliases,
+        aliases
     };
 ";
     let person: Vec<Person> = client
@@ -36,11 +30,6 @@ async fn get_person() -> impl Responder {
         .collect::<Vec<String>>()
         .join("\n");
     HttpResponse::Ok().body(result)
-}
-
-#[derive(Debug, Deserialize, Queryable)]
-pub struct Instrument {
-    pub name: Option<String>,
 }
 
 #[get("/instrument")]
