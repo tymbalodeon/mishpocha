@@ -2,6 +2,18 @@ use edgedb_derive::Queryable;
 use edgedb_protocol::model::LocalDate;
 
 #[derive(Debug, Queryable)]
+pub struct Date {
+    pub day: Option<i16>,
+    pub month: Option<i16>,
+    pub year: Option<Vec<i32>>,
+    pub display: Option<String>,
+    pub local_date: Option<LocalDate>,
+    pub birhtdays: Option<Vec<Person>>,
+    pub deathdays: Option<Vec<Person>>,
+    pub compositions: Option<Vec<Composition>>,
+}
+
+#[derive(Debug, Queryable)]
 pub struct Key {
     pub name: Option<String>,
 }
@@ -21,18 +33,6 @@ pub struct Composition {
     pub instrumentation: Option<Instrument>,
     pub key: Option<Key>,
     pub time_signature: Option<TimeSignature>,
-}
-
-#[derive(Debug, Queryable)]
-pub struct Date {
-    pub day: Option<i16>,
-    pub month: Option<i16>,
-    pub year: Option<Vec<i32>>,
-    pub display: Option<String>,
-    pub local_date: Option<LocalDate>,
-    pub birhtdays: Option<Vec<Person>>,
-    pub deathdays: Option<Vec<Person>>,
-    pub compositions: Option<Vec<Composition>>,
 }
 
 #[derive(Debug, Queryable)]
