@@ -1,4 +1,4 @@
-CREATE MIGRATION m1xgruvexzyyu6se5les7ubmnvj2fpx56d3rxz7pigjz7vhw7qlz3a
+CREATE MIGRATION m14ckqoa7fnqakzubqeqszkqylfx4bxu2ectxz2cozzn4vs6mqrn3q
     ONTO initial
 {
   CREATE FUNCTION default::get_date_element(local_date: cal::local_date, element: std::str) ->  std::float64 USING (cal::date_get(local_date, element));
@@ -74,9 +74,9 @@ CREATE MIGRATION m1xgruvexzyyu6se5les7ubmnvj2fpx56d3rxz7pigjz7vhw7qlz3a
   };
   CREATE TYPE default::Artist {
       CREATE MULTI LINK members: default::Person;
+      CREATE LINK year_end: default::Date;
+      CREATE LINK year_start: default::Date;
       CREATE PROPERTY name: std::str;
-      CREATE PROPERTY year_end: cal::local_date;
-      CREATE PROPERTY year_start: cal::local_date;
   };
   ALTER TYPE default::Album {
       CREATE MULTI LINK artists: default::Artist;
@@ -139,13 +139,13 @@ CREATE MIGRATION m1xgruvexzyyu6se5les7ubmnvj2fpx56d3rxz7pigjz7vhw7qlz3a
       CREATE CONSTRAINT std::exclusive ON ((.numerator, .denominator));
   };
   CREATE TYPE default::Composition {
+      CREATE LINK arrangement_date: default::Date;
       CREATE MULTI LINK arrangers: default::Person;
       CREATE MULTI LINK composers: default::Person;
       CREATE LINK composition_date: default::Date;
       CREATE LINK key: default::Key;
       CREATE MULTI LINK lyricists: default::Person;
       CREATE LINK time_signature: default::TimeSignature;
-      CREATE PROPERTY arrangement_date: cal::local_date;
       CREATE PROPERTY title: std::str;
   };
   ALTER TYPE default::Person {
@@ -207,13 +207,13 @@ CREATE MIGRATION m1xgruvexzyyu6se5les7ubmnvj2fpx56d3rxz7pigjz7vhw7qlz3a
                   std::contains(std::array_agg(track.compositions), default::Composition)
               )), ',')));
       };
+      CREATE LINK year_mastered: default::Date;
+      CREATE LINK year_mixed: default::Date;
+      CREATE LINK year_recorded: default::Date;
+      CREATE LINK year_released: default::Date;
       CREATE MULTI LINK players: default::Player;
       CREATE PROPERTY duration: std::duration;
       CREATE PROPERTY number: std::int16;
-      CREATE PROPERTY year_mastered: cal::local_date;
-      CREATE PROPERTY year_mixed: cal::local_date;
-      CREATE PROPERTY year_recorded: cal::local_date;
-      CREATE PROPERTY year_released: cal::local_date;
   };
   ALTER TYPE default::Disc {
       CREATE MULTI LINK tracks: default::Track;

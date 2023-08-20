@@ -135,7 +135,7 @@ module default {
         multi lyricists: Person;
         multi arrangers: Person;
         composition_date: Date;
-        arrangement_date: cal::local_date;
+        arrangement_date: Date;
         multi instrumentation: Instrument;
         key: Key;
         time_signature: TimeSignature;
@@ -151,8 +151,8 @@ module default {
     type Artist {
         name: str;
         multi members: Person;
-        year_start: cal::local_date;
-        year_end: cal::local_date;
+        year_start: Date;
+        year_end: Date;
         multi link albums := .<artists[is Album];
     }
 
@@ -172,10 +172,10 @@ module default {
         };
         multi compositions: Composition;
         multi players: Player;
-        year_recorded: cal::local_date;
-        year_released: cal::local_date;
-        year_mastered: cal::local_date;
-        year_mixed: cal::local_date;
+        year_recorded: Date;
+        year_released: Date;
+        year_mastered: Date;
+        year_mixed: Date;
         number: int16;
         duration: duration;
     }
