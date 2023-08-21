@@ -39,13 +39,12 @@ async fn get_people() -> impl Responder {
 }
 
 #[derive(Deserialize)]
-struct Person {
-    first_name: String,
-    last_name: String,
+struct FullName {
+    full_name: String,
 }
 
 #[get("/person")]
-async fn get_person(person: Query<Person>) -> impl Responder {
+async fn get_person(query: Query<FullName>) -> impl Responder {
     let client = edgedb_tokio::create_client()
         .await
         .expect("Failed to connect to database");
@@ -55,16 +54,21 @@ async fn get_person(person: Query<Person>) -> impl Responder {
                 "
                 select Person { * }
                 filter {
-                    .first_name = <str>$0,
-                    .last_name = <str>$1
+                    .full_name = <str>$0
                 };
                 ",
-                &(&person.first_name, &person.last_name),
+                &(&query.full_name,),
             )
             .await
             .expect("failed to execute query")
             .to_string(),
     )
+}
+
+#[derive(Deserialize)]
+struct Person {
+    first_name: String,
+    last_name: String,
 }
 
 #[post("/person")]

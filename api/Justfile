@@ -36,7 +36,6 @@ seed: start
     http {{local_url}}/people | jq
 
 # View people in the database.
-person first_name last_name: start
+person full_name: start
     #!/usr/bin/env zsh
-    query="first_name={{first_name}}&last_name={{last_name}}"
-    http "{{local_url}}/person?${query}" | jq
+    http "{{local_url}}/person?full_name={{full_name}}" | jq
