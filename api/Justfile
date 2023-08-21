@@ -26,9 +26,19 @@ stop:
 # Seed the database with initial data.
 seed: start
     #!/usr/bin/env zsh
-    cd seed/person
+    cd seed/date
     for file in $(ls); do
-        http POST {{local_url}}/person < "${file}"
+        http POST {{local_url}}/date < "${file}"
+    done
+    cd ../person
+    for file in $(ls); do
+        first_name="$(cat "${file}" | jq ".first_name")"
+        last_name="$(cat "${file}" | jq ".last_name")"
+        full_name="${first_name} ${last_name}"
+        person="$(just person "${full_name}")"
+        if [ "${person}" = "[]" ]; then
+            http POST {{local_url}}/person < "${file}"
+        fi
     done
 
 # View people in the database.

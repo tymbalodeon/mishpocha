@@ -10,7 +10,7 @@ async fn welcome() -> impl Responder {
     HttpResponse::Ok().body("Welcome to the Mishpocha database!")
 }
 
-#[get("/date")]
+#[get("/dates")]
 async fn get_dates() -> impl Responder {
     let client = edgedb_tokio::create_client()
         .await
@@ -69,6 +69,7 @@ async fn get_person(query: Query<FullName>) -> impl Responder {
 struct Person {
     first_name: String,
     last_name: String,
+    birthdate_display: String,
 }
 
 #[post("/person")]
@@ -82,10 +83,49 @@ async fn post_person(person: Json<Person>) -> impl Responder {
                 "
                 insert Person {
                     first_name := <str>$0,
-                    last_name := <str>$1
-                };
+                    last_name := <str>$1,
+                    birth_date := (
+                        select Date
+                        filter .display = <str>$2
+                        limit 1
+                    )
+                } unless conflict;
                 ",
-                &(&person.first_name, &person.last_name),
+                &(
+                    &person.first_name,
+                    &person.last_name,
+                    &person.birthdate_display,
+                ),
+            )
+            .await
+            .expect("failed to execute query")
+            .to_string(),
+    )
+}
+
+#[derive(Deserialize)]
+struct Date {
+    day: i16,
+    month: i16,
+    year: i32,
+}
+
+#[post("/date")]
+async fn post_date(date: Json<Date>) -> impl Responder {
+    let client = edgedb_tokio::create_client()
+        .await
+        .expect("Failed to connect to database");
+    HttpResponse::Ok().body(
+        client
+            .query_json(
+                "
+                insert Date {
+                    day := <int16>$0,
+                    month := <int16>$1,
+                    year := <int32>$2
+                } unless conflict;
+                ",
+                &(&date.day, &date.month, &date.year),
             )
             .await
             .expect("failed to execute query")
@@ -116,6 +156,7 @@ async fn main() -> std::io::Result<()> {
             .service(get_people)
             .service(post_person)
             .service(get_person)
+            .service(post_date)
             .service(get_instruments)
     })
     .bind(("127.0.0.1", 8080))?
