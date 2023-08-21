@@ -1,4 +1,4 @@
-use actix_web::{get, App, HttpResponse, HttpServer, Responder};
+use actix_web::{get, post, App, HttpResponse, HttpServer, Responder};
 
 #[get("/")]
 async fn welcome() -> impl Responder {
@@ -15,7 +15,7 @@ async fn get_dates() -> impl Responder {
             .query_json("select Date {*};", &())
             .await
             .expect("failed to execute query")
-            .to_string()
+            .to_string(),
     )
 }
 
@@ -29,7 +29,29 @@ async fn get_people() -> impl Responder {
             .query_json("select Person {*};", &())
             .await
             .expect("failed to execute query")
-            .to_string()
+            .to_string(),
+    )
+}
+
+
+#[post("/person")]
+async fn post_person(first_name: String, last_name: String) -> impl Responder {
+    let client = edgedb_tokio::create_client()
+        .await
+        .expect("Failed to connect to database");
+    HttpResponse::Ok().body(
+        client
+            .query_json(
+                "
+                insert Person {
+                    first_name := <str>$0,
+                    last_name := <str>$1};
+                ",
+                &(first_name, last_name),
+            )
+            .await
+            .expect("failed to execute query")
+            .to_string(),
     )
 }
 
@@ -43,7 +65,7 @@ async fn get_instruments() -> impl Responder {
             .query_json("select Instrument {*};", &())
             .await
             .expect("failed to execute query")
-            .to_string()
+            .to_string(),
     )
 }
 
@@ -54,6 +76,7 @@ async fn main() -> std::io::Result<()> {
             .service(welcome)
             .service(get_dates)
             .service(get_people)
+            .service(post_person)
             .service(get_instruments)
     })
     .bind(("127.0.0.1", 8080))?

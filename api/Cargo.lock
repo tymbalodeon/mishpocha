@@ -952,6 +952,7 @@ dependencies = [
  "edgedb-protocol",
  "edgedb-tokio",
  "serde",
+ "serde_json",
  "tokio",
  "uuid",
 ]
