@@ -153,10 +153,10 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .service(welcome)
             .service(get_dates)
-            .service(get_people)
-            .service(post_person)
-            .service(get_person)
             .service(post_date)
+            .service(get_people)
+            .service(get_person)
+            .service(post_person)
             .service(get_instruments)
     })
     .bind(("127.0.0.1", 8080))?
