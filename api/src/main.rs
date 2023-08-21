@@ -1,5 +1,7 @@
 use actix_web::{
-    get, post, web::Json, App, HttpResponse, HttpServer, Responder,
+    get, post,
+    web::{Json, Query},
+    App, HttpResponse, HttpServer, Responder,
 };
 use serde::Deserialize;
 
@@ -42,6 +44,29 @@ struct Person {
     last_name: String,
 }
 
+#[get("/person")]
+async fn get_person(person: Query<Person>) -> impl Responder {
+    let client = edgedb_tokio::create_client()
+        .await
+        .expect("Failed to connect to database");
+    HttpResponse::Ok().body(
+        client
+            .query_json(
+                "
+                select Person { * }
+                filter {
+                    .first_name = <str>$0,
+                    .last_name = <str>$1
+                };
+                ",
+                &(&person.first_name, &person.last_name),
+            )
+            .await
+            .expect("failed to execute query")
+            .to_string(),
+    )
+}
+
 #[post("/person")]
 async fn post_person(person: Json<Person>) -> impl Responder {
     let client = edgedb_tokio::create_client()
@@ -53,7 +78,8 @@ async fn post_person(person: Json<Person>) -> impl Responder {
                 "
                 insert Person {
                     first_name := <str>$0,
-                    last_name := <str>$1};
+                    last_name := <str>$1
+                };
                 ",
                 &(&person.first_name, &person.last_name),
             )
@@ -70,7 +96,7 @@ async fn get_instruments() -> impl Responder {
         .expect("Failed to connect to database");
     HttpResponse::Ok().body(
         client
-            .query_json("select Instrument {*};", &())
+            .query_json("select Instrument { * };", &())
             .await
             .expect("failed to execute query")
             .to_string(),
@@ -85,6 +111,7 @@ async fn main() -> std::io::Result<()> {
             .service(get_dates)
             .service(get_people)
             .service(post_person)
+            .service(get_person)
             .service(get_instruments)
     })
     .bind(("127.0.0.1", 8080))?
