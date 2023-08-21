@@ -1,25 +1,36 @@
 @_help:
     just --list
 
-# Run the server.
-@run:
-    env EDGEDB_DSN="$( \
-        edgedb instance credentials \
-            --insecure-dsn \
-            --instance mishpocha_db \
-        )?tls_security=insecure" \
-    cargo run
-
 local_url := "http://localhost:8080"
 
+# Run the server.
+start:
+    #!/usr/bin/env zsh
+    if ! http GET {{local_url}} &>/dev/null; then
+        env EDGEDB_DSN="$( \
+            edgedb instance credentials \
+                --insecure-dsn \
+                --instance mishpocha_db \
+            )?tls_security=insecure" \
+        cargo run &>/dev/null &
+    fi
+
+# Stop the server.
+stop:
+    #!/usr/bin/env zsh
+    mishpocha="$(pgrep mishpocha-api)"
+    if [ -n "${mishpocha}" ]; then
+        kill "${mishpocha}" &>/dev/null
+    fi
+
 # Seed the database with initial data.
-seed:
+seed: start
     #!/usr/bin/env zsh
     cd seed/person
     for file in $(ls); do
         http POST {{local_url}}/person < "${file}"
     done
 
-# View people in the database;
-@people:
+# View people in the database.
+@people: start
     http {{local_url}}/people | jq
