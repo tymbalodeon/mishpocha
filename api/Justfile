@@ -9,3 +9,17 @@
             --instance mishpocha_db \
         )?tls_security=insecure" \
     cargo run
+
+local_url := "http://localhost:8080"
+
+# Seed the database with initial data.
+seed:
+    #!/usr/bin/env zsh
+    cd seed/person
+    for file in $(ls); do
+        http POST {{local_url}}/person < "${file}"
+    done
+
+# View people in the database;
+@people:
+    http {{local_url}}/people | jq

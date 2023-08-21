@@ -1,4 +1,7 @@
-use actix_web::{get, post, App, HttpResponse, HttpServer, Responder};
+use actix_web::{
+    get, post, web::Json, App, HttpResponse, HttpServer, Responder,
+};
+use serde::Deserialize;
 
 #[get("/")]
 async fn welcome() -> impl Responder {
@@ -33,9 +36,14 @@ async fn get_people() -> impl Responder {
     )
 }
 
+#[derive(Deserialize)]
+struct Person {
+    first_name: String,
+    last_name: String,
+}
 
 #[post("/person")]
-async fn post_person(first_name: String, last_name: String) -> impl Responder {
+async fn post_person(person: Json<Person>) -> impl Responder {
     let client = edgedb_tokio::create_client()
         .await
         .expect("Failed to connect to database");
@@ -47,7 +55,7 @@ async fn post_person(first_name: String, last_name: String) -> impl Responder {
                     first_name := <str>$0,
                     last_name := <str>$1};
                 ",
-                &(first_name, last_name),
+                &(&person.first_name, &person.last_name),
             )
             .await
             .expect("failed to execute query")
