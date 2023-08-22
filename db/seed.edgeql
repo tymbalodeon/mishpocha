@@ -3,8 +3,7 @@ with dates := <json>(
     { day := 5, month := 4, year := 1944 },
     { day := 8, month := 3, year := 1947 },
     { day := 22, month := 4, year := 1947 },
-),
-for date in json_array_unpack(dates) union (
+) for date in json_array_unpack(dates) union (
     insert Date {
         day := <int16>date["day"],
         month := <int16>date["month"],
@@ -33,8 +32,7 @@ with people := <json>(
         last_name := "McPhee",
         birth_date_display := "1939-11-3"
     },
-),
-for person in json_array_unpack(people) union (
+) for person in json_array_unpack(people) union (
     insert Person {
         first_name := <str>person["first_name"],
         last_name := <str>person["last_name"],
@@ -52,8 +50,7 @@ with instruments := <json>(
     { name := "tenor saxophone" },
     { name := "bass" },
     { name := "drums" },
-),
-for instrument in json_array_unpack(instruments) union (
+) for instrument in json_array_unpack(instruments) union (
     insert Instrument {
         name := <str>instrument["name"],
     } unless conflict
@@ -80,8 +77,7 @@ with players := <json>(
         person_name := "Joe McPhee",
         instrument_name := "trumpet",
     },
-),
-for player in json_array_unpack(players) union (
+) for player in json_array_unpack(players) union (
     insert Player {
         person := (
             select Person
@@ -95,7 +91,6 @@ for player in json_array_unpack(players) union (
         )
     } unless conflict
 );
-
 
 with tracks := <json>(
     {
@@ -144,8 +139,7 @@ with tracks := <json>(
             { full_name := "Joe McPhee", instrument := "trumpet" },
         )
     },
-)
-for track in json_array_unpack(tracks) union (
+) for track in json_array_unpack(tracks) union (
     insert Track {
         title := <str>track["title"],
         number := <int16>track["number"],
