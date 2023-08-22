@@ -34,7 +34,7 @@ module default {
     type Person {
         first_name: str;
         last_name: str;
-        aliases: array<str>;
+        multi aliases: str;
         birth_date: Date;
         death_date: Date;
         is_alive: bool {
@@ -75,6 +75,11 @@ module default {
         multi link compositions := .<composers[is Composition];
         multi link arrangements := .<arrangers[is Composition];
         multi link lyrics := .<lyricists[is Composition];
+        multi link tracks := (
+            with id := .id
+            select Track
+            filter .players.person.id = id
+        );
         property is_composer := count(.compositions) > 0;
         property is_arranger := count(.arrangements) > 0;
         property is_lyricist := count(.lyrics) > 0;
@@ -82,11 +87,7 @@ module default {
         multi link instruments := (
             with id := .id
             select Instrument
-            filter (
-                select Player
-                filter .person.id = id
-            )
-            in .players
+            filter .players.person.id = id
         );
         multi link groups := .<members[is Artist];
     }
@@ -103,7 +104,7 @@ module default {
 
     type Instrument {
         name: str;
-        aliases: array<str>;
+        multi aliases: str;
         tuning: Note;
 
         constraint exclusive on ((.name, .tuning));
@@ -151,8 +152,8 @@ module default {
     type Artist {
         name: str;
         multi members: Person;
-        year_start: Date;
-        year_end: Date;
+        date_start: Date;
+        date_end: Date;
         multi link albums := .<artists[is Album];
     }
 
@@ -172,10 +173,10 @@ module default {
         };
         multi compositions: Composition;
         multi players: Player;
-        year_recorded: Date;
-        year_released: Date;
-        year_mastered: Date;
-        year_mixed: Date;
+        date_recorded: Date;
+        date_released: Date;
+        date_mastered: Date;
+        date_mixed: Date;
         number: int16;
         duration: duration;
     }

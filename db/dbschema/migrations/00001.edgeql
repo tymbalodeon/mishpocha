@@ -1,4 +1,4 @@
-CREATE MIGRATION m14ckqoa7fnqakzubqeqszkqylfx4bxu2ectxz2cozzn4vs6mqrn3q
+CREATE MIGRATION m1zomvq76prt6jeiq45vypuza57w6yokbcwiyj3kyohl5bq27zigia
     ONTO initial
 {
   CREATE FUNCTION default::get_date_element(local_date: cal::local_date, element: std::str) ->  std::float64 USING (cal::date_get(local_date, element));
@@ -61,7 +61,7 @@ CREATE MIGRATION m14ckqoa7fnqakzubqeqszkqylfx4bxu2ectxz2cozzn4vs6mqrn3q
               UPDATE 
               USING ((__subject__.is_alive ?? NOT (EXISTS (__subject__.death_date))));
       };
-      CREATE PROPERTY aliases: array<std::str>;
+      CREATE MULTI PROPERTY aliases: std::str;
       CREATE PROPERTY first_name: std::str;
       CREATE PROPERTY last_name: std::str;
       CREATE PROPERTY full_name := ((((.first_name ++ ' ') IF (.first_name != '') ELSE '') ++ .last_name));
@@ -73,9 +73,9 @@ CREATE MIGRATION m14ckqoa7fnqakzubqeqszkqylfx4bxu2ectxz2cozzn4vs6mqrn3q
       CREATE PROPERTY title: std::str;
   };
   CREATE TYPE default::Artist {
+      CREATE LINK date_end: default::Date;
+      CREATE LINK date_start: default::Date;
       CREATE MULTI LINK members: default::Person;
-      CREATE LINK year_end: default::Date;
-      CREATE LINK year_start: default::Date;
       CREATE PROPERTY name: std::str;
   };
   ALTER TYPE default::Album {
@@ -165,7 +165,7 @@ CREATE MIGRATION m14ckqoa7fnqakzubqeqszkqylfx4bxu2ectxz2cozzn4vs6mqrn3q
       CREATE LINK tuning: default::Note;
       CREATE PROPERTY name: std::str;
       CREATE CONSTRAINT std::exclusive ON ((.name, .tuning));
-      CREATE PROPERTY aliases: array<std::str>;
+      CREATE MULTI PROPERTY aliases: std::str;
   };
   ALTER TYPE default::Composition {
       CREATE MULTI LINK instrumentation: default::Instrument;
@@ -207,10 +207,10 @@ CREATE MIGRATION m14ckqoa7fnqakzubqeqszkqylfx4bxu2ectxz2cozzn4vs6mqrn3q
                   std::contains(std::array_agg(track.compositions), default::Composition)
               )), ',')));
       };
-      CREATE LINK year_mastered: default::Date;
-      CREATE LINK year_mixed: default::Date;
-      CREATE LINK year_recorded: default::Date;
-      CREATE LINK year_released: default::Date;
+      CREATE LINK date_mastered: default::Date;
+      CREATE LINK date_mixed: default::Date;
+      CREATE LINK date_recorded: default::Date;
+      CREATE LINK date_released: default::Date;
       CREATE MULTI LINK players: default::Player;
       CREATE PROPERTY duration: std::duration;
       CREATE PROPERTY number: std::int16;
@@ -228,11 +228,15 @@ CREATE MIGRATION m14ckqoa7fnqakzubqeqszkqylfx4bxu2ectxz2cozzn4vs6mqrn3q
       SELECT
           default::Instrument
       FILTER
-          ((SELECT
-              default::Player
-          FILTER
-              (.person.id = id)
-          ) IN .players)
+          (.players.person.id = id)
+      );
+      CREATE MULTI LINK tracks := (WITH
+          id := 
+              .id
+      SELECT
+          default::Track
+      FILTER
+          (.players.person.id = id)
       );
       CREATE PROPERTY is_player := ((std::count(.<person[IS default::Player]) > 0));
   };

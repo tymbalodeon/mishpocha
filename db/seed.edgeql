@@ -85,3 +85,33 @@ for player in json_array_unpack(players) union (
         )
     } unless conflict
 );
+
+
+with tracks := <json>(
+    {
+        title := "Not Yet",
+        number := 1
+    },
+    {
+        title := "The Masks",
+        number := 2
+    },
+    {
+        title := "Craig's Story",
+        number := 3
+    },
+    {
+        title := "Pedal (for Warren)",
+        number := 4
+    },
+    {
+        title := "Then Paul saw the Snake (for Susan)",
+        number := 5
+    },
+),
+for track in json_array_unpack(tracks) union (
+    insert Track {
+        title := <str>track["title"],
+        number := <int16>track["number"],
+    } unless conflict
+);
