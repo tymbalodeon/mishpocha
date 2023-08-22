@@ -151,8 +151,12 @@ module default {
     }
 
     type Player {
-        person: Person;
-        instrument: Instrument;
+        person: Person {
+            on target delete delete source
+        };
+        instrument: Instrument {
+            on target delete delete source
+        };
 
         constraint exclusive on ((.person, .instrument));
     }

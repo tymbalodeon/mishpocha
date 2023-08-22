@@ -1,4 +1,4 @@
-CREATE MIGRATION m1vgyzqhthsvapvewsl4s46hbzev5ubgdfvnvsbibi7ippoyo7aeza
+CREATE MIGRATION m1gdtcqmm7u5crofbqtmm3ltafzji4emvynubfmw3qpp6dih6bui3q
     ONTO initial
 {
   CREATE FUNCTION default::get_date_element(local_date: cal::local_date, element: std::str) ->  std::float64 USING (cal::date_get(local_date, element));
@@ -177,8 +177,12 @@ CREATE MIGRATION m1vgyzqhthsvapvewsl4s46hbzev5ubgdfvnvsbibi7ippoyo7aeza
       CREATE MULTI LINK instrumentation: default::Instrument;
   };
   CREATE TYPE default::Player {
-      CREATE LINK instrument: default::Instrument;
-      CREATE LINK person: default::Person;
+      CREATE LINK instrument: default::Instrument {
+          ON TARGET DELETE DELETE SOURCE;
+      };
+      CREATE LINK person: default::Person {
+          ON TARGET DELETE DELETE SOURCE;
+      };
       CREATE CONSTRAINT std::exclusive ON ((.person, .instrument));
   };
   CREATE TYPE default::Track {
