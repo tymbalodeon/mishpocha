@@ -70,7 +70,7 @@ with players := <json>(
     },
     {
         person_name := "Barry Guy",
-        instrument_name := "Bass",
+        instrument_name := "bass",
     },
     {
         person_name := "Paul Lytton",

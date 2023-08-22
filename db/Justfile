@@ -224,5 +224,5 @@ jq := "jq | " + bat
 # View a track in the database.
 @track title:
     {{edgedb_instance}} query \
-        "select Track { ** } filter .person.title = '{{title}}'" \
+        "select Track { **, players: { person: { full_name }, instrument: { name } } } filter .title = '{{title}}'" \
         | {{jq}}
