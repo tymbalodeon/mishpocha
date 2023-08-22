@@ -26,9 +26,17 @@ module default {
             cal::to_local_date(.year, .month, .day)
         };
 
-        multi link birthdays := .<birth_date[is Person];
-        multi link deathdays := .<death_date[is Person];
-        multi link compositions := .<composition_date[is Composition];
+        multi link births := .<birth_date[is Person];
+        multi link deaths := .<death_date[is Person];
+        multi link artist_starts := .<date_start[is Artist];
+        multi link artist_ends := .<date_end[is Artist];
+        multi link compositions := .<date_composed[is Composition];
+        multi link arrangements := .<date_arranged[is Composition];
+        multi link tracks_recorded := .<date_recorded[is Track];
+        multi link tracks_released := .<date_released[is Track];
+        multi link tracks_mastered := .<date_mastered[is Track];
+        multi link tracks_mixed := .<date_mixed[is Track];
+        multi link albums_released := .<date_released[is Album];
     }
 
     type Person {
@@ -135,8 +143,8 @@ module default {
         multi composers: Person;
         multi lyricists: Person;
         multi arrangers: Person;
-        composition_date: Date;
-        arrangement_date: Date;
+        date_composed: Date;
+        date_arranged: Date;
         multi instrumentation: Instrument;
         key: Key;
         time_signature: TimeSignature;

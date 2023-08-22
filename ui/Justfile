@@ -47,9 +47,6 @@ update *_from-main:
 dev_port := "5173"
 prod_port := "3000"
 
-@_build_css:
-    pnpm run build-css
-
 # Open the application in the browser.
 open *prod:
     #!/usr/bin/env zsh
@@ -57,10 +54,8 @@ open *prod:
     open "http://localhost:${port}/"
 
 # Run project locally, and optionally "--open" in browser.
-@local *open: _build_css
-    pnpm run watch-css \
-    & pnpm {{ if open == "--open" { "start" } else { "dev" } }} \
-    && kill $!
+@local *open:
+    pnpm {{ if open == "--open" { "start" } else { "dev" } }}
 
 # Format code.
 @format:

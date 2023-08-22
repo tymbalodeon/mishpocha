@@ -1,4 +1,4 @@
-CREATE MIGRATION m1zomvq76prt6jeiq45vypuza57w6yokbcwiyj3kyohl5bq27zigia
+CREATE MIGRATION m1vgyzqhthsvapvewsl4s46hbzev5ubgdfvnvsbibi7ippoyo7aeza
     ONTO initial
 {
   CREATE FUNCTION default::get_date_element(local_date: cal::local_date, element: std::str) ->  std::float64 USING (cal::date_get(local_date, element));
@@ -106,6 +106,11 @@ CREATE MIGRATION m1zomvq76prt6jeiq45vypuza57w6yokbcwiyj3kyohl5bq27zigia
   ALTER TYPE default::Artist {
       CREATE MULTI LINK albums := (.<artists[IS default::Album]);
   };
+  ALTER TYPE default::Date {
+      CREATE MULTI LINK albums_released := (.<date_released[IS default::Album]);
+      CREATE MULTI LINK artist_ends := (.<date_end[IS default::Artist]);
+      CREATE MULTI LINK artist_starts := (.<date_start[IS default::Artist]);
+  };
   CREATE TYPE default::Disc {
       CREATE PROPERTY number: std::int32 {
           CREATE CONSTRAINT std::min_value(1);
@@ -139,10 +144,10 @@ CREATE MIGRATION m1zomvq76prt6jeiq45vypuza57w6yokbcwiyj3kyohl5bq27zigia
       CREATE CONSTRAINT std::exclusive ON ((.numerator, .denominator));
   };
   CREATE TYPE default::Composition {
-      CREATE LINK arrangement_date: default::Date;
       CREATE MULTI LINK arrangers: default::Person;
       CREATE MULTI LINK composers: default::Person;
-      CREATE LINK composition_date: default::Date;
+      CREATE LINK date_arranged: default::Date;
+      CREATE LINK date_composed: default::Date;
       CREATE LINK key: default::Key;
       CREATE MULTI LINK lyricists: default::Person;
       CREATE LINK time_signature: default::TimeSignature;
@@ -157,9 +162,10 @@ CREATE MIGRATION m1zomvq76prt6jeiq45vypuza57w6yokbcwiyj3kyohl5bq27zigia
       CREATE PROPERTY is_lyricist := ((std::count(.lyrics) > 0));
   };
   ALTER TYPE default::Date {
-      CREATE MULTI LINK compositions := (.<composition_date[IS default::Composition]);
-      CREATE MULTI LINK birthdays := (.<birth_date[IS default::Person]);
-      CREATE MULTI LINK deathdays := (.<death_date[IS default::Person]);
+      CREATE MULTI LINK arrangements := (.<date_arranged[IS default::Composition]);
+      CREATE MULTI LINK compositions := (.<date_composed[IS default::Composition]);
+      CREATE MULTI LINK births := (.<birth_date[IS default::Person]);
+      CREATE MULTI LINK deaths := (.<death_date[IS default::Person]);
   };
   CREATE TYPE default::Instrument {
       CREATE LINK tuning: default::Note;
@@ -214,6 +220,12 @@ CREATE MIGRATION m1zomvq76prt6jeiq45vypuza57w6yokbcwiyj3kyohl5bq27zigia
       CREATE MULTI LINK players: default::Player;
       CREATE PROPERTY duration: std::duration;
       CREATE PROPERTY number: std::int16;
+  };
+  ALTER TYPE default::Date {
+      CREATE MULTI LINK tracks_mastered := (.<date_mastered[IS default::Track]);
+      CREATE MULTI LINK tracks_mixed := (.<date_mixed[IS default::Track]);
+      CREATE MULTI LINK tracks_recorded := (.<date_recorded[IS default::Track]);
+      CREATE MULTI LINK tracks_released := (.<date_released[IS default::Track]);
   };
   ALTER TYPE default::Disc {
       CREATE MULTI LINK tracks: default::Track;

@@ -1,11 +1,8 @@
 # Mishpocha
 
-## Main
-
-- [About](/)
-
 ## Objects
 
+- [About](/)
 - [Dates](/dates)
 - [People](/people)
 - [Instruments](/instruments)
