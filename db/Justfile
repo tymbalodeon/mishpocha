@@ -193,6 +193,10 @@ jq := "jq | " + bat
 @players:
     {{edgedb_instance}} query "select Player { ** };" | {{jq}}
 
+# View tracks in the database.
+@tracks:
+    {{edgedb_instance}} query "select Track { ** };" | {{jq}}
+
 # View a date in the database.
 @date display :
     {{edgedb_instance}} query \
@@ -215,4 +219,10 @@ jq := "jq | " + bat
 @player name:
     {{edgedb_instance}} query \
         "select Player { ** } filter .person.full_name = '{{name}}'" \
+        | {{jq}}
+
+# View a track in the database.
+@track title:
+    {{edgedb_instance}} query \
+        "select Track { ** } filter .person.title = '{{title}}'" \
         | {{jq}}
