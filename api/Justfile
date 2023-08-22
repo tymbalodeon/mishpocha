@@ -25,37 +25,10 @@ stop:
         kill "${mishpocha}" &>/dev/null
     fi
 
-# Seed the database with initial data.
-seed: start
-    #!/usr/bin/env zsh
-    cd seed/date
-    for file in $(ls); do
-        http POST {{local_url}}/date < "${file}"
-    done
-    cd ../person
-    for file in $(ls); do
-        first_name="$(cat "${file}" | jq ".first_name")"
-        last_name="$(cat "${file}" | jq ".last_name")"
-        full_name="${first_name} ${last_name}"
-        person="$(just person "${full_name}")"
-        if [ "${person}" = "[]" ]; then
-            http POST {{local_url}}/person < "${file}"
-        fi
-    done
-    cd ../instrument
-    for file in $(ls); do
-        http POST {{local_url}}/instrument < "${file}"
-    done
-    cd ../player
-    for file in $(ls); do
-        http POST {{local_url}}/player < "${file}"
-    done
-
 # View people in the database.
 @people: start
     http {{local_url}}/people | {{jq}}
 
-# View people in the database.
-person full_name: start
-    #!/usr/bin/env zsh
+# View a person in the database.
+@person full_name: start
     http "{{local_url}}/person?full_name={{full_name}}" | {{jq}}

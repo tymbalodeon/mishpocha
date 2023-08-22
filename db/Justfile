@@ -17,12 +17,13 @@ install *_from-main:
 
 image := "mishpocha-db"
 instance := replace(image, "-", "_")
+edgedb_instance := "edgedb --instance " + instance
 
 _create:
     #!/usr/bin/env zsh
     if ! edgedb instance list | grep -q {{instance}}; then
         edgedb instance create {{instance}}
-        edgedb migrate --instance {{instance}}
+        {{edgedb_instance}} migrate
     fi
 
 config := "edgedb-config"
@@ -46,9 +47,8 @@ dsn: _create
         )
     else
         base_dsn=$(
-            edgedb instance credentials \
-                --insecure-dsn \
-                --instance {{instance}}
+            {{edgedb_instance}} instance credentials \
+                --insecure-dsn
         )
     echo "${base_dsn}&tls_security=insecure"
     fi
@@ -57,16 +57,16 @@ dsn: _create
 local *ui: _create
     #!/usr/bin/env zsh
     if [ "{{ui}}" = "--ui" ]; then
-        edgedb ui --instance {{instance}}
+        {{edgedb_instance}} ui
     else
-        edgedb --instance {{instance}}
+        {{edgedb_instance}}
     fi
 
 # Migrate the database.
 migrate: _create
     #!/usr/bin/env zsh
-    edgedb migration create --squash --instance {{instance}}
-    edgedb migrate --instance {{instance}}
+    {{edgedb_instance}} migration create --squash
+    {{edgedb_instance}} migrate
 
 # Show if the container is running.
 running:
@@ -159,7 +159,7 @@ shell:
 drop *args: stop
     #!/usr/bin/env zsh
     if [ "{{args}}" = "--local" ] || [ -z "{{args}}" ]; then
-        edgedb instance destroy --instance {{instance}} --force >/dev/null 2>&1
+        {{edgedb_instance}} instance destroy --force >/dev/null 2>&1
     fi
     if [ "{{args}}" = "--docker" ] || [ -z "{{args}}" ]; then
         volumes=("$(docker volume list --quiet --filter name={{data}})")
@@ -169,3 +169,50 @@ drop *args: stop
             done
         fi
     fi
+
+# Seed the database.
+@seed:
+    {{edgedb_instance}} query --file seed.edgeql
+
+bat := "bat --style plain --language json"
+jq := "jq | " + bat
+
+# View dates in the database.
+@dates:
+    {{edgedb_instance}} query "select Date { ** };" | {{jq}}
+
+# View people in the database.
+@people:
+    {{edgedb_instance}} query "select Person { ** };" | {{jq}}
+
+# View instruments in the database.
+@instruments:
+    {{edgedb_instance}} query "select Instrument { ** };" | {{jq}}
+
+# View players in the database.
+@players:
+    {{edgedb_instance}} query "select Player { ** };" | {{jq}}
+
+# View a date in the database.
+@date display :
+    {{edgedb_instance}} query \
+        "select Date { ** } filter .display = '{{display}}'" \
+        | {{jq}}
+
+# View a person in the database.
+@person full_name:
+    {{edgedb_instance}} query \
+        "select Person { ** } filter .full_name = '{{full_name}}'" \
+        | {{jq}}
+
+# View an instrument in the database.
+@instrument name:
+    {{edgedb_instance}} query \
+        "select Instrument { ** } filter .name = '{{name}}'" \
+        | {{jq}}
+
+# View a player in the database.
+@player name:
+    {{edgedb_instance}} query \
+        "select Player { ** } filter .person.full_name = '{{name}}'" \
+        | {{jq}}
