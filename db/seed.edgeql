@@ -1,4 +1,5 @@
 with dates := <json>(
+    { day := 3, month := 11, year := 1939 },
     { day := 5, month := 4, year := 1944 },
     { day := 8, month := 3, year := 1947 },
     { day := 22, month := 4, year := 1947 },
@@ -26,6 +27,11 @@ with people := <json>(
         first_name := "Barry",
         last_name := "Guy",
         birth_date_display := "1947-4-22"
+    },
+    {
+        first_name := "Joe",
+        last_name := "McPhee",
+        birth_date_display := "1939-11-3"
     },
 ),
 for person in json_array_unpack(people) union (
@@ -70,6 +76,10 @@ with players := <json>(
         person_name := "Paul Lytton",
         instrument_name := "drums",
     },
+    {
+        person_name := "Joe McPhee",
+        instrument_name := "trumpet",
+    },
 ),
 for player in json_array_unpack(players) union (
     insert Player {
@@ -90,28 +100,63 @@ for player in json_array_unpack(players) union (
 with tracks := <json>(
     {
         title := "Not Yet",
-        number := 1
+        number := 1,
+        players := (
+            { full_name := "Evan Parker", instrument := "soprano saxophone" },
+            { full_name := "Barry Guy", instrument := "bass" },
+            { full_name := "Paul Lytton", instrument := "drums" },
+        )
     },
     {
         title := "The Masks",
-        number := 2
+        number := 2,
+        players := (
+            { full_name := "Evan Parker", instrument := "soprano saxophone" },
+            { full_name := "Barry Guy", instrument := "bass" },
+            { full_name := "Paul Lytton", instrument := "drums" },
+        )
     },
     {
         title := "Craig's Story",
-        number := 3
+        number := 3,
+        players := (
+            { full_name := "Evan Parker", instrument := "soprano saxophone" },
+            { full_name := "Barry Guy", instrument := "bass" },
+            { full_name := "Paul Lytton", instrument := "drums" },
+        )
     },
     {
         title := "Pedal (for Warren)",
-        number := 4
+        number := 4,
+        players := (
+            { full_name := "Evan Parker", instrument := "soprano saxophone" },
+            { full_name := "Barry Guy", instrument := "bass" },
+            { full_name := "Paul Lytton", instrument := "drums" },
+        )
     },
     {
         title := "Then Paul saw the Snake (for Susan)",
-        number := 5
+        number := 5,
+        players := (
+            { full_name := "Evan Parker", instrument := "soprano saxophone" },
+            { full_name := "Barry Guy", instrument := "bass" },
+            { full_name := "Paul Lytton", instrument := "drums" },
+            { full_name := "Joe McPhee", instrument := "trumpet" },
+        )
     },
-),
+)
 for track in json_array_unpack(tracks) union (
     insert Track {
         title := <str>track["title"],
         number := <int16>track["number"],
+        players := distinct (
+            for player in json_array_unpack(track["players"]) union (
+                select Player
+                filter {
+                    .person.full_name = <str>player["full_name"],
+                    .instrument.name = <str>player["instrument"]
+                }
+            )
+        )
     } unless conflict
 );
