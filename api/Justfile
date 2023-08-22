@@ -2,6 +2,8 @@
     just --list
 
 local_url := "http://localhost:8080"
+bat := "bat --style plain --language json"
+jq := "jq | " + bat
 
 # Run the server.
 start:
@@ -40,12 +42,20 @@ seed: start
             http POST {{local_url}}/person < "${file}"
         fi
     done
+    cd ../instrument
+    for file in $(ls); do
+        http POST {{local_url}}/instrument < "${file}"
+    done
+    cd ../player
+    for file in $(ls); do
+        http POST {{local_url}}/player < "${file}"
+    done
 
 # View people in the database.
 @people: start
-    http {{local_url}}/people | jq
+    http {{local_url}}/people | {{jq}}
 
 # View people in the database.
 person full_name: start
     #!/usr/bin/env zsh
-    http "{{local_url}}/person?full_name={{full_name}}" | jq
+    http "{{local_url}}/person?full_name={{full_name}}" | {{jq}}
