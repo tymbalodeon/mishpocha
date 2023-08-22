@@ -26,15 +26,8 @@ export default component$(() => {
 
   return (
     <>
-      <main class="container">
-        <div class="columns">
-          <div class="column is-narrow">
-            <Menu />
-          </div>
-          <div class="column">
-            <Slot />
-          </div>
-        </div>
+      <main>
+        <Slot />
       </main>
     </>
   );

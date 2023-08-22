@@ -1,18 +1,12 @@
-# Course Request Form
+# Mishpocha
 
 ## Main
 
-- [Home](/)
-- [Requests](/requests)
-- [Courses](/courses)
-- [Schools](/schools)
+- [About](/)
+
+## Objects
+
+- [Dates](/dates)
+- [People](/people)
+- [Instruments](/instruments)
 - [Subjects](/subjects)
-
-## Admin
-
-- [Admin Portal]()
-- [Run Tasks]()
-- [Quick Config]()
-- [User Lookup]()
-- [Course Lookup]()
-- [Auto-Adds]()
