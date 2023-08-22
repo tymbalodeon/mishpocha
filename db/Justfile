@@ -174,7 +174,7 @@ drop *args: stop
 @seed:
     {{edgedb_instance}} query --file seed.edgeql
 
-bat := "bat --style plain --language json"
+bat := "bat --style plain --language json --theme gruvbox-dark"
 jq := "jq | " + bat
 
 # View dates in the database.
