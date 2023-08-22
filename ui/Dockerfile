@@ -1,4 +1,4 @@
-FROM node:latest AS base
+FROM node AS base
 RUN npm install --global pnpm
 WORKDIR /ui
 COPY ./ ./
