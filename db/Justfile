@@ -181,27 +181,15 @@ jq := "jq | " + bat
 @dates:
     {{edgedb_instance}} query "select Date { ** };" | {{jq}}
 
-# View people in the database.
-@people:
-    {{edgedb_instance}} query "select Person { ** };" | {{jq}}
-
-# View instruments in the database.
-@instruments:
-    {{edgedb_instance}} query "select Instrument { ** };" | {{jq}}
-
-# View players in the database.
-@players:
-    {{edgedb_instance}} query "select Player { ** };" | {{jq}}
-
-# View tracks in the database.
-@tracks:
-    {{edgedb_instance}} query "select Track { ** };" | {{jq}}
-
 # View a date in the database.
-@date display :
+@date display:
     {{edgedb_instance}} query \
         "select Date { ** } filter .display = '{{display}}'" \
         | {{jq}}
+
+# View people in the database.
+@people:
+    {{edgedb_instance}} query "select Person { ** };" | {{jq}}
 
 # View a person in the database.
 @person full_name:
@@ -209,17 +197,29 @@ jq := "jq | " + bat
         "select Person { ** } filter .full_name = '{{full_name}}'" \
         | {{jq}}
 
+# View instruments in the database.
+@instruments:
+    {{edgedb_instance}} query "select Instrument { ** };" | {{jq}}
+
 # View an instrument in the database.
 @instrument name:
     {{edgedb_instance}} query \
         "select Instrument { ** } filter .name = '{{name}}'" \
         | {{jq}}
 
+# View players in the database.
+@players:
+    {{edgedb_instance}} query "select Player { ** };" | {{jq}}
+
 # View a player in the database.
 @player name:
     {{edgedb_instance}} query \
         "select Player { ** } filter .person.full_name = '{{name}}'" \
         | {{jq}}
+
+# View tracks in the database.
+@tracks:
+    {{edgedb_instance}} query "select Track { ** };" | {{jq}}
 
 # View a track in the database.
 @track title:
