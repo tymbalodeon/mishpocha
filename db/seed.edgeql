@@ -42,7 +42,7 @@ with people := <json>(
     ), inserts := (
         person if not exists existing_person else <json>{}
     )
-    for existing_person in { inserts } union (
+    for non_existing_person in { inserts } union (
         insert Person {
             first_name := <str>person["first_name"],
             last_name := <str>person["last_name"],
@@ -62,9 +62,17 @@ with instruments := <json>(
     { name := "bass" },
     { name := "drums" },
 ) for instrument in json_array_unpack(instruments) union (
-    insert Instrument {
-        name := <str>instrument["name"],
-    } unless conflict
+    with existing_instrument := (
+        select Instrument
+        filter .name = <str>instrument["name"]
+        limit 1
+    ), inserts := (
+        instrument if not exists existing_instrument else <json>{}
+    ) for non_existing_instrument in { inserts } union (
+        insert Instrument {
+            name := <str>instrument["name"],
+        }
+    )
 );
 
 with players := <json>(
@@ -151,17 +159,27 @@ with tracks := <json>(
         )
     },
 ) for track in json_array_unpack(tracks) union (
-    insert Track {
-        title := <str>track["title"],
-        number := <int16>track["number"],
-        players := distinct (
-            for player in json_array_unpack(track["players"]) union (
-                select Player
-                filter {
-                    .person.full_name = <str>player["full_name"],
-                    .instrument.name = <str>player["instrument"]
-                }
+    with existing_track := (
+        select Track
+        filter {
+            .title = <str>track["title"],
+            .number = <int16>track["number"],
+        } limit 1
+    ), inserts := (
+        track if not exists existing_track else <json>{}
+    ) for non_existing_track in { inserts } union (
+        insert Track {
+            title := <str>track["title"],
+            number := <int16>track["number"],
+            players := distinct (
+                for player in json_array_unpack(track["players"]) union (
+                    select Player
+                    filter {
+                        .person.full_name = <str>player["full_name"],
+                        .instrument.name = <str>player["instrument"]
+                    }
+                )
             )
-        )
-    } unless conflict
+        }
+    )
 );
