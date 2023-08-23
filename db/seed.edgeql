@@ -33,15 +33,26 @@ with people := <json>(
         birth_date_display := "1939-11-3"
     },
 ) for person in json_array_unpack(people) union (
-    insert Person {
-        first_name := <str>person["first_name"],
-        last_name := <str>person["last_name"],
-        birth_date := (
-            select Date
-            filter .display = <str>person["birth_date_display"]
-            limit 1
-        )
-    } unless conflict
+    with existing_person := (
+        select Person
+        filter {
+            .first_name = <str>person["first_name"],
+            .last_name = <str>person["last_name"]
+        } limit 1
+    ), inserts := (
+        person if not exists existing_person else <json>{}
+    )
+    for existing_person in { inserts } union (
+        insert Person {
+            first_name := <str>person["first_name"],
+            last_name := <str>person["last_name"],
+            birth_date := (
+                select Date
+                filter .display = <str>person["birth_date_display"]
+                limit 1
+            )
+        }
+    )
 );
 
 with instruments := <json>(
