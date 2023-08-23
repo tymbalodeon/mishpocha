@@ -65,7 +65,7 @@ local *ui: _create
 # Migrate the database.
 migrate: _create
     #!/usr/bin/env zsh
-    {{edgedb_instance}} migration create --squash
+    {{edgedb_instance}} migration create
     {{edgedb_instance}} migrate
 
 # Show if the container is running.
