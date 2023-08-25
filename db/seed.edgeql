@@ -183,3 +183,19 @@ with tracks := <json>(
         }
     )
 );
+
+with albums := <json>(
+    { title := "The Redwood Session" },
+) for album in json_array_unpack(albums) union (
+    with existing_album := (
+        select Album
+        filter .title = <str>album["title"]
+        limit 1
+    ), inserts := (
+        album if not exists existing_album else <json>{}
+    ) for non_existing_album in { inserts } union (
+        insert Album {
+            title := <str>album["title"],
+        }
+    )
+);

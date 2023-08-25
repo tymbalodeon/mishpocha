@@ -237,3 +237,7 @@ jq := "jq | " + bat
         } \
         filter .title = '{{title}}'" \
         | {{jq}}
+
+# View albums in the database.
+@albums:
+    {{edgedb_instance}} query "select Album { ** };" | {{jq}}
