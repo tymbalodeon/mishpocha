@@ -1,8 +1,35 @@
 module default {
     function get_date_element(
         local_date: cal::local_date, element: str
-    ) -> float64
-        using (cal::date_get(local_date, element));
+    ) -> float64 using (
+        cal::date_get(local_date, element)
+    );
+
+    function get_age(
+        person_year: float64,
+        person_month: float64,
+        person_day: float64,
+        date_year: float64,
+        date_month: float64,
+        date_day: float64
+    ) -> set of float64 using (
+        with age := date_year - person_year
+        select age
+        if date_month >= person_month
+        and date_day >= person_day
+        else age - 1
+    );
+
+    function get_age_when(person: Person, date: Date) -> set of float64 using (
+        get_age(
+            date.year,
+            date.month,
+            date.day,
+            person.birth_date.year,
+            person.birth_date.month,
+            person.birth_date.day,
+        )
+    );
 }
 
 module default {
@@ -73,21 +100,19 @@ module default {
                 .death_date.month ?? current_month
             ), latest_day := (
                 .death_date.day ?? current_day
-            ), age := (
-                latest_year - .birth_date.year
-            ) select age
-                if latest_month >= .birth_date.month
-                and latest_day >= .birth_date.day
-                else age - 1
+            ) select get_age(
+                latest_year,
+                latest_month,
+                latest_day,
+                .birth_date.year,
+                .birth_date.month,
+                .birth_date.day,
+            )
         );
         multi link compositions := .<composers[is Composition];
         multi link arrangements := .<arrangers[is Composition];
         multi link lyrics := .<lyricists[is Composition];
-        multi link tracks := (
-            with id := .id
-            select Track
-            filter .players.person.id = id
-        );
+        multi link tracks := .<person[is Player].<players[is Track];
         property is_composer := count(.compositions) > 0;
         property is_arranger := count(.arrangements) > 0;
         property is_lyricist := count(.lyrics) > 0;
@@ -203,11 +228,7 @@ module default {
 
         multi link series := .<label[is Series];
         multi link albums := .<label[is Album];
-        multi link artists := (
-            with albums := .albums,
-            albums := (select Album filter Album in albums),
-            select albums.artists
-        );
+        multi link artists := .albums.artists;
     }
 
     type Disc {
