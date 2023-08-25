@@ -185,7 +185,10 @@ with tracks := <json>(
 );
 
 with albums := <json>(
-    { title := "The Redwood Session" },
+    {
+        title := "The Redwood Session",
+        series_number := 101
+    },
 ) for album in json_array_unpack(albums) union (
     with existing_album := (
         select Album
@@ -196,6 +199,7 @@ with albums := <json>(
     ) for non_existing_album in { inserts } union (
         insert Album {
             title := <str>album["title"],
+            series_number := <int32>album["series_number"],
         }
     )
 );

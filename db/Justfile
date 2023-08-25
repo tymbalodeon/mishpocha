@@ -184,7 +184,7 @@ jq := "jq | " + bat
 # View a date in the database.
 @date display:
     {{edgedb_instance}} query \
-        "select Date { ** } filter .display = '{{display}}'" \
+        "select Date { ** } filter .display ilike '%{{display}}%'" \
         | {{jq}}
 
 # View people in the database.
@@ -194,7 +194,7 @@ jq := "jq | " + bat
 # View a person in the database.
 @person full_name:
     {{edgedb_instance}} query \
-        "select Person { ** } filter .full_name = '{{full_name}}'" \
+        "select Person { ** } filter .full_name ilke '%{{full_name}}%'" \
         | {{jq}}
 
 # View instruments in the database.
@@ -204,7 +204,7 @@ jq := "jq | " + bat
 # View an instrument in the database.
 @instrument name:
     {{edgedb_instance}} query \
-        "select Instrument { ** } filter .name = '{{name}}'" \
+        "select Instrument { ** } filter .name ilike '%{{name}}%'" \
         | {{jq}}
 
 # View players in the database.
@@ -214,7 +214,7 @@ jq := "jq | " + bat
 # View a player in the database.
 @player name:
     {{edgedb_instance}} query \
-        "select Player { ** } filter .person.full_name = '{{name}}'" \
+        "select Player { ** } filter .person.full_name ilike '%{{name}}%'" \
         | {{jq}}
 
 # View tracks in the database.
@@ -235,9 +235,14 @@ jq := "jq | " + bat
                 } \
             } \
         } \
-        filter .title = '{{title}}'" \
+        filter .title ilike '%{{title}}%'" \
         | {{jq}}
 
 # View albums in the database.
 @albums:
     {{edgedb_instance}} query "select Album { ** };" | {{jq}}
+
+# View an album in the database.
+@album title:
+    {{edgedb_instance}} query \
+        "select Album { ** } filter .title ilike '%{{title}}%'" | {{jq}}
