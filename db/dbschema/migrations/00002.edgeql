@@ -1,10 +1,9 @@
-CREATE MIGRATION m1gdxyee6u2qy5u5mwgkr3as75xpu73nxeol4z7tc3l66ag22znpqq
-    ONTO m1gdtcqmm7u5crofbqtmm3ltafzji4emvynubfmw3qpp6dih6bui3q
+CREATE MIGRATION m1q7e6w6nqzb2raxhriplqgd6yqe5aqtvswn4foplnmw2miojtjjxa
+    ONTO m1zedttmav2ik7th7cvimucsqucoiwl7uh6i6exjfmmaohrfoisjhq
 {
-  CREATE FUNCTION default::get_age_when(person: default::Person, date: default::Date) -> SET OF std::float64 USING (WITH
-      age := 
-          (date.year - person.birth_date.year)
-  SELECT
-      (age IF ((date.month >= person.birth_date.month) AND (date.day >= person.birth_date.day)) ELSE (age - 1))
-  );
+  ALTER TYPE default::Composition {
+      ALTER LINK composers {
+          ON TARGET DELETE ALLOW;
+      };
+  };
 };

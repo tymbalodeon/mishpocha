@@ -165,12 +165,16 @@ module default {
 
     type Composition {
         title: str;
-        multi composers: Person;
+        multi composers: Person {
+            on target delete allow
+        };
         multi lyricists: Person;
         multi arrangers: Person;
         date_composed: Date;
         date_arranged: Date;
-        multi instrumentation: Instrument;
+        multi instrumentation: Instrument {
+            on target delete allow
+        };
         key: Key;
         time_signature: TimeSignature;
     }
@@ -197,19 +201,24 @@ module default {
     type Track {
         title: str {
             rewrite insert, update using (
-                __subject__.title
+                with id := .id
+                select __subject__.title
                 ?? to_str(
-                    array_agg((
-                    with track := (select Track limit 1)
-                    select Composition.title
-                    filter contains(
-                        array_agg(track.compositions), Composition
-                    ))
-                ), ",")
+                    array_agg(
+                        (
+                            select Track filter .id = id limit 1
+                        ).compositions.title
+                    ),
+                ",")
             )
         };
-        multi compositions: Composition;
-        multi players: Player;
+        multi compositions: Composition {
+            on target delete allow
+        };
+
+        multi players: Player {
+            on target delete allow
+        };
         date_recorded: Date;
         date_released: Date;
         date_mastered: Date;
@@ -248,6 +257,7 @@ module default {
         series: Series;
         series_number: int32;
         date_released: Date;
+        date_recorded: Date;
 
         property disc_total := (
             count(.discs)

@@ -1,6 +1,12 @@
-CREATE MIGRATION m1gdtcqmm7u5crofbqtmm3ltafzji4emvynubfmw3qpp6dih6bui3q
+CREATE MIGRATION m1zedttmav2ik7th7cvimucsqucoiwl7uh6i6exjfmmaohrfoisjhq
     ONTO initial
 {
+  CREATE FUNCTION default::get_age(person_year: std::float64, person_month: std::float64, person_day: std::float64, date_year: std::float64, date_month: std::float64, date_day: std::float64) -> SET OF std::float64 USING (WITH
+      age := 
+          (date_year - person_year)
+  SELECT
+      (age IF ((date_month >= person_month) AND (date_day >= person_day)) ELSE (age - 1))
+  );
   CREATE FUNCTION default::get_date_element(local_date: cal::local_date, element: std::str) ->  std::float64 USING (cal::date_get(local_date, element));
   CREATE TYPE default::Date {
       CREATE PROPERTY day: std::int16 {
@@ -47,11 +53,8 @@ CREATE MIGRATION m1gdtcqmm7u5crofbqtmm3ltafzji4emvynubfmw3qpp6dih6bui3q
           ,
           latest_day := 
               (.death_date.day ?? current_day)
-          ,
-          age := 
-              (latest_year - .birth_date.year)
       SELECT
-          (age IF ((latest_month >= .birth_date.month) AND (latest_day >= .birth_date.day)) ELSE (age - 1))
+          default::get_age(latest_year, latest_month, latest_day, .birth_date.year, .birth_date.month, .birth_date.day)
       );
       CREATE PROPERTY is_alive: std::bool {
           CREATE REWRITE
@@ -66,7 +69,9 @@ CREATE MIGRATION m1gdtcqmm7u5crofbqtmm3ltafzji4emvynubfmw3qpp6dih6bui3q
       CREATE PROPERTY last_name: std::str;
       CREATE PROPERTY full_name := ((((.first_name ++ ' ') IF (.first_name != '') ELSE '') ++ .last_name));
   };
+  CREATE FUNCTION default::get_age_when(person: default::Person, date: default::Date) -> SET OF std::float64 USING (default::get_age(date.year, date.month, date.day, person.birth_date.year, person.birth_date.month, person.birth_date.day));
   CREATE TYPE default::Album {
+      CREATE LINK date_recorded: default::Date;
       CREATE LINK date_released: default::Date;
       CREATE MULTI LINK producers: default::Person;
       CREATE PROPERTY series_number: std::int32;
@@ -81,6 +86,9 @@ CREATE MIGRATION m1gdtcqmm7u5crofbqtmm3ltafzji4emvynubfmw3qpp6dih6bui3q
   ALTER TYPE default::Album {
       CREATE MULTI LINK artists: default::Artist;
   };
+  ALTER TYPE default::Artist {
+      CREATE MULTI LINK albums := (.<artists[IS default::Album]);
+  };
   CREATE TYPE default::Label {
       CREATE PROPERTY name: std::str;
   };
@@ -89,22 +97,7 @@ CREATE MIGRATION m1gdtcqmm7u5crofbqtmm3ltafzji4emvynubfmw3qpp6dih6bui3q
   };
   ALTER TYPE default::Label {
       CREATE MULTI LINK albums := (.<label[IS default::Album]);
-      CREATE MULTI LINK artists := (WITH
-          albums := 
-              .albums
-          ,
-          albums := 
-              (SELECT
-                  default::Album
-              FILTER
-                  (default::Album IN albums)
-              )
-      SELECT
-          albums.artists
-      );
-  };
-  ALTER TYPE default::Artist {
-      CREATE MULTI LINK albums := (.<artists[IS default::Album]);
+      CREATE MULTI LINK artists := (.albums.artists);
   };
   ALTER TYPE default::Date {
       CREATE MULTI LINK albums_released := (.<date_released[IS default::Album]);
@@ -174,7 +167,9 @@ CREATE MIGRATION m1gdtcqmm7u5crofbqtmm3ltafzji4emvynubfmw3qpp6dih6bui3q
       CREATE MULTI PROPERTY aliases: std::str;
   };
   ALTER TYPE default::Composition {
-      CREATE MULTI LINK instrumentation: default::Instrument;
+      CREATE MULTI LINK instrumentation: default::Instrument {
+          ON TARGET DELETE ALLOW;
+      };
   };
   CREATE TYPE default::Player {
       CREATE LINK instrument: default::Instrument {
@@ -186,42 +181,44 @@ CREATE MIGRATION m1gdtcqmm7u5crofbqtmm3ltafzji4emvynubfmw3qpp6dih6bui3q
       CREATE CONSTRAINT std::exclusive ON ((.person, .instrument));
   };
   CREATE TYPE default::Track {
-      CREATE MULTI LINK compositions: default::Composition;
+      CREATE MULTI LINK compositions: default::Composition {
+          ON TARGET DELETE ALLOW;
+      };
       CREATE PROPERTY title: std::str {
           CREATE REWRITE
               INSERT 
-              USING ((__subject__.title ?? std::to_str(std::array_agg((WITH
-                  track := 
-                      (SELECT
-                          default::Track 
-                      LIMIT
-                          1
-                      )
+              USING (WITH
+                  id := 
+                      .id
               SELECT
-                  default::Composition.title
-              FILTER
-                  std::contains(std::array_agg(track.compositions), default::Composition)
-              )), ',')));
+                  (__subject__.title ?? std::to_str(std::array_agg(((SELECT
+                      default::Track FILTER
+                          (.id = id)
+                  LIMIT
+                      1
+                  )).compositions.title), ','))
+              );
           CREATE REWRITE
               UPDATE 
-              USING ((__subject__.title ?? std::to_str(std::array_agg((WITH
-                  track := 
-                      (SELECT
-                          default::Track 
-                      LIMIT
-                          1
-                      )
+              USING (WITH
+                  id := 
+                      .id
               SELECT
-                  default::Composition.title
-              FILTER
-                  std::contains(std::array_agg(track.compositions), default::Composition)
-              )), ',')));
+                  (__subject__.title ?? std::to_str(std::array_agg(((SELECT
+                      default::Track FILTER
+                          (.id = id)
+                  LIMIT
+                      1
+                  )).compositions.title), ','))
+              );
       };
       CREATE LINK date_mastered: default::Date;
       CREATE LINK date_mixed: default::Date;
       CREATE LINK date_recorded: default::Date;
       CREATE LINK date_released: default::Date;
-      CREATE MULTI LINK players: default::Player;
+      CREATE MULTI LINK players: default::Player {
+          ON TARGET DELETE ALLOW;
+      };
       CREATE PROPERTY duration: std::duration;
       CREATE PROPERTY number: std::int16;
   };
@@ -246,14 +243,7 @@ CREATE MIGRATION m1gdtcqmm7u5crofbqtmm3ltafzji4emvynubfmw3qpp6dih6bui3q
       FILTER
           (.players.person.id = id)
       );
-      CREATE MULTI LINK tracks := (WITH
-          id := 
-              .id
-      SELECT
-          default::Track
-      FILTER
-          (.players.person.id = id)
-      );
+      CREATE MULTI LINK tracks := (.<person[IS default::Player].<players[IS default::Track]);
       CREATE PROPERTY is_player := ((std::count(.<person[IS default::Player]) > 0));
   };
   ALTER TYPE default::Label {

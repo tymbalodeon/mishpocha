@@ -3,6 +3,7 @@ with dates := <json>(
     { day := 5, month := 4, year := 1944 },
     { day := 8, month := 3, year := 1947 },
     { day := 22, month := 4, year := 1947 },
+    { day := 18, month := 6, year := 1995 },
 ) for date in json_array_unpack(dates) union (
     insert Date {
         day := <int16>date["day"],
@@ -111,9 +112,117 @@ with players := <json>(
     } unless conflict
 );
 
-with tracks := <json>(
+with compositions := <json>(
     {
         title := "Not Yet",
+        composers := (
+            { full_name := "Evan Parker"},
+            { full_name := "Barry Guy"},
+            { full_name := "Paul Lytton"},
+        ),
+        date_composed := { day := 18, month := 6, year := 1995 },
+        instrumentation := (
+            { name := "tenor saxophone" },
+            { name := "bass" },
+            { name := "drums" },
+        )
+    },
+    {
+        title := "The Masks",
+        composers := (
+            { full_name := "Evan Parker"},
+            { full_name := "Barry Guy"},
+            { full_name := "Paul Lytton"},
+        ),
+        date_composed := { day := 18, month := 6, year := 1995 },
+        instrumentation := (
+            { name := "tenor saxophone" },
+            { name := "bass" },
+            { name := "drums" },
+        )
+    },
+    {
+        title := "Craig's Story",
+        composers := (
+            { full_name := "Evan Parker"},
+            { full_name := "Barry Guy"},
+            { full_name := "Paul Lytton"},
+        ),
+        date_composed := { day := 18, month := 6, year := 1995 },
+        instrumentation := (
+            { name := "tenor saxophone" },
+            { name := "bass" },
+            { name := "drums" },
+        )
+    },
+    {
+        title := "Pedal (For Warren)",
+        composers := (
+            { full_name := "Evan Parker"},
+            { full_name := "Barry Guy"},
+            { full_name := "Paul Lytton"},
+        ),
+        date_composed := { day := 18, month := 6, year := 1995 },
+        instrumentation := (
+            { name := "tenor saxophone" },
+            { name := "bass" },
+            { name := "drums" },
+        )
+    },
+    {
+        title := "Then Paul Saw the Snake (For Susan)",
+        composers := (
+            { full_name := "Evan Parker"},
+            { full_name := "Barry Guy"},
+            { full_name := "Paul Lytton"},
+            { full_name := "Joe McPhee"},
+        ),
+        date_composed := { day := 18, month := 6, year := 1995 },
+        instrumentation := (
+            { name := "tenor saxophone" },
+            { name := "trumpet" },
+            { name := "bass" },
+            { name := "drums" },
+        )
+    },
+) for composition in json_array_unpack(compositions) union (
+    with existing_composition := (
+        select Composition
+        filter .title = <str>composition["title"]
+        limit 1
+    ), inserts := (
+        composition if not exists existing_composition else <json>{}
+    ) for non_existing_composition in { inserts } union (
+        insert Composition {
+            title := <str>composition["title"],
+            composers := distinct (
+                for composer in json_array_unpack(composition["composers"]) union (
+                    select Person
+                    filter .full_name = <str>composer["full_name"]
+                )
+            ),
+            date_composed := (
+                select Date
+                filter {
+                    .day = <int16>composition["date_composed"]["day"],
+                    .month = <int16>composition["date_composed"]["month"],
+                    .year = <int32>composition["date_composed"]["year"]
+                }
+                limit 1
+            ),
+            instrumentation := distinct (
+                for instrument in json_array_unpack(composition["instrumentation"]) union (
+                    select Instrument
+                    filter .name = <str>instrument["name"]
+                )
+            )
+        }
+    )
+);
+
+with tracks := <json>(
+    {
+        compositions := ({ title := "Not Yet"},),
         number := 1,
         players := (
             { full_name := "Evan Parker", instrument := "soprano saxophone" },
@@ -122,7 +231,7 @@ with tracks := <json>(
         )
     },
     {
-        title := "The Masks",
+        compositions := ({ title := "The Masks"},),
         number := 2,
         players := (
             { full_name := "Evan Parker", instrument := "soprano saxophone" },
@@ -131,7 +240,7 @@ with tracks := <json>(
         )
     },
     {
-        title := "Craig's Story",
+        compositions := ({ title := "Craig's Story"},),
         number := 3,
         players := (
             { full_name := "Evan Parker", instrument := "soprano saxophone" },
@@ -140,7 +249,7 @@ with tracks := <json>(
         )
     },
     {
-        title := "Pedal (for Warren)",
+        compositions := ({ title := "Pedal (for Warren)"},),
         number := 4,
         players := (
             { full_name := "Evan Parker", instrument := "soprano saxophone" },
@@ -149,7 +258,7 @@ with tracks := <json>(
         )
     },
     {
-        title := "Then Paul saw the Snake (for Susan)",
+        compositions := ({ title := "Then Paul saw the Snake (for Susan)"},),
         number := 5,
         players := (
             { full_name := "Evan Parker", instrument := "soprano saxophone" },
@@ -161,15 +270,18 @@ with tracks := <json>(
 ) for track in json_array_unpack(tracks) union (
     with existing_track := (
         select Track
-        filter {
-            .title = <str>track["title"],
-            .number = <int16>track["number"],
-        } limit 1
+        filter .number = <int16>track["number"]
+        limit 1
     ), inserts := (
         track if not exists existing_track else <json>{}
     ) for non_existing_track in { inserts } union (
         insert Track {
-            title := <str>track["title"],
+            compositions  := distinct (
+                for composition in json_array_unpack(track["compositions"]) union (
+                    select Composition
+                    filter .title = <str>composition["title"]
+                )
+            ),
             number := <int16>track["number"],
             players := distinct (
                 for player in json_array_unpack(track["players"]) union (
