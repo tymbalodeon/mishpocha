@@ -159,7 +159,10 @@ shell:
 drop *args: stop
     #!/usr/bin/env zsh
     if [ "{{args}}" = "--local" ] || [ -z "{{args}}" ]; then
-        {{edgedb_instance}} instance destroy --force >/dev/null 2>&1
+        edgedb instance destroy \
+            --instance {{instance}} \
+            --force \
+            >/dev/null 2>&1
     fi
     if [ "{{args}}" = "--docker" ] || [ -z "{{args}}" ]; then
         volumes=("$(docker volume list --quiet --filter name={{data}})")
