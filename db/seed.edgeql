@@ -378,12 +378,30 @@ with discs := <json>(
     )
 );
 
+with series_list := <json>(
+    { name := "Spirit Room Series" },
+) for series in json_array_unpack(series_list) union (
+    with existing_series := (
+        select Series
+        filter .name = <str>series["name"]
+        limit 1
+    ), inserts := (
+        series if not exists existing_series else <json>{}
+    ) for non_existing_series in inserts union (
+        insert Series {
+            name := <str>series["name"],
+        }
+    )
+);
+
 with albums := <json>(
     {
         title := "The Redwood Session",
         artist_name := "Evan Parker, Paul Lytton, Barry Guy",
         producer_name := "Robert Rusch",
-        series_number := 101,
+        catalog_number := 101,
+        series_name := "Spirit Room Series",
+        series_number := 1,
         label_name := "CIMP"
     },
 ) for album in json_array_unpack(albums) union (
@@ -396,7 +414,13 @@ with albums := <json>(
     ) for non_existing_album in inserts union (
         insert Album {
             title := <str>album["title"],
+            series := (
+                select Series
+                filter .name = <str>album["series_name"]
+                limit 1
+            ),
             series_number := <int32>album["series_number"],
+            catalog_number := <int32>album["catalog_number"],
             artists := (
                 select Artist
                 filter .name = <str>album["artist_name"]

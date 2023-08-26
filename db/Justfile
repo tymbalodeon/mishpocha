@@ -348,7 +348,7 @@ jq := "jq | " + bat
             name, \
             albums_released := .albums.title, \
             artists_recorded := .artists.name \
-            };" \
+        };" \
         | {{jq}}
 
 # View a label in the database.
@@ -358,6 +358,22 @@ jq := "jq | " + bat
             name, \
             albums_released := .albums.title, \
             artists_recorded := .artists.name \
+        } filter .name ilike '%{{name}}%'" \
+        | {{jq}}
+
+# View series in the database.
+@series:
+    {{edgedb_instance}} query \
+        "select Series { \
+            name, \
+        };" \
+        | {{jq}}
+
+# View a series in the database.
+@series-single name:
+    {{edgedb_instance}} query \
+        "select Series { \
+            name, \
         } filter .name ilike '%{{name}}%'" \
         | {{jq}}
 
@@ -388,11 +404,12 @@ jq := "jq | " + bat
     {{edgedb_instance}} query \
         "select Album { \
             title, \
+            album_artists := .artists.name, \
             disc_total, \
+            series_name := .series.name, \
             series_number, \
             duration, \
             producer := .producers.full_name, \
-            artist := .artists.name, \
             record_label := .label.name, \
             tracklisting := .tracks.title, \
         };" \
@@ -403,11 +420,12 @@ jq := "jq | " + bat
     {{edgedb_instance}} query \
         "select Album { \
             title, \
+            album_artists := .artists.name, \
             disc_total, \
+            series_name := .series.name, \
             series_number, \
             duration, \
             producer := .producers.full_name, \
-            artist := .artists.name, \
             record_label := .label.name, \
             tracklisting := .tracks.title, \
         } filter .title ilike '%{{title}}%'" \

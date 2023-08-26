@@ -258,7 +258,8 @@ module default {
 
     type Series {
         name: str;
-        label: Label;
+
+        link label: Label;
     }
 
     type Label {
@@ -277,9 +278,7 @@ module default {
         multi tracks: Track;
 
         link album := .<discs[is Album];
-        property title := {
-            .disc_title ?? .album.title
-        };
+        property title := .disc_title ?? .album.title;
         property duration := (
             with seconds := sum(get_totalseconds(.tracks.duration))
             select get_duration_from_seconds(seconds)
@@ -292,15 +291,14 @@ module default {
         multi producers: Person;
         multi discs: Disc;
         label: Label;
+        catalog_number: int64;
         series: Series;
-        series_number: int32;
+        series_number: int64;
         date_released: Date;
         date_recorded: Date;
 
         multi link tracks := .discs.tracks;
-        property disc_total := (
-            count(.discs)
-        );
+        property disc_total := count(.discs);
         property duration := (
             with seconds := sum(get_totalseconds(.discs.duration))
             select get_duration_from_seconds(seconds)
