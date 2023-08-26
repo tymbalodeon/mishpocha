@@ -117,6 +117,7 @@ module default {
         property is_arranger := count(.arrangements) > 0;
         property is_lyricist := count(.lyrics) > 0;
         property is_player := count(.<person[is Player]) > 0;
+        property is_producer := count(.<producers[is Album]) > 0;
         multi link instruments := (
             with id := .id
             select Instrument
@@ -191,7 +192,22 @@ module default {
     }
 
     type Artist {
-        name: str;
+        name: str {
+            rewrite insert, update using (
+                with id := .id
+                select __subject__.name
+                ?? (
+                    with members := (
+                        __subject__.members
+                        ?? (
+                            select Artist.members
+                            filter .id = id
+                            limit 1
+                        )
+                    ) select to_str(array_agg(members.full_name), ", ")
+                )
+            )
+        };
         multi members: Person;
         date_start: Date;
         date_end: Date;
@@ -209,7 +225,7 @@ module default {
                             select Track filter .id = id limit 1
                         ).compositions.title
                     ),
-                ",")
+                ", ")
             )
         };
         multi compositions: Composition {

@@ -33,6 +33,11 @@ with people := <json>(
         last_name := "McPhee",
         birth_date_display := "1939-11-3"
     },
+    {
+        first_name := "Robert",
+        last_name := "Rusch",
+        birth_date_display := "1943-4-3"
+    },
 ) for person in json_array_unpack(people) union (
     with existing_person := (
         select Person
@@ -296,6 +301,31 @@ with tracks := <json>(
     )
 );
 
+with artists := <json>(
+    {
+        member_names := (
+            "Evan Parker",
+            "Barry Guy",
+            "Paul Lytton",
+        )
+    },
+) for artist in json_array_unpack(artists) union (
+    with existing_artist := (
+        select Artist
+        filter contains(<array<str>>artist["member_names"], .name)
+        limit 1
+    ), inserts := (
+        artist if not exists existing_artist else <json>{}
+    ) for non_existing_artist in { inserts } union (
+        insert Artist {
+            members := (
+                select Person
+                filter contains(<array<str>>artist["member_names"], .full_name)
+            )
+        }
+    )
+);
+
 with labels := <json>(
     {
         name := "CIMP",
@@ -317,6 +347,8 @@ with labels := <json>(
 with albums := <json>(
     {
         title := "The Redwood Session",
+        artist_name := "Evan Parker, Paul Lytton, Barry Guy",
+        producer_name := "Robert Rusch",
         series_number := 101,
         label_name := "CIMP"
     },
@@ -331,6 +363,16 @@ with albums := <json>(
         insert Album {
             title := <str>album["title"],
             series_number := <int32>album["series_number"],
+            artists := (
+                select Artist
+                filter .name = <str>album["artist_name"]
+                limit 1
+            ),
+            producers := (
+                select Person
+                filter .full_name = <str>album["producer_name"]
+                limit 1
+            ),
             label := (
                 select Label
                 filter .name = <str>album["label_name"]

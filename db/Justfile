@@ -170,6 +170,20 @@ drop *args: stop
         fi
     fi
 
+# Delete all objects in the database.
+@delete:
+    {{edgedb_instance}} query \
+        "delete Album; \
+        delete Track; \
+        delete Player; \
+        delete Artist; \
+        delete Person; \
+        delete Composition; \
+        delete Label; \
+        delete Date; \
+        delete Instrument;" \
+        | {{jq}}
+
 # Seed the database.
 @seed:
     {{edgedb_instance}} query --file seed.edgeql
@@ -207,6 +221,15 @@ jq := "jq | " + bat
         "select Instrument { ** } filter .name ilike '%{{name}}%'" \
         | {{jq}}
 
+# View compositions in the database.
+@compositions:
+    {{edgedb_instance}} query "select Composition { ** };" | {{jq}}
+
+# View a composition in the database.
+@composition title:
+    {{edgedb_instance}} query \
+        "select Composition { ** } filter .title ilike '%{{title}}%'" | {{jq}}
+
 # View players in the database.
 @players:
     {{edgedb_instance}} query "select Player { ** };" | {{jq}}
@@ -217,14 +240,14 @@ jq := "jq | " + bat
         "select Player { ** } filter .person.full_name ilike '%{{name}}%'" \
         | {{jq}}
 
-# View compositions in the database.
-@compositions:
-    {{edgedb_instance}} query "select Composition { ** };" | {{jq}}
+# View artists in the database.
+@artists:
+    {{edgedb_instance}} query "select Artist { ** };" | {{jq}}
 
-# View a composition in the database.
-@composition title:
+# View an artist in the database.
+@artist name:
     {{edgedb_instance}} query \
-        "select Composition { ** } filter .title ilike '%{{title}}%'" | {{jq}}
+        "select Artist { ** } filter .name ilike '%{{name}}%'" | {{jq}}
 
 # View tracks in the database.
 @tracks:
@@ -247,6 +270,15 @@ jq := "jq | " + bat
         filter .title ilike '%{{title}}%'" \
         | {{jq}}
 
+# View labels in the database.
+@labels:
+    {{edgedb_instance}} query "select Label { ** };" | {{jq}}
+
+# View a label in the database.
+@label name:
+    {{edgedb_instance}} query \
+        "select Label { ** } filter .name ilike '%{{name}}%'" | {{jq}}
+
 # View albums in the database.
 @albums:
     {{edgedb_instance}} query "select Album { ** };" | {{jq}}
@@ -255,3 +287,4 @@ jq := "jq | " + bat
 @album title:
     {{edgedb_instance}} query \
         "select Album { ** } filter .title ilike '%{{title}}%'" | {{jq}}
+
