@@ -219,13 +219,16 @@ module default {
             rewrite insert, update using (
                 with id := .id
                 select __subject__.title
-                ?? to_str(
-                    array_agg(
-                        (
-                            select Track filter .id = id limit 1
-                        ).compositions.title
-                    ),
-                ", ")
+                ?? (
+                    with compositions  := (
+                        __subject__.compositions
+                        ?? (
+                            select Track.compositions
+                            filter .id = id
+                            limit 1
+                        )
+                    ) select to_str(array_agg(compositions.title), ", ")
+                )
             )
         };
         multi compositions: Composition {
@@ -257,11 +260,21 @@ module default {
     }
 
     type Disc {
-        title: str;
+        disc_title: str;
         number: int32 {
             constraint min_value(1);
         };
         multi tracks: Track;
+
+        link album := .<discs[is Album];
+        property title := {
+            .disc_title ?? .album.title
+        };
+        property duration := (
+            to_duration(
+                seconds := sum((duration_get(.tracks.duration, "totalseconds")))
+            )
+        );
     }
 
     type Album {
@@ -275,8 +288,14 @@ module default {
         date_released: Date;
         date_recorded: Date;
 
+        multi link tracks := .discs.tracks;
         property disc_total := (
             count(.discs)
+        );
+        property duration := (
+            to_duration(
+                seconds := sum((duration_get(.discs.duration, "totalseconds")))
+            )
         );
     }
 };

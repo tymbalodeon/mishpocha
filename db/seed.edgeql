@@ -48,7 +48,7 @@ with people := <json>(
     ), inserts := (
         person if not exists existing_person else <json>{}
     )
-    for non_existing_person in { inserts } union (
+    for non_existing_person in inserts union (
         insert Person {
             first_name := <str>person["first_name"],
             last_name := <str>person["last_name"],
@@ -74,7 +74,7 @@ with instruments := <json>(
         limit 1
     ), inserts := (
         instrument if not exists existing_instrument else <json>{}
-    ) for non_existing_instrument in { inserts } union (
+    ) for non_existing_instrument in inserts union (
         insert Instrument {
             name := <str>instrument["name"],
         }
@@ -175,7 +175,7 @@ with compositions := <json>(
         )
     },
     {
-        title := "Then Paul Saw the Snake (For Susan)",
+        title := "Then Paul Saw the Snake (for Susan)",
         composers := (
             { full_name := "Evan Parker"},
             { full_name := "Barry Guy"},
@@ -197,7 +197,7 @@ with compositions := <json>(
         limit 1
     ), inserts := (
         composition if not exists existing_composition else <json>{}
-    ) for non_existing_composition in { inserts } union (
+    ) for non_existing_composition in inserts union (
         insert Composition {
             title := <str>composition["title"],
             composers := distinct (
@@ -233,7 +233,8 @@ with tracks := <json>(
             { full_name := "Evan Parker", instrument := "soprano saxophone" },
             { full_name := "Barry Guy", instrument := "bass" },
             { full_name := "Paul Lytton", instrument := "drums" },
-        )
+        ),
+        duration := "12 minutes 47 seconds"
     },
     {
         compositions := ({ title := "The Masks"},),
@@ -242,7 +243,8 @@ with tracks := <json>(
             { full_name := "Evan Parker", instrument := "soprano saxophone" },
             { full_name := "Barry Guy", instrument := "bass" },
             { full_name := "Paul Lytton", instrument := "drums" },
-        )
+        ),
+        duration := "10 minutes 47 seconds"
     },
     {
         compositions := ({ title := "Craig's Story"},),
@@ -251,26 +253,29 @@ with tracks := <json>(
             { full_name := "Evan Parker", instrument := "soprano saxophone" },
             { full_name := "Barry Guy", instrument := "bass" },
             { full_name := "Paul Lytton", instrument := "drums" },
-        )
+        ),
+        duration := "14 minutes 10 seconds"
     },
     {
-        compositions := ({ title := "Pedal (for Warren)"},),
+        compositions := ({ title := "Pedal (For Warren)"},),
         number := 4,
         players := (
             { full_name := "Evan Parker", instrument := "soprano saxophone" },
             { full_name := "Barry Guy", instrument := "bass" },
             { full_name := "Paul Lytton", instrument := "drums" },
-        )
+        ),
+        duration := "9 minutes 22 seconds"
     },
     {
-        compositions := ({ title := "Then Paul saw the Snake (for Susan)"},),
+        compositions := ({ title := "Then Paul Saw the Snake (for Susan)"},),
         number := 5,
         players := (
             { full_name := "Evan Parker", instrument := "soprano saxophone" },
             { full_name := "Barry Guy", instrument := "bass" },
             { full_name := "Paul Lytton", instrument := "drums" },
             { full_name := "Joe McPhee", instrument := "trumpet" },
-        )
+        ),
+        duration := "11 minutes 59 seconds"
     },
 ) for track in json_array_unpack(tracks) union (
     with existing_track := (
@@ -279,7 +284,7 @@ with tracks := <json>(
         limit 1
     ), inserts := (
         track if not exists existing_track else <json>{}
-    ) for non_existing_track in { inserts } union (
+    ) for non_existing_track in inserts union (
         insert Track {
             compositions  := distinct (
                 for composition in json_array_unpack(track["compositions"]) union (
@@ -296,7 +301,8 @@ with tracks := <json>(
                         .instrument.name = <str>player["instrument"]
                     }
                 )
-            )
+            ),
+            duration := <duration>track["duration"]
         }
     )
 );
@@ -316,7 +322,7 @@ with artists := <json>(
         limit 1
     ), inserts := (
         artist if not exists existing_artist else <json>{}
-    ) for non_existing_artist in { inserts } union (
+    ) for non_existing_artist in inserts union (
         insert Artist {
             members := (
                 select Person
@@ -337,9 +343,37 @@ with labels := <json>(
         limit 1
     ), inserts := (
         label if not exists existing_label else <json>{}
-    ) for non_existing_label in { inserts } union (
+    ) for non_existing_label in inserts union (
         insert Label {
             name := <str>label["name"],
+        }
+    )
+);
+
+with discs := <json>(
+    {
+        album_title := "The Redwood Session",
+        track_names := {
+            "Not Yet",
+            "The Masks",
+            "Craig's Story",
+            "Pedal (For Warren)",
+            "Then Paul Saw the Snake (for Susan)",
+        }
+    },
+) for disc in json_array_unpack(discs) union (
+    with existing_disc := (
+        select Disc
+        filter .title = <str>disc["album_title"]
+        limit 1
+    ), inserts := (
+        disc if not exists existing_disc else <json>{}
+    ) for non_existing_disc in inserts union (
+        insert Disc {
+            tracks := (
+                select Track
+                filter contains(<array<str>>disc["track_names"], .title)
+            )
         }
     )
 );
@@ -359,7 +393,7 @@ with albums := <json>(
         limit 1
     ), inserts := (
         album if not exists existing_album else <json>{}
-    ) for non_existing_album in { inserts } union (
+    ) for non_existing_album in inserts union (
         insert Album {
             title := <str>album["title"],
             series_number := <int32>album["series_number"],
@@ -367,6 +401,9 @@ with albums := <json>(
                 select Artist
                 filter .name = <str>album["artist_name"]
                 limit 1
+            ),
+            discs := (
+                select Disc
             ),
             producers := (
                 select Person
@@ -381,3 +418,4 @@ with albums := <json>(
         }
     )
 );
+
