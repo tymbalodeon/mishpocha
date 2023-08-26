@@ -1,9 +1,9 @@
 use actix_web::{
     get, post,
     web::{Json, Query},
-    App, HttpResponse, HttpServer, Responder,
+    App, HttpResponse, HttpServer, Responder, Result,
 };
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 #[get("/")]
 async fn welcome() -> impl Responder {
@@ -54,18 +54,24 @@ async fn get_dates() -> impl Responder {
     )
 }
 
+#[derive(Serialize)]
+struct PersonName {
+    full_name: String,
+}
+
 #[get("/people")]
-async fn get_people() -> impl Responder {
+async fn get_people() -> Result<impl Responder> {
     let client = edgedb_tokio::create_client()
         .await
         .expect("Failed to connect to database");
-    HttpResponse::Ok().body(
-        client
-            .query_json("select Person { ** };", &())
+    let person = PersonName {
+        full_name: client
+            .query_json("select Person { full_name };", &())
             .await
             .expect("failed to execute query")
             .to_string(),
-    )
+    };
+    Ok(Json(person))
 }
 
 #[derive(Deserialize)]
@@ -201,7 +207,7 @@ async fn post_player(player: Json<Player>) -> impl Responder {
                     )
                 } unless conflict;
                 ",
-                &(&player.person_name,&player.instrument_name),
+                &(&player.person_name, &player.instrument_name),
             )
             .await
             .expect("failed to execute query")
