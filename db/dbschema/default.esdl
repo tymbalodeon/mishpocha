@@ -30,6 +30,14 @@ module default {
             person.birth_date.day,
         )
     );
+
+    function get_totalseconds(duration: duration) -> float64 using (
+        duration_get(duration, "totalseconds")
+    );
+
+    function get_duration_from_seconds(seconds: float64) -> duration using (
+        to_duration(seconds := seconds)
+    );
 }
 
 module default {
@@ -273,9 +281,8 @@ module default {
             .disc_title ?? .album.title
         };
         property duration := (
-            to_duration(
-                seconds := sum((duration_get(.tracks.duration, "totalseconds")))
-            )
+            with seconds := sum(get_totalseconds(.tracks.duration))
+            select get_duration_from_seconds(seconds)
         );
     }
 
@@ -295,9 +302,8 @@ module default {
             count(.discs)
         );
         property duration := (
-            to_duration(
-                seconds := sum((duration_get(.discs.duration, "totalseconds")))
-            )
+            with seconds := sum(get_totalseconds(.discs.duration))
+            select get_duration_from_seconds(seconds)
         );
     }
 };

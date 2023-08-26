@@ -184,7 +184,8 @@ drop *args: stop
         delete Person; \
         delete Composition; \
         delete Label; \
-        delete Date; \ delete Instrument;" \
+        delete Date; \
+        delete Instrument;" \
         | {{jq}}
 
 # Seed the database.
