@@ -189,6 +189,8 @@ module default {
         };
 
         constraint exclusive on ((.person, .instrument));
+
+        property display := .person.full_name ++ " (" ++ .instrument.name ++ ")"
     }
 
     type Artist {
