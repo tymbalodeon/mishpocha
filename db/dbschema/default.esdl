@@ -101,12 +101,12 @@ module default {
             ), latest_day := (
                 .death_date.day ?? current_day
             ) select get_age(
-                latest_year,
-                latest_month,
-                latest_day,
                 .birth_date.year,
                 .birth_date.month,
                 .birth_date.day,
+                latest_year,
+                latest_month,
+                latest_day
             )
         );
         multi link compositions := .<composers[is Composition];

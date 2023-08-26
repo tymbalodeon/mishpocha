@@ -194,7 +194,7 @@ jq := "jq | " + bat
 # View a person in the database.
 @person full_name:
     {{edgedb_instance}} query \
-        "select Person { ** } filter .full_name ilke '%{{full_name}}%'" \
+        "select Person { ** } filter .full_name ilike '%{{full_name}}%'" \
         | {{jq}}
 
 # View instruments in the database.
@@ -216,6 +216,15 @@ jq := "jq | " + bat
     {{edgedb_instance}} query \
         "select Player { ** } filter .person.full_name ilike '%{{name}}%'" \
         | {{jq}}
+
+# View compositions in the database.
+@compositions:
+    {{edgedb_instance}} query "select Composition { ** };" | {{jq}}
+
+# View a composition in the database.
+@composition title:
+    {{edgedb_instance}} query \
+        "select Composition { ** } filter .title ilike '%{{title}}%'" | {{jq}}
 
 # View tracks in the database.
 @tracks:
