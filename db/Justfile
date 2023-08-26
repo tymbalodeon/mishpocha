@@ -194,32 +194,61 @@ jq := "jq | " + bat
 
 # View dates in the database.
 @dates:
-    {{edgedb_instance}} query "select Date { ** };" | {{jq}}
+    {{edgedb_instance}} query \
+        "select Date { local_date, birthdays := .births.full_name };" | {{jq}}
 
 # View a date in the database.
 @date display:
     {{edgedb_instance}} query \
-        "select Date { ** } filter .display ilike '%{{display}}%'" \
+        "select Date { \
+            local_date, \
+            birthdays := .births.full_name \
+        } filter .display ilike '%{{display}}%'" \
         | {{jq}}
 
 # View people in the database.
 @people:
-    {{edgedb_instance}} query "select Person { ** };" | {{jq}}
+    {{edgedb_instance}} query \
+        "select Person { \
+            is_alive, \
+            full_name, \
+            age, \
+            birthday := .birth_date.local_date, \
+            groups_in := .groups.name, \
+            compositions_written := .compositions.title, \
+            instruments_played := .instruments.name, \
+            tracks_recorded := .tracks.title, \
+        };" | {{jq}}
 
 # View a person in the database.
 @person full_name:
     {{edgedb_instance}} query \
-        "select Person { ** } filter .full_name ilike '%{{full_name}}%'" \
+        "select Person { \
+            is_alive, \
+            full_name, \
+            age, \
+            birthday := .birth_date.local_date, \
+            groups_in := .groups.name, \
+            compositions_written := .compositions.title, \
+            instruments_played := .instruments.name, \
+            tracks_recorded := .tracks.title, \
+        } filter .full_name ilike '%{{full_name}}%'" \
         | {{jq}}
 
 # View instruments in the database.
 @instruments:
-    {{edgedb_instance}} query "select Instrument { ** };" | {{jq}}
+    {{edgedb_instance}} query "select Instrument { \
+        name, \
+        people_playing := .players.person.full_name \
+    };" | {{jq}}
 
 # View an instrument in the database.
 @instrument name:
     {{edgedb_instance}} query \
-        "select Instrument { ** } filter .name ilike '%{{name}}%'" \
+        "select Instrument { \
+            name, \
+            people_playing := .players.person.full_name \
+        } filter .name ilike '%{{name}}%'" \
         | {{jq}}
 
 # View compositions in the database.
