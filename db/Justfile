@@ -214,14 +214,14 @@ jq := "jq | " + bat
 @people:
     {{edgedb_instance}} query \
         "select Person { \
-            is_alive, \
             full_name, \
-            age, \
             birthday := .birth_date.local_date, \
-            groups_in := .groups.name, \
-            compositions_written := .compositions.title, \
-            instruments_played := .instruments.name, \
-            tracks_recorded := .tracks.title, \
+            age, \
+            is_alive, \
+            person_instruments := .instruments.name, \
+            person_groups := .groups.name, \
+            person_compositions := .compositions.title, \
+            person_tracks := .tracks.title, \
         };" \
         | {{jq}}
 
@@ -229,14 +229,14 @@ jq := "jq | " + bat
 @person full_name:
     {{edgedb_instance}} query \
         "select Person { \
-            is_alive, \
             full_name, \
-            age, \
             birthday := .birth_date.local_date, \
-            groups_in := .groups.name, \
-            compositions_written := .compositions.title, \
-            instruments_played := .instruments.name, \
-            tracks_recorded := .tracks.title, \
+            age, \
+            is_alive, \
+            person_instruments := .instruments.name, \
+            person_groups := .groups.name, \
+            person_compositions := .compositions.title, \
+            person_tracks := .tracks.title, \
         } filter .full_name ilike '%{{full_name}}%'" \
         | {{jq}}
 
@@ -245,7 +245,7 @@ jq := "jq | " + bat
     {{edgedb_instance}} query \
         "select Instrument { \
             name, \
-            people_playing := .players.person.full_name \
+            instrument_players := .players.person.full_name \
         };" \
         | {{jq}}
 
@@ -254,7 +254,7 @@ jq := "jq | " + bat
     {{edgedb_instance}} query \
         "select Instrument { \
             name, \
-            people_playing := .players.person.full_name \
+            instrument_players := .players.person.full_name \
         } filter .name ilike '%{{name}}%'" \
         | {{jq}}
 
