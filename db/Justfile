@@ -195,19 +195,22 @@ drop *args: stop
 bat := "bat --style plain --language json --theme gruvbox-dark"
 jq := "jq | " + bat
 
+select_date := "\
+select Date { \
+    local_date, \
+    birthdays := .births.full_name \
+}"
+
 # View dates in the database.
 @dates:
     {{edgedb_instance}} query \
-        "select Date { local_date, birthdays := .births.full_name };" \
+        "{{select_date}}" \
         | {{jq}}
 
 # View a date in the database.
 @date display:
     {{edgedb_instance}} query \
-        "select Date { \
-            local_date, \
-            birthdays := .births.full_name \
-        } filter .display ilike '%{{display}}%'" \
+        "{{select_date}} filter .display ilike '%{{display}}%'" \
         | {{jq}}
 
 # View people in the database.
@@ -326,7 +329,7 @@ jq := "jq | " + bat
             duration, \
             number, \
             people := .players.display, \
-            date_recorded, \
+            track_date_recorded := .date_recorded.local_date, \
         };" | {{jq}}
 
 # View a track in the database.
@@ -337,7 +340,7 @@ jq := "jq | " + bat
             duration, \
             number, \
             people := .players.display, \
-            date_recorded, \
+            track_date_recorded := .date_recorded.local_date, \
         } filter .title ilike '%{{title}}%'" \
         | {{jq}}
 

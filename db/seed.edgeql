@@ -234,6 +234,7 @@ with tracks := <json>(
             { full_name := "Barry Guy", instrument := "bass" },
             { full_name := "Paul Lytton", instrument := "drums" },
         ),
+        date_recorded := { day := 18, month := 6, year := 1995 },
         duration := "12 minutes 47 seconds"
     },
     {
@@ -244,6 +245,7 @@ with tracks := <json>(
             { full_name := "Barry Guy", instrument := "bass" },
             { full_name := "Paul Lytton", instrument := "drums" },
         ),
+        date_recorded := { day := 18, month := 6, year := 1995 },
         duration := "10 minutes 47 seconds"
     },
     {
@@ -254,6 +256,7 @@ with tracks := <json>(
             { full_name := "Barry Guy", instrument := "bass" },
             { full_name := "Paul Lytton", instrument := "drums" },
         ),
+        date_recorded := { day := 18, month := 6, year := 1995 },
         duration := "14 minutes 10 seconds"
     },
     {
@@ -264,6 +267,7 @@ with tracks := <json>(
             { full_name := "Barry Guy", instrument := "bass" },
             { full_name := "Paul Lytton", instrument := "drums" },
         ),
+        date_recorded := { day := 18, month := 6, year := 1995 },
         duration := "9 minutes 22 seconds"
     },
     {
@@ -275,6 +279,7 @@ with tracks := <json>(
             { full_name := "Paul Lytton", instrument := "drums" },
             { full_name := "Joe McPhee", instrument := "trumpet" },
         ),
+        date_recorded := { day := 18, month := 6, year := 1995 },
         duration := "11 minutes 59 seconds"
     },
 ) for track in json_array_unpack(tracks) union (
@@ -301,6 +306,15 @@ with tracks := <json>(
                         .instrument.name = <str>player["instrument"]
                     }
                 )
+            ),
+            date_recorded := (
+                select Date
+                filter {
+                    .day = <int16>track["date_recorded"]["day"],
+                    .month = <int16>track["date_recorded"]["month"],
+                    .year = <int32>track["date_recorded"]["year"]
+                }
+                limit 1
             ),
             duration := <duration>track["duration"]
         }
