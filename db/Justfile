@@ -203,9 +203,7 @@ select Date { \
 
 # View dates in the database.
 @dates:
-    {{edgedb_instance}} query \
-        "{{select_date}}" \
-        | {{jq}}
+    {{edgedb_instance}} query "{{select_date}}" | {{jq}}
 
 # View a date in the database.
 @date display:
@@ -213,229 +211,190 @@ select Date { \
         "{{select_date}} filter .display ilike '%{{display}}%'" \
         | {{jq}}
 
+select_person := "\
+select Person { \
+    full_name, \
+    birthday := .birth_date.local_date, \
+    age, \
+    is_alive, \
+    person_instruments := .instruments.name, \
+    person_groups := .groups.name, \
+    person_compositions := .compositions.title, \
+    person_tracks := .tracks.title, \
+};"
+
 # View people in the database.
 @people:
-    {{edgedb_instance}} query \
-        "select Person { \
-            full_name, \
-            birthday := .birth_date.local_date, \
-            age, \
-            is_alive, \
-            person_instruments := .instruments.name, \
-            person_groups := .groups.name, \
-            person_compositions := .compositions.title, \
-            person_tracks := .tracks.title, \
-        };" \
-        | {{jq}}
+    {{edgedb_instance}} query "{{select_person}}" | {{jq}}
 
 # View a person in the database.
 @person full_name:
     {{edgedb_instance}} query \
-        "select Person { \
-            full_name, \
-            birthday := .birth_date.local_date, \
-            age, \
-            is_alive, \
-            person_instruments := .instruments.name, \
-            person_groups := .groups.name, \
-            person_compositions := .compositions.title, \
-            person_tracks := .tracks.title, \
-        } filter .full_name ilike '%{{full_name}}%'" \
+        "{{select_person}} filter .full_name ilike '%{{full_name}}%'" \
         | {{jq}}
+
+select_instrument := "\
+select Instrument { \
+    name, \
+    instrument_players := .players.person.full_name \
+};"
 
 # View instruments in the database.
 @instruments:
-    {{edgedb_instance}} query \
-        "select Instrument { \
-            name, \
-            instrument_players := .players.person.full_name \
-        };" \
-        | {{jq}}
+    {{edgedb_instance}} query "{{select_instrument}}" | {{jq}}
 
 # View an instrument in the database.
 @instrument name:
     {{edgedb_instance}} query \
-        "select Instrument { \
-            name, \
-            instrument_players := .players.person.full_name \
-        } filter .name ilike '%{{name}}%'" \
+        "{{select_instrument}} filter .name ilike '%{{name}}%'" \
         | {{jq}}
+
+select_composition := "\
+select Composition { \
+    title, \
+    date := .date_composed.local_date, \
+    creators := .composers.full_name, \
+    instruments := .instrumentation.name, \
+};"
 
 # View compositions in the database.
 @compositions:
     {{edgedb_instance}} query \
-        "select Composition { \
-            title, \
-            date := .date_composed.local_date, \
-            creators := .composers.full_name, \
-            instruments := .instrumentation.name, \
-        };" \
+        "{{select_composition}}" \
         | {{jq}}
 
 # View a composition in the database.
 @composition title:
     {{edgedb_instance}} query \
-        "select Composition { \
-            title, \
-            date := .date_composed.local_date, \
-            creators := .composers.full_name, \
-            instruments := .instrumentation.name, \
-        } filter .title ilike '%{{title}}%'" \
+        "{{select_composition}} filter .title ilike '%{{title}}%'" \
         | {{jq}}
+
+select_player := "\
+select Player { \
+    instrument_played := .instrument.name, \
+    performer := .person.full_name, \
+};"
 
 # View players in the database.
 @players:
     {{edgedb_instance}} query \
-        "select Player { \
-            instrument_played := .instrument.name, \
-            performer := .person.full_name, \
-        };" \
+        "{{select_player}}" \
         | {{jq}}
 
 # View a player in the database.
 @player name:
     {{edgedb_instance}} query \
-        "select Player { \
-            instrument_played := .instrument.name, \
-            performer := .person.full_name, \
-        } filter .person.full_name ilike '%{{name}}%'" \
+        "{{select_player}} filter .person.full_name ilike '%{{name}}%'" \
         | {{jq}}
+
+select_artist := "\
+select Artist { \
+    name, \
+    people := .members.full_name, \
+    albums_made := .albums.title, \
+};"
 
 # View artists in the database.
 @artists:
-    {{edgedb_instance}} query \
-        "select Artist { \
-            name, \
-            people := .members.full_name, \
-            albums_made := .albums.title, \
-        };" \
-        | {{jq}}
+    {{edgedb_instance}} query "{{select_artist}}" | {{jq}}
 
 # View an artist in the database.
 @artist name:
     {{edgedb_instance}} query \
-        "select Artist { \
-            name, \
-            people := .members.full_name, \
-            albums_made := .albums.title, \
-        } filter .name ilike '%{{name}}%'" \
+        "{{select_artist}} filter .name ilike '%{{name}}%'" \
         | {{jq}}
+
+select_track := "\
+select Track { \
+    title, \
+    duration, \
+    number, \
+    people := .players.display, \
+    track_date_recorded := .date_recorded.local_date, \
+};"
 
 # View tracks in the database.
 @tracks:
-    {{edgedb_instance}} query \
-        "select Track { \
-            title, \
-            duration, \
-            number, \
-            people := .players.display, \
-            track_date_recorded := .date_recorded.local_date, \
-        };" | {{jq}}
+    {{edgedb_instance}} query "{{select_track}}" | {{jq}}
 
 # View a track in the database.
 @track title:
     {{edgedb_instance}} query \
-        "select Track { \
-            title, \
-            duration, \
-            number, \
-            people := .players.display, \
-            track_date_recorded := .date_recorded.local_date, \
-        } filter .title ilike '%{{title}}%'" \
+        "{{select_track}} filter .title ilike '%{{title}}%'" \
         | {{jq}}
+
+select_label := "\
+select Label { \
+    name, \
+    label_series := .series.name, \
+    label_albums := .albums.title, \
+    label_artists := .artists.name \
+};"
 
 # View labels in the database.
 @labels:
-    {{edgedb_instance}} query \
-        "select Label { \
-            name, \
-            label_series := .series.name, \
-            label_albums := .albums.title, \
-            label_artists := .artists.name \
-        };" \
-        | {{jq}}
+    {{edgedb_instance}} query "{{select_label}}" | {{jq}}
 
 # View a label in the database.
 @label name:
     {{edgedb_instance}} query \
-        "select Label { \
-            name, \
-            label_series := .series.name, \
-            label_albums := .albums.title, \
-            label_artists := .artists.name \
-        } filter .name ilike '%{{name}}%'" \
+        "{{select_label}} filter .name ilike '%{{name}}%'" \
         | {{jq}}
+
+select_series := "\
+select Series { \
+    name, \
+    series_label := .label.name, \
+    series_albums := .albums.title, \
+};"
 
 # View series in the database.
 @series:
-    {{edgedb_instance}} query \
-        "select Series { \
-            name, \
-            series_label := .label.name, \
-            series_albums := .albums.title, \
-        };" \
-        | {{jq}}
+    {{edgedb_instance}} query "{{select_series}}" | {{jq}}
 
 # View a series in the database.
 @series-single name:
     {{edgedb_instance}} query \
-        "select Series { \
-            name, \
-            series_label := .label.name, \
-            series_albums := .albums.name, \
-        } filter .name ilike '%{{name}}%'" \
+        "{{select_series}} filter .name ilike '%{{name}}%'" \
         | {{jq}}
+
+select_disc := "\
+select Disc { \
+    title, \
+    tracks: { title, duration, number} order by .number, \
+    duration, \
+};"
 
 # View discs in the database.
 @discs:
-    {{edgedb_instance}} query \
-        "select Disc { \
-            title, \
-            tracks: { title, duration, number} order by .number, \
-            duration, \
-        };" \
-        | {{jq}}
+    {{edgedb_instance}} query "{{select_disc}}" | {{jq}}
 
 # View a disc in the database.
 @disc title:
     {{edgedb_instance}} query \
-        "select Disc { \
-            title, \
-            tracks: { title, duration, number} order by .number, \
-            duration, \
-        } filter .title ilike '%{{title}}%'" \
+        "{{select_disc}} filter .title ilike '%{{title}}%'" \
         | {{jq}}
+
+select_album := "\
+select Album { \
+    title, \
+    album_artists := .artists.name, \
+    disc_total, \
+    album_tracks := .tracks.title, \
+    duration, \
+    album_label := .label.name, \
+    producer := .producers.full_name, \
+    catalog_number, \
+    series_name := .series.name, \
+    series_number, \
+};"
 
 # View albums in the database.
 @albums:
-    {{edgedb_instance}} query \
-        "select Album { \
-            title, \
-            album_artists := .artists.name, \
-            disc_total, \
-            album_tracks := .tracks.title, \
-            duration, \
-            album_label := .label.name, \
-            producer := .producers.full_name, \
-            catalog_number, \
-            series_name := .series.name, \
-            series_number, \
-        };" \
-        | {{jq}}
+    {{edgedb_instance}} query "{{select_album}}" | {{jq}}
 
 # View an album in the database.
 @album title:
     {{edgedb_instance}} query \
-        "select Album { \
-            title, \
-            album_artists := .artists.name, \
-            disc_total, \
-            album_tracks := .tracks.title, \
-            duration, \
-            album_label := .label.name, \
-            producer := .producers.full_name, \
-            catalog_number, \
-            series_name := .series.name, \
-            series_number, \
-        } filter .title ilike '%{{title}}%'" \
+        "{{select_album}} filter .title ilike '%{{title}}%'" \
         | {{jq}}
