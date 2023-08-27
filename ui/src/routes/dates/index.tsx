@@ -28,10 +28,16 @@ export const dates = [
 export default component$(() => {
   return (
     <>
-      <h2>Dates</h2>
+      <h2 class="font-bold text-xl pl-4 pt-8">Dates</h2>
       {dates
         ? dates.map((date) => {
-            return <Date localDate={date.localDate} births={date.births} />;
+            return (
+              <Date
+                localDate={date.localDate}
+                births={date.births}
+                compact={true}
+              />
+            );
           })
         : null}
     </>

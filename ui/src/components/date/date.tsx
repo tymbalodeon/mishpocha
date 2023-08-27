@@ -7,14 +7,13 @@ interface Date {
 
 export const Date = component$<Date>((props) => {
   return (
-    <>
-      <h2>{props.localDate}</h2>
+    <a href={"/dates/" + props.localDate}>
       <div class="card w-96 bg-neutral shadow-xl m-4">
         <div class="card-body">
           <h2 class="card-title">{props.localDate}</h2>
-          <p>Births: {props.births}</p>
+          {!props.compact ? <p>Births: {props.births}</p> : null}
         </div>
       </div>
-    </>
+    </a>
   );
 });

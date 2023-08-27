@@ -7,7 +7,14 @@ export default component$(() => {
   const id = useLocation().params.id;
   const date = dates.find((date) => date.localDate == id);
 
-  return <Date localDate={date.localDate} births={date.births} />;
+  return (
+    <>
+      <Date localDate={date.localDate} births={date.births} />
+      <a href="/dates" class="link pl-4">
+        All dates
+      </a>
+    </>
+  );
 });
 
 export const head: DocumentHead = {
