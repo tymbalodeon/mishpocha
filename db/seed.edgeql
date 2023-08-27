@@ -346,24 +346,6 @@ with artists := <json>(
     )
 );
 
-with labels := <json>(
-    {
-        name := "CIMP",
-    },
-) for label in json_array_unpack(labels) union (
-    with existing_label := (
-        select Label
-        filter .name = <str>label["name"]
-        limit 1
-    ), inserts := (
-        label if not exists existing_label else <json>{}
-    ) for non_existing_label in inserts union (
-        insert Label {
-            name := <str>label["name"],
-        }
-    )
-);
-
 with discs := <json>(
     {
         album_title := "The Redwood Session",
@@ -404,6 +386,30 @@ with series_list := <json>(
     ) for non_existing_series in inserts union (
         insert Series {
             name := <str>series["name"],
+        }
+    )
+);
+
+with labels := <json>(
+    {
+        name := "CIMP",
+        series_name := "Spirit Room Series"
+    },
+) for label in json_array_unpack(labels) union (
+    with existing_label := (
+        select Label
+        filter .name = <str>label["name"]
+        limit 1
+    ), inserts := (
+        label if not exists existing_label else <json>{}
+    ) for non_existing_label in inserts union (
+        insert Label {
+            name := <str>label["name"],
+            series := (
+                select Series
+                filter .name = <str>label["series_name"]
+                limit 1
+            ),
         }
     )
 );

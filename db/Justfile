@@ -349,8 +349,9 @@ select Date { \
     {{edgedb_instance}} query \
         "select Label { \
             name, \
-            albums_released := .albums.title, \
-            artists_recorded := .artists.name \
+            label_series := .series.name, \
+            label_albums := .albums.title, \
+            label_artists := .artists.name \
         };" \
         | {{jq}}
 
@@ -359,8 +360,9 @@ select Date { \
     {{edgedb_instance}} query \
         "select Label { \
             name, \
-            albums_released := .albums.title, \
-            artists_recorded := .artists.name \
+            label_series := .series.name, \
+            label_albums := .albums.title, \
+            label_artists := .artists.name \
         } filter .name ilike '%{{name}}%'" \
         | {{jq}}
 
@@ -369,6 +371,8 @@ select Date { \
     {{edgedb_instance}} query \
         "select Series { \
             name, \
+            series_label := .label.name, \
+            series_albums := .albums.title, \
         };" \
         | {{jq}}
 
@@ -377,6 +381,8 @@ select Date { \
     {{edgedb_instance}} query \
         "select Series { \
             name, \
+            series_label := .label.name, \
+            series_albums := .albums.name, \
         } filter .name ilike '%{{name}}%'" \
         | {{jq}}
 

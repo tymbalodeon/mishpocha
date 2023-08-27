@@ -259,13 +259,14 @@ module default {
     type Series {
         name: str;
 
-        link label: Label;
+        link label := .<series[is Label];
+        multi link albums := .<series[is Album];
     }
 
     type Label {
         name: str;
+        multi series: Series;
 
-        multi link series := .<label[is Series];
         multi link albums := .<label[is Album];
         multi link artists := .albums.artists;
     }
