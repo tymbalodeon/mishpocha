@@ -54,6 +54,10 @@ _build *prod:
         docker build --target "${target}" --tag {{image}} .
     fi
 
+# Open the application in the browser.
+@open:
+    open {{url}}
+
 # Run the Docker container, and optionally "--open" in the browser.
 start *args: stop (_build args)
     #!/usr/bin/env zsh
@@ -95,10 +99,6 @@ clean:
     #!/usr/bin/env zsh
     docker rmi {{image}} >/dev/null 2>&1
     exit 0
-
-# Open the application in the browser.
-@open:
-    open {{url}}
 
 # View people in the database.
 @people: local
