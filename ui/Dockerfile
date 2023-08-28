@@ -1,14 +1,14 @@
-FROM node AS base
+FROM node as base
 RUN npm install --global pnpm
 WORKDIR /ui
-COPY ./ ./
+COPY . .
 RUN pnpm install
 
-FROM base AS dev
+FROM base as dev
 WORKDIR /ui
-CMD [ "pnpm", "dev", "--host" ]
+CMD ["pnpm", "dev", "--host"]
 
-FROM base AS prod
+FROM base as prod
 WORKDIR /ui
 RUN pnpm build
-CMD [ "node", "server/entry.express" ]
+CMD ["node", "server/entry.express"]

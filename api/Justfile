@@ -1,30 +1,43 @@
-@_help:
-    just --list
+set fallback
 
-local_url := "http://localhost:8080"
+cargo_run_with_db := 'env EDGEDB_DSN="${EDGEDB_DSN}" cargo run'
 image := "mishpocha-api"
-dev_port := "8080"
+port := "8080"
+url := "http://localhost:" + port
 bat := "bat --style plain --language json"
 jq := "jq | " + bat
 
-# Run the server locally.
-local:
+_help *_from-main:
     #!/usr/bin/env zsh
-    if ! http GET {{local_url}} &>/dev/null; then
-        env EDGEDB_DSN="$( \
-            edgedb instance credentials \
-                --insecure-dsn \
-                --instance mishpocha_db \
-            )?tls_security=insecure" \
-        cargo run &>/dev/null &
+    if [ -z "{{_from-main}}" ]; then
+        just --list
+    else
+        just --list --list-heading $'\nAPI: [`just api <COMMAND>`]\n'
+    fi
+
+# Run the server locally.
+local *args: stop
+    #!/usr/bin/env zsh
+    EDGEDB_DSN="$( \
+        edgedb instance credentials \
+            --insecure-dsn \
+            --instance mishpocha_db \
+        )?tls_security=insecure"
+    if [[ "{{args}}" = *"--background"* ]]; then
+        {{cargo_run_with_db}} &>/dev/null &
+    else
+        {{cargo_run_with_db}}
     fi
 
 # Stop the server.
 stop:
     #!/usr/bin/env zsh
-    mishpocha="$(pgrep mishpocha-api)"
+    mishpocha="$(pgrep {{image}})"
     if [ -n "${mishpocha}" ]; then
         kill "${mishpocha}" &>/dev/null
+    fi
+    if [ -n "$(just running)" ]; then
+        docker kill {{image}}
     fi
 
 # Show if the container is running.
@@ -34,27 +47,63 @@ running:
         docker container ls --filter name={{image}}
     fi
 
-_build:
+_build *prod:
     #!/usr/bin/env zsh
     if [ -z "$(just running)" ]; then \
-        docker build --tag {{image}} .
+        target="{{ if prod =~ "--prod" { "prod" } else { "dev" } }}"
+        docker build --target "${target}" --tag {{image}} .
     fi
 
-# Run the docker container.
-@start *args: _build
-    docker run \
-        --detach \
-        --name {{image}} \
-        --publish {{dev_port}}:{{dev_port}} \
-        --rm \
-        --volume "$(pwd)"/src:/ui/src \
-        {{image}}
+# Run the Docker container, and optionally "--open" in the browser.
+start *args: stop (_build args)
+    #!/usr/bin/env zsh
+    if [[ "{{args}}" = *--prod* ]]; then
+        docker run \
+            --detach \
+            --name {{image}} \
+            --publish {{port}}:{{port}} \
+            --rm \
+            {{image}}
+    else
+        docker run \
+            --detach \
+            --name {{image}} \
+            --publish {{port}}:{{port}} \
+            --rm \
+            --volume "$(pwd)"/src:/api \
+            {{image}}
+    fi
     {{ if args =~ "--open" { "just open" } else { "" } }}
 
+# Show the Docker logs.
+logs tail="20":
+    #!/usr/bin/env zsh
+    if [ -n "$(just _is_running)" ]; then
+        docker logs {{image}} --tail {{tail}}
+    fi
+
+# Log into the interactive shell in Docker.
+shell:
+    #!/usr/bin/env zsh
+    if [ -n "$(just running)" ]; then
+        just start
+    fi
+    docker exec --interactive --tty {{image}} bash
+
+# Remove the Docker image.
+clean:
+    #!/usr/bin/env zsh
+    docker rmi {{image}} >/dev/null 2>&1
+    exit 0
+
+# Open the application in the browser.
+@open:
+    open {{url}}
+
 # View people in the database.
-@people: start
-    http {{local_url}}/people | {{jq}}
+@people: local
+    http {{url}}/people | {{jq}}
 
 # View a person in the database.
-@person full_name: start
-    http "{{local_url}}/person?full_name={{full_name}}" | {{jq}}
+@person full_name: local
+    http "{{url}}/person?full_name={{full_name}}" | {{jq}}
