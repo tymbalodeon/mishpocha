@@ -4,6 +4,7 @@ COPY . .
 
 FROM base as dev
 WORKDIR /api
+RUN cargo build
 CMD ["cargo", "run"]
 
 FROM base as prod
