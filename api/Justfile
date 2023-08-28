@@ -2,11 +2,13 @@
     just --list
 
 local_url := "http://localhost:8080"
+image := "mishpocha-api"
+dev_port := "8080"
 bat := "bat --style plain --language json"
 jq := "jq | " + bat
 
-# Run the server.
-start:
+# Run the server locally.
+local:
     #!/usr/bin/env zsh
     if ! http GET {{local_url}} &>/dev/null; then
         env EDGEDB_DSN="$( \
@@ -24,6 +26,30 @@ stop:
     if [ -n "${mishpocha}" ]; then
         kill "${mishpocha}" &>/dev/null
     fi
+
+# Show if the container is running.
+running:
+    #!/usr/bin/env zsh
+    if ps | grep docker | grep -v grep; then
+        docker container ls --filter name={{image}}
+    fi
+
+_build:
+    #!/usr/bin/env zsh
+    if [ -z "$(just running)" ]; then \
+        docker build --tag {{image}} .
+    fi
+
+# Run the docker container.
+@start *args: _build
+    docker run \
+        --detach \
+        --name {{image}} \
+        --publish {{dev_port}}:{{dev_port}} \
+        --rm \
+        --volume "$(pwd)"/src:/ui/src \
+        {{image}}
+    {{ if args =~ "--open" { "just open" } else { "" } }}
 
 # View people in the database.
 @people: start

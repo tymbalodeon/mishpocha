@@ -67,7 +67,7 @@ start *args: stop
 
 # Remove the Docker image.
 @clean:
-    just api clean
+    # just api clean
     just db clean
     just ui clean
 
