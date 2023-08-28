@@ -1,12 +1,12 @@
 FROM rust as base
 WORKDIR /api
 COPY . .
-RUN cargo build
 
 FROM base as dev
 WORKDIR /api
-CMD ["./target/debug/mishpocha-api"]
+CMD ["cargo", "run"]
 
 FROM base as prod
 WORKDIR /api
+RUN cargo build --release
 CMD ["./target/release/mishpocha-api"]

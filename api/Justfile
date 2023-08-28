@@ -74,7 +74,6 @@ start *args: stop (_build args)
             --name {{image}} \
             --publish {{port}}:{{port}} \
             --rm \
-            --volume "$(pwd)"/src:/api \
             {{image}}
     fi
     {{ if args =~ "--open" { "just open" } else { "" } }}
@@ -82,7 +81,7 @@ start *args: stop (_build args)
 # Show the Docker logs.
 logs tail="20":
     #!/usr/bin/env zsh
-    if [ -n "$(just _is_running)" ]; then
+    if [ -n "$(just running)" ]; then
         docker logs {{image}} --tail {{tail}}
     fi
 
