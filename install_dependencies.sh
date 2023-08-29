@@ -19,14 +19,6 @@ if ((${args[(I)*--all*]})) \
 fi
 
 if ((${args[(I)*--all*]})) \
-    || ((${args[(I)*--api*]})); then
-    dependencies+=(
-        "pdm"
-        "python"
-    )
-fi
-
-if ((${args[(I)*--all*]})) \
     || ((${args[(I)*--db*]})); then
     dependencies+=(
         "edgedb"
@@ -60,15 +52,8 @@ install_dependency() {
             cd "${ui_directory}"
             rtx install
             ;;
-        "pdm")
-            brew install pdm
-            ;;
         "pnpm")
             npm install --global pnpm
-            ;;
-        "python")
-            python_version="python@${python_version}"
-            printf "${python_version}" | xargs rtx install
             ;;
         "rtx")
             brew install rtx
@@ -96,9 +81,6 @@ update_dependency() {
         "just")
             brew upgrade just
             ;;
-        "pdm")
-            brew upgrade pdm
-            ;;
         "pnpm")
             cd "${ui_directory}"
             pnpm add --global pnpm
@@ -118,21 +100,6 @@ for dependency in "${dependencies[@]}"; do
             if printf "${node_version}" \
                 | xargs -I % zsh -c \
                     'rtx list node \
-                    | grep % \
-                    | grep --quiet --invert-match missing'; then
-                should_install=""
-            else
-                should_install="true"
-            fi
-            ;;
-        "python")
-            cd "${api_directory}"
-            python_version=$(
-                pdm show | grep "Requires Python:" | awk -F= '{print $2}'
-            )
-            if printf "${python_version}" \
-                | xargs -I % zsh -c \
-                    'rtx list python \
                     | grep % \
                     | grep --quiet --invert-match missing'; then
                 should_install=""

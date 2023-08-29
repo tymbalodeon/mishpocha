@@ -34,7 +34,6 @@ help:
 # Update dependencies.
 @update:
     ./install_dependencies.sh --all --update
-    just api update --from-main
     just ui update --from-main
 
 # Open the applications in the browser.

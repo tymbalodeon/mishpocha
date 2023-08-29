@@ -1,6 +1,8 @@
 FROM rust as base
 WORKDIR /api
-COPY Cargo.toml Cargo.lock src ./
+COPY Cargo.toml Cargo.toml
+COPY Cargo.lock Cargo.lock
+COPY src src
 
 FROM base as dev
 WORKDIR /api

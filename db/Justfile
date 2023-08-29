@@ -79,9 +79,7 @@ running *verbose:
 
 _build:
     #!/usr/bin/env zsh
-    if [ -z "$(just running)" ]; then \
-        docker build --tag {{image}} .
-    fi
+    docker build --tag {{image}} .
 
 # Open the application in the browser.
 @open:

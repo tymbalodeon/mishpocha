@@ -1,6 +1,6 @@
 set fallback
 
-cargo_run_with_db := 'env EDGEDB_DSN="${EDGEDB_DSN}" cargo run'
+cargo_run_with_db := "env EDGEDB_DSN='${EDGEDB_DSN}' cargo run"
 image := "mishpocha-api"
 port := "8080"
 url := "http://localhost:" + port
@@ -41,27 +41,31 @@ stop:
     fi
 
 # Show if the container is running.
-running:
+running *verbose:
     #!/usr/bin/env zsh
     if ps | grep docker &>/dev/null; then
-        docker container ls --filter name={{image}}
+        docker container ls \
+            {{ if verbose =~ "--verbose" { "" } else { "--quiet" } }} \
+            --filter name={{image}}
     fi
 
 _build *prod:
     #!/usr/bin/env zsh
-    if [ -z "$(just running)" ]; then \
-        target="{{ if prod =~ "--prod" { "prod" } else { "dev" } }}"
-        docker build --target "${target}" --tag {{image}} .
-    fi
+    target={{ if prod =~ "--prod" { "prod" } else { "dev" } }}
+    docker build --target "${target}" --tag {{image}} .
 
 # Open the application in the browser.
 @open:
     open {{url}}
 
+# Ping the application.
+@ping:
+    http get {{url}}
+
 # Run the Docker container, and optionally "--open" in the browser.
 start *args: stop (_build args)
     #!/usr/bin/env zsh
-    if [[ "{{args}}" = *--prod* ]]; then
+    if [[ "{{args}}" = *"--prod"* ]]; then
         docker run \
             --detach \
             --name {{image}} \
