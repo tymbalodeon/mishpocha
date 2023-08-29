@@ -1,5 +1,12 @@
 set fallback
 
+image := "mishpocha-db"
+instance := replace(image, "-", "_")
+edgedb_instance := "edgedb --instance " + instance
+port := "5656"
+data := "db-config"
+config := "edgedb-config"
+
 _help *_from-main:
     #!/usr/bin/env zsh
     if [ -z "{{_from-main}}" ]; then
@@ -15,18 +22,12 @@ install *_from-main:
         ../install_dependencies.sh --db
     fi
 
-image := "mishpocha-db"
-instance := replace(image, "-", "_")
-edgedb_instance := "edgedb --instance " + instance
-
 _create:
     #!/usr/bin/env zsh
     if ! edgedb instance list | grep -q {{instance}}; then
         edgedb instance create {{instance}}
         {{edgedb_instance}} migrate
     fi
-
-config := "edgedb-config"
 
 # Show the DSN for the database.
 dsn: _create
@@ -36,7 +37,7 @@ dsn: _create
             docker run \
                 --interactive \
                 --link {{image}} \
-                --net default \
+                --network default \
                 --rm \
                 --tty \
                 --volume {{config}}:/.config/edgedb \
@@ -69,10 +70,12 @@ migrate: _create
     {{edgedb_instance}} migrate
 
 # Show if the container is running.
-running:
+running *verbose:
     #!/usr/bin/env zsh
-    if ps | grep docker | grep -v grep; then
-        docker container ls --filter name={{image}}
+    if ps | grep docker &>/dev/null; then
+        docker container ls \
+            {{ if verbose =~ "--verbose" { "" } else { "--quiet" } }} \
+            --filter name={{image}}
     fi
 
 _build:
@@ -80,8 +83,6 @@ _build:
     if [ -z "$(just running)" ]; then \
         docker build --tag {{image}} .
     fi
-
-port := "5656"
 
 # Open the application in the browser.
 @open:
@@ -100,8 +101,6 @@ port := "5656"
                 --non-interactive \
                 --trust-tls-cert \
                 --overwrite
-
-data := "db-config"
 
 # Run the Docker container.
 @start *open: stop _build

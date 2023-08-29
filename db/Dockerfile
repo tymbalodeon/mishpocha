@@ -1,2 +1,2 @@
 FROM edgedb/edgedb
-COPY . .
+COPY edgedb.toml dbschema ./
