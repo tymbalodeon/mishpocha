@@ -37,7 +37,6 @@ dsn: _create
             docker run \
                 --interactive \
                 --link {{image}} \
-                --network default \
                 --rm \
                 --tty \
                 --volume {{config}}:/.config/edgedb \
@@ -51,8 +50,8 @@ dsn: _create
             {{edgedb_instance}} instance credentials \
                 --insecure-dsn
         )
-    echo "${base_dsn}&tls_security=insecure"
     fi
+    echo "${base_dsn}&tls_security=insecure"
 
 # Connect to the database locally, optionally via the edgedb "--ui".
 local *ui: _create
