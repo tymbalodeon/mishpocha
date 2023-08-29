@@ -2,7 +2,6 @@
 
 main_directory="${"$(pwd)"/(ui|api)/}"
 ui_directory="${main_directory}/ui"
-api_directory="${main_directory}/api"
 
 dependencies=(
     "brew"
@@ -53,6 +52,7 @@ install_dependency() {
             rtx install
             ;;
         "pnpm")
+            cd "${ui_directory}"
             npm install --global pnpm
             ;;
         "rtx")

@@ -2,14 +2,6 @@
     just --list \
         {{ if all == "" { "" } else { "--list-heading $'ALL:\n'"  } }}
 
-# Display help for all commands.
-help:
-    #!/usr/bin/env zsh
-    just _help --all
-    just api _help --from-main
-    just db _help --from-main
-    just ui _help --from-main
-
 @_run_justfile parent *args:
     just --justfile ./{{parent}}/Justfile {{args}}
 
@@ -25,10 +17,17 @@ help:
 @db *args:
     just _run_justfile db {{args}}
 
+# Display help for all commands.
+help:
+    #!/usr/bin/env zsh
+    just _help --all
+    just api _help --from-main
+    just db _help --from-main
+    just ui _help --from-main
+
 # Install dependencies.
 @install:
     ./install_dependencies.sh --all
-    just api install --from-main
     just ui install --from-main
 
 # Update dependencies.
@@ -36,15 +35,10 @@ help:
     ./install_dependencies.sh --all --update
     just ui update --from-main
 
-# Open the applications in the browser.
-@open *prod:
-    just api open
-    just ui open {{prod}}
-
 # Run the containers, optionally in "--prod" mode, and optionally "--open" in the browser.
 start *args: stop
     #!/usr/bin/env zsh
-    if [[ "{{args}}" = *--prod* ]]; then
+    if [[ "{{args}}" = *"--prod"* ]]; then
         docker compose up --build --detach
         {{ if args =~ "--open" { "just open --prod" } else { "" } }}
     else
@@ -64,11 +58,10 @@ start *args: stop
     just ui stop
     docker compose down
 
-# Remove the Docker image.
-@clean:
-    # just api clean
-    just db clean
-    just ui clean
+# Open the applications in the browser.
+@open *prod:
+    just api open
+    just ui open {{prod}}
 
 # List running containers.
 running:
@@ -80,17 +73,22 @@ running:
 # Show the Docker logs.
 logs tail="10":
     #!/usr/bin/env zsh
-    if [ -n "$(just api _is_running)" ]; then
+    if [ -n "$(just api running)" ]; then
         echo "API logs:"
         just api logs {{tail}}
     fi
-    if [ -n "$(just db _is_running)" ]; then
+    if [ -n "$(just db running)" ]; then
         echo
         echo "DB logs:"
         just db logs {{tail}}
     fi
-    if [ -n "$(just ui _is_running)" ]; then
+    if [ -n "$(just ui running)" ]; then
         echo
         echo "UI logs:"
         just ui logs {{tail}}
     fi
+
+# Remove the Docker image.
+@clean:
+    just db clean
+    just ui clean
