@@ -43,7 +43,7 @@ stop:
 # Show if the container is running.
 running:
     #!/usr/bin/env zsh
-    if ps | grep docker | grep -v grep; then
+    if ps | grep docker &>/dev/null; then
         docker container ls --filter name={{image}}
     fi
 
