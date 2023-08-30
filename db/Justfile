@@ -185,7 +185,7 @@ ui *instance:
         {{edgedb_command}} ui
     fi
 
-# Drop the persisted databases or only in "--docker", or "--local".
+# Drop the persisted databases (optional: "--docker", or "--local").
 drop *args: stop
     #!/usr/bin/env zsh
     if [ "{{args}}" = "--local" ] || [ -z "{{args}}" ]; then
