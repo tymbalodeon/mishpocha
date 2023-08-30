@@ -46,7 +46,7 @@ _create:
         {{edgedb_command}} migrate
     fi
 
-# Migrate the database.
+# Migrate the (local) database.
 migrate: _create
     #!/usr/bin/env zsh
     {{edgedb_command}} migration create
@@ -77,7 +77,7 @@ _link:
                 --trust-tls-cert \
                 --overwrite
 
-# Run the Docker container.
+# Start the Docker container.
 start *open: stop _build && _link
     #!/usr/bin/env zsh
     {{check_if_docker_running}}
@@ -124,7 +124,7 @@ clean:
     docker rmi {{image}} >/dev/null 2>&1
     exit 0
 
-# Show the DSN for the database.
+# Show the DSN for the database (optional: "--docker" or "--local").
 dsn *instance:
     #!/usr/bin/env zsh
     instance="$(just _get_instance {{instance}})"
@@ -153,7 +153,7 @@ dsn *instance:
     fi
     echo "${base_dsn}&tls_security=insecure"
 
-# Log into the interactive shell in Docker.
+# Open the edgedb shell (optional: "--docker" or "--local").
 shell *instance:
     #!/usr/bin/env zsh
     instance="$(just _get_instance {{instance}})"
@@ -173,6 +173,7 @@ shell *instance:
         {{edgedb_command}}
     fi
 
+# Open the Edgedb UI (optional: "--docker" or "--local")
 ui *instance:
     #!/usr/bin/env zsh
     instance="$(just _get_instance {{instance}})"
