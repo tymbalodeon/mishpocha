@@ -32,7 +32,7 @@ _help *_from-main:
 
 _get_instance *instance:
     #!/usr/bin/env zsh
-    if [ -n "$(just running)" ] && [ -z "{{instance}}"] \
+    if [ -n "$(pgrep docker -q)" ] && [ -z "{{instance}}"] \
         || [[ "{{instance}}" = *"--docker"* ]]; then
         printf "docker"
     else
