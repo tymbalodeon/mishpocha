@@ -19,6 +19,15 @@ _help *_from-main:
 @install:
     ../install_dependencies.sh --db
 
+_get_instance *instance:
+    #!/usr/bin/env zsh
+    if [ -n "$(just running)" ] && [ -z "{{instance}}"] \
+        || [[ "{{instance}}" = *"--docker"* ]]; then
+        printf "docker"
+    else
+        printf "local"
+    fi
+
 _create:
     #!/usr/bin/env zsh
     if ! edgedb instance list | grep -q {{edgedb_instance}}; then
@@ -29,16 +38,9 @@ _create:
 # Show the DSN for the database.
 dsn *instance:
     #!/usr/bin/env zsh
-    is_running="$(just running)"
-    if [[ "{{instance}}" = *"--docker"* ]] \
-        || [ -z "{{instance}}" ] \
-        && [ -n "${is_running}" ]; then
-        instance="docker"
-    else
-        instance="local"
-    fi
+    instance="$(just _get_instance {{instance}})"
     if [ "${instance}" = "docker" ]; then
-        if [ -z "${is_running}" ]; then
+        if [ -z "$(just running)" ]; then
             if ! just start &>/dev/null; then
                 echo "Docker not running. Please start Docker and try again"
                 exit
