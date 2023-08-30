@@ -6,6 +6,14 @@ edgedb_command := "edgedb --instance " + edgedb_instance
 port := "5656"
 data := "db-config"
 config := "edgedb-config"
+check_if_docker_running := "
+if ! pgrep docker -q &>/dev/null; then
+    just _error_docker_not_running
+    exit
+fi
+"
+bat := "bat --style plain --language json --theme gruvbox-dark"
+jq := "jq | " + bat
 
 _help *_from-main:
     #!/usr/bin/env zsh
@@ -18,6 +26,9 @@ _help *_from-main:
 # Install dependencies.
 @install:
     ../install_dependencies.sh --db
+
+@_error_docker_not_running:
+    echo "Docker not running. Please start Docker and try again"
 
 _get_instance *instance:
     #!/usr/bin/env zsh
@@ -35,69 +46,24 @@ _create:
         {{edgedb_command}} migrate
     fi
 
-# Show the DSN for the database.
-dsn *instance:
-    #!/usr/bin/env zsh
-    instance="$(just _get_instance {{instance}})"
-    if [ "${instance}" = "docker" ]; then
-        if [ -z "$(just running)" ]; then
-            if ! just start &>/dev/null; then
-                echo "Docker not running. Please start Docker and try again"
-                exit
-            fi
-        fi
-        base_dsn=$(
-            docker run \
-                --interactive \
-                --link {{image}} \
-                --rm \
-                --tty \
-                --volume {{config}}:/.config/edgedb \
-                edgedb/edgedb-cli \
-                    --instance {{edgedb_instance}} \
-                    instance credentials \
-                        --insecure-dsn
-        )
-        base_dsn=$(sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//'<<<"${base_dsn}")
-    else
-        just _create
-        base_dsn=$({{edgedb_command}} instance credentials --insecure-dsn)
-    fi
-    echo "${base_dsn}&tls_security=insecure"
-
-# Connect to the database locally, optionally via the edgedb "--ui".
-local *ui: _create
-    #!/usr/bin/env zsh
-    if [ "{{ui}}" = "--ui" ]; then
-        {{edgedb_command}} ui
-    else
-        {{edgedb_command}}
-    fi
-
 # Migrate the database.
 migrate: _create
     #!/usr/bin/env zsh
     {{edgedb_command}} migration create
     {{edgedb_command}} migrate
 
-# Show if the container is running.
-running *verbose:
-    #!/usr/bin/env zsh
-    if pgrep -q docker; then
-        docker container ls \
-            {{ if verbose =~ "--verbose" { "" } else { "--quiet" } }} \
-            --filter name={{image}}
-    fi
-
 _build:
     #!/usr/bin/env zsh
+    if ! pgrep -q docker; then
+        exit
+    fi
     docker build --tag {{image}} .
 
-# Open the application in the browser.
-@open:
-    open "http://localhost:{{port}}/ui"
-
-@_link:
+_link:
+    #!/usr/bin/env zsh
+    if ! pgrep -q docker; then
+        exit
+    fi
     docker run \
         --interactive \
         --link {{image}} \
@@ -112,7 +78,9 @@ _build:
                 --overwrite
 
 # Run the Docker container.
-@start *open: stop _build
+start *open: stop _build && _link
+    #!/usr/bin/env zsh
+    {{check_if_docker_running}}
     docker run \
         --detach \
         --env EDGEDB_SERVER_SECURITY=insecure_dev_mode \
@@ -122,8 +90,7 @@ _build:
         --rm \
         --volume {{data}}:/var/lib/edgedb/data \
         {{image}}
-    just _link
-    {{ if open =~ "--open" { "just open" } else { "" } }}
+    {{ if open =~ "--open" { "just ui --docker" } else { "" } }}
 
 # Stop the Docker container.
 stop:
@@ -135,11 +102,14 @@ stop:
         fi
     fi
 
-# Remove the Docker image.
-clean:
+# Show if the container is running.
+running *verbose:
     #!/usr/bin/env zsh
-    docker rmi {{image}} >/dev/null 2>&1
-    exit 0
+    if pgrep -q docker; then
+        docker container ls \
+            {{ if verbose =~ "--verbose" { "" } else { "--quiet" } }} \
+            --filter name={{image}}
+    fi
 
 # Show the Docker logs.
 logs tail="20":
@@ -148,20 +118,71 @@ logs tail="20":
         docker logs {{image}} --tail {{tail}}
     fi
 
-# Log into the interactive shell in Docker.
-shell:
+# Remove the Docker image.
+clean:
     #!/usr/bin/env zsh
-    if [ -z "$(just running)" ]; then
-        just start
+    docker rmi {{image}} >/dev/null 2>&1
+    exit 0
+
+# Show the DSN for the database.
+dsn *instance:
+    #!/usr/bin/env zsh
+    instance="$(just _get_instance {{instance}})"
+    if [ "${instance}" = "docker" ]; then
+        if [ -z "$(just running)" ]; then
+            {{check_if_docker_running}}
+        fi
+        base_dsn=$(
+            docker run \
+                --interactive \
+                --link {{image}} \
+                --rm \
+                --tty \
+                --volume {{config}}:/.config/edgedb \
+                edgedb/edgedb-cli \
+                    --instance {{edgedb_instance}} \
+                    instance credentials \
+                        --insecure-dsn
+        )
+        base_dsn=$(
+            sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//'<<<"${base_dsn}"
+        )
+    else
+        just _create
+        base_dsn=$({{edgedb_command}} instance credentials --insecure-dsn)
     fi
-    docker run \
-        --interactive \
-        --link {{image}} \
-        --rm \
-        --tty \
-        --volume {{config}}:/.config/edgedb \
-        edgedb/edgedb-cli \
-            --instance {{edgedb_instance}}
+    echo "${base_dsn}&tls_security=insecure"
+
+# Log into the interactive shell in Docker.
+shell *instance:
+    #!/usr/bin/env zsh
+    instance="$(just _get_instance {{instance}})"
+    if [ "${instance}" = "docker" ]; then
+        {{check_if_docker_running}}
+        just start
+        docker run \
+            --interactive \
+            --link {{image}} \
+            --rm \
+            --tty \
+            --volume {{config}}:/.config/edgedb \
+            edgedb/edgedb-cli \
+                --instance {{edgedb_instance}}
+    else
+        just _create
+        {{edgedb_command}}
+    fi
+
+ui *instance:
+    #!/usr/bin/env zsh
+    instance="$(just _get_instance {{instance}})"
+    if [ "${instance}" = "docker" ]; then
+        {{check_if_docker_running}}
+        open "http://localhost:{{port}}/ui"
+    else
+        just _create
+        {{edgedb_command}} ui
+    fi
 
 # Drop the persisted databases or only in "--docker", or "--local".
 drop *args: stop
@@ -173,6 +194,10 @@ drop *args: stop
             >/dev/null 2>&1
     fi
     if [ "{{args}}" = "--docker" ] || [ -z "{{args}}" ]; then
+        if ! pgrep -q docker; then
+            just _error_docker_not_running
+            exit
+        fi
         volumes=("$(docker volume list --quiet --filter name={{data}})")
         if [ -n "${volumes}" ]; then
             for volume in "${volumes}"; do
@@ -180,6 +205,10 @@ drop *args: stop
             done
         fi
     fi
+
+# Seed the database.
+@seed:
+    {{edgedb_command}} query --file seed.edgeql
 
 # Delete all objects in the database.
 @delete:
@@ -195,13 +224,6 @@ drop *args: stop
         delete Date; \
         delete Instrument;" \
         | {{jq}}
-
-# Seed the database.
-@seed:
-    {{edgedb_command}} query --file seed.edgeql
-
-bat := "bat --style plain --language json --theme gruvbox-dark"
-jq := "jq | " + bat
 
 select_date := "\
 select Date { \
