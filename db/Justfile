@@ -1,8 +1,8 @@
 set fallback
 
 image := "mishpocha-db"
-instance := replace(image, "-", "_")
-edgedb_instance := "edgedb --instance " + instance
+edgedb_instance := replace(image, "-", "_")
+edgedb_command := "edgedb --instance " + edgedb_instance
 port := "5656"
 data := "db-config"
 config := "edgedb-config"
@@ -21,18 +21,18 @@ _help *_from-main:
 
 _create:
     #!/usr/bin/env zsh
-    if ! edgedb instance list | grep -q {{instance}}; then
-        edgedb instance create {{instance}}
-        {{edgedb_instance}} migrate
+    if ! edgedb instance list | grep -q {{edgedb_instance}}; then
+        edgedb instance create {{edgedb_instance}}
+        {{edgedb_command}} migrate
     fi
 
 # Show the DSN for the database.
-dsn *instance: _create
+dsn *instance:
     #!/usr/bin/env zsh
     is_running="$(just running)"
-    if [ -z "{{instance}}" ] \
-        && [ -n "${is_running}" ] \
-        || [[ "{{instance}}" = *"--docker"* ]]; then
+    if [[ "{{instance}}" = *"--docker"* ]] \
+        || [ -z "{{instance}}" ] \
+        && [ -n "${is_running}" ]; then
         instance="docker"
     else
         instance="local"
@@ -52,15 +52,14 @@ dsn *instance: _create
                 --tty \
                 --volume {{config}}:/.config/edgedb \
                 edgedb/edgedb-cli \
+                    --instance {{edgedb_instance}} \
                     instance credentials \
-                        --insecure-dsn \
-                        --instance {{instance}}
+                        --insecure-dsn
         )
+        base_dsn=$(sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//'<<<"${base_dsn}")
     else
-        base_dsn=$(
-            {{edgedb_instance}} instance credentials \
-                --insecure-dsn
-        )
+        just _create
+        base_dsn=$({{edgedb_command}} instance credentials --insecure-dsn)
     fi
     echo "${base_dsn}&tls_security=insecure"
 
@@ -68,16 +67,16 @@ dsn *instance: _create
 local *ui: _create
     #!/usr/bin/env zsh
     if [ "{{ui}}" = "--ui" ]; then
-        {{edgedb_instance}} ui
+        {{edgedb_command}} ui
     else
-        {{edgedb_instance}}
+        {{edgedb_command}}
     fi
 
 # Migrate the database.
 migrate: _create
     #!/usr/bin/env zsh
-    {{edgedb_instance}} migration create
-    {{edgedb_instance}} migrate
+    {{edgedb_command}} migration create
+    {{edgedb_command}} migrate
 
 # Show if the container is running.
 running *verbose:
@@ -105,7 +104,7 @@ _build:
         --volume {{config}}:/.config/edgedb \
         edgedb/edgedb-cli \
             --host {{image}} \
-            instance link {{instance}} \
+            instance link {{edgedb_instance}} \
                 --non-interactive \
                 --trust-tls-cert \
                 --overwrite
@@ -160,14 +159,14 @@ shell:
         --tty \
         --volume {{config}}:/.config/edgedb \
         edgedb/edgedb-cli \
-            --instance {{instance}}
+            --instance {{edgedb_instance}}
 
 # Drop the persisted databases or only in "--docker", or "--local".
 drop *args: stop
     #!/usr/bin/env zsh
     if [ "{{args}}" = "--local" ] || [ -z "{{args}}" ]; then
         edgedb instance destroy \
-            --instance {{instance}} \
+            --instance {{edgedb_instance}} \
             --force \
             >/dev/null 2>&1
     fi
@@ -182,7 +181,7 @@ drop *args: stop
 
 # Delete all objects in the database.
 @delete:
-    {{edgedb_instance}} query \
+    {{edgedb_command}} query \
         "delete Album; \
         delete Disc; \
         delete Track; \
@@ -197,7 +196,7 @@ drop *args: stop
 
 # Seed the database.
 @seed:
-    {{edgedb_instance}} query --file seed.edgeql
+    {{edgedb_command}} query --file seed.edgeql
 
 bat := "bat --style plain --language json --theme gruvbox-dark"
 jq := "jq | " + bat
@@ -210,11 +209,11 @@ select Date { \
 
 # View dates in the database.
 @dates:
-    {{edgedb_instance}} query "{{select_date}}" | {{jq}}
+    {{edgedb_command}} query "{{select_date}}" | {{jq}}
 
 # View a date in the database.
 @date display:
-    {{edgedb_instance}} query \
+    {{edgedb_command}} query \
         "{{select_date}} filter .display ilike '%{{display}}%'" \
         | {{jq}}
 
@@ -232,11 +231,11 @@ select Person { \
 
 # View people in the database.
 @people:
-    {{edgedb_instance}} query "{{select_person}}" | {{jq}}
+    {{edgedb_command}} query "{{select_person}}" | {{jq}}
 
 # View a person in the database.
 @person full_name:
-    {{edgedb_instance}} query \
+    {{edgedb_command}} query \
         "{{select_person}} filter .full_name ilike '%{{full_name}}%'" \
         | {{jq}}
 
@@ -248,11 +247,11 @@ select Instrument { \
 
 # View instruments in the database.
 @instruments:
-    {{edgedb_instance}} query "{{select_instrument}}" | {{jq}}
+    {{edgedb_command}} query "{{select_instrument}}" | {{jq}}
 
 # View an instrument in the database.
 @instrument name:
-    {{edgedb_instance}} query \
+    {{edgedb_command}} query \
         "{{select_instrument}} filter .name ilike '%{{name}}%'" \
         | {{jq}}
 
@@ -266,13 +265,13 @@ select Composition { \
 
 # View compositions in the database.
 @compositions:
-    {{edgedb_instance}} query \
+    {{edgedb_command}} query \
         "{{select_composition}}" \
         | {{jq}}
 
 # View a composition in the database.
 @composition title:
-    {{edgedb_instance}} query \
+    {{edgedb_command}} query \
         "{{select_composition}} filter .title ilike '%{{title}}%'" \
         | {{jq}}
 
@@ -284,13 +283,13 @@ select Player { \
 
 # View players in the database.
 @players:
-    {{edgedb_instance}} query \
+    {{edgedb_command}} query \
         "{{select_player}}" \
         | {{jq}}
 
 # View a player in the database.
 @player name:
-    {{edgedb_instance}} query \
+    {{edgedb_command}} query \
         "{{select_player}} filter .person.full_name ilike '%{{name}}%'" \
         | {{jq}}
 
@@ -303,11 +302,11 @@ select Artist { \
 
 # View artists in the database.
 @artists:
-    {{edgedb_instance}} query "{{select_artist}}" | {{jq}}
+    {{edgedb_command}} query "{{select_artist}}" | {{jq}}
 
 # View an artist in the database.
 @artist name:
-    {{edgedb_instance}} query \
+    {{edgedb_command}} query \
         "{{select_artist}} filter .name ilike '%{{name}}%'" \
         | {{jq}}
 
@@ -322,11 +321,11 @@ select Track { \
 
 # View tracks in the database.
 @tracks:
-    {{edgedb_instance}} query "{{select_track}}" | {{jq}}
+    {{edgedb_command}} query "{{select_track}}" | {{jq}}
 
 # View a track in the database.
 @track title:
-    {{edgedb_instance}} query \
+    {{edgedb_command}} query \
         "{{select_track}} filter .title ilike '%{{title}}%'" \
         | {{jq}}
 
@@ -340,11 +339,11 @@ select Label { \
 
 # View labels in the database.
 @labels:
-    {{edgedb_instance}} query "{{select_label}}" | {{jq}}
+    {{edgedb_command}} query "{{select_label}}" | {{jq}}
 
 # View a label in the database.
 @label name:
-    {{edgedb_instance}} query \
+    {{edgedb_command}} query \
         "{{select_label}} filter .name ilike '%{{name}}%'" \
         | {{jq}}
 
@@ -357,11 +356,11 @@ select Series { \
 
 # View series in the database.
 @series:
-    {{edgedb_instance}} query "{{select_series}}" | {{jq}}
+    {{edgedb_command}} query "{{select_series}}" | {{jq}}
 
 # View a series in the database.
 @series-single name:
-    {{edgedb_instance}} query \
+    {{edgedb_command}} query \
         "{{select_series}} filter .name ilike '%{{name}}%'" \
         | {{jq}}
 
@@ -374,11 +373,11 @@ select Disc { \
 
 # View discs in the database.
 @discs:
-    {{edgedb_instance}} query "{{select_disc}}" | {{jq}}
+    {{edgedb_command}} query "{{select_disc}}" | {{jq}}
 
 # View a disc in the database.
 @disc title:
-    {{edgedb_instance}} query \
+    {{edgedb_command}} query \
         "{{select_disc}} filter .title ilike '%{{title}}%'" \
         | {{jq}}
 
@@ -398,10 +397,10 @@ select Album { \
 
 # View albums in the database.
 @albums:
-    {{edgedb_instance}} query "{{select_album}}" | {{jq}}
+    {{edgedb_command}} query "{{select_album}}" | {{jq}}
 
 # View an album in the database.
 @album title:
-    {{edgedb_instance}} query \
+    {{edgedb_command}} query \
         "{{select_album}} filter .title ilike '%{{title}}%'" \
         | {{jq}}
