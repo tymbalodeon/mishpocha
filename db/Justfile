@@ -59,11 +59,19 @@ _build:
     fi
     docker build --tag {{image}} .
 
-_link:
+# Start the Docker container.
+start *open: stop _build
     #!/usr/bin/env zsh
-    if ! pgrep -q docker; then
-        exit
-    fi
+    {{check_if_docker_running}}
+    docker run \
+        --detach \
+        --env EDGEDB_SERVER_SECURITY=insecure_dev_mode \
+        --env EDGEDB_SERVER_ADMIN_UI=enabled \
+        --name {{image}} \
+        --publish {{port}}:{{port}} \
+        --rm \
+        --volume {{data}}:/var/lib/edgedb/data \
+        {{image}}
     docker run \
         --interactive \
         --link {{image}} \
@@ -76,20 +84,6 @@ _link:
                 --non-interactive \
                 --trust-tls-cert \
                 --overwrite
-
-# Start the Docker container.
-start *open: stop _build && _link
-    #!/usr/bin/env zsh
-    {{check_if_docker_running}}
-    docker run \
-        --detach \
-        --env EDGEDB_SERVER_SECURITY=insecure_dev_mode \
-        --env EDGEDB_SERVER_ADMIN_UI=enabled \
-        --name {{image}} \
-        --publish {{port}}:{{port}} \
-        --rm \
-        --volume {{data}}:/var/lib/edgedb/data \
-        {{image}}
     {{ if open =~ "--open" { "just ui --docker" } else { "" } }}
 
 # Stop the Docker container.
@@ -159,7 +153,9 @@ shell *instance:
     instance="$(just _get_instance {{instance}})"
     if [ "${instance}" = "docker" ]; then
         {{check_if_docker_running}}
-        just start
+        if [ -z "$(just running)" ]; then
+            just start
+        fi
         docker run \
             --interactive \
             --link {{image}} \
