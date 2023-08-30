@@ -43,7 +43,7 @@ stop:
 # Show if the container is running.
 running *verbose:
     #!/usr/bin/env zsh
-    if ps | grep docker &>/dev/null; then
+    if pgrep -q docker; then
         docker container ls \
             {{ if verbose =~ "--verbose" { "" } else { "--quiet" } }} \
             --filter name={{image}}

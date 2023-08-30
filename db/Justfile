@@ -16,11 +16,8 @@ _help *_from-main:
     fi
 
 # Install dependencies.
-install *_from-main:
-    #!/usr/bin/env zsh
-    if [ -z "{{_from-main}}" ]; then
-        ../install_dependencies.sh --db
-    fi
+@install:
+    ../install_dependencies.sh --db
 
 _create:
     #!/usr/bin/env zsh
@@ -30,9 +27,23 @@ _create:
     fi
 
 # Show the DSN for the database.
-dsn: _create
+dsn *instance: _create
     #!/usr/bin/env zsh
-    if [ -n "$(just running)" ]; then
+    is_running="$(just running)"
+    if [ -z "{{instance}}" ] \
+        && [ -n "${is_running}" ] \
+        || [[ "{{instance}}" = *"--docker"* ]]; then
+        instance="docker"
+    else
+        instance="local"
+    fi
+    if [ "${instance}" = "docker" ]; then
+        if [ -z "${is_running}" ]; then
+            if ! just start &>/dev/null; then
+                echo "Docker not running. Please start Docker and try again"
+                exit
+            fi
+        fi
         base_dsn=$(
             docker run \
                 --interactive \
@@ -71,7 +82,7 @@ migrate: _create
 # Show if the container is running.
 running *verbose:
     #!/usr/bin/env zsh
-    if ps | grep docker &>/dev/null; then
+    if pgrep -q docker; then
         docker container ls \
             {{ if verbose =~ "--verbose" { "" } else { "--quiet" } }} \
             --filter name={{image}}
