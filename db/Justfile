@@ -7,7 +7,7 @@ data := "db-config"
 config := "edgedb-config"
 check_if_docker_running := "
 if ! pgrep docker -q &>/dev/null; then
-    {{just}} _error_docker_not_running
+" + just + " _error_docker_not_running
     exit
 fi
 "
