@@ -80,8 +80,8 @@ start *open: stop _build
     {{check_if_docker_running}}
     docker run \
         --detach \
-        --env EDGEDB_SERVER_SECURITY=insecure_dev_mode \
         --env EDGEDB_SERVER_ADMIN_UI=enabled \
+        --env EDGEDB_SERVER_SECURITY=insecure_dev_mode \
         --name {{image}} \
         --publish {{port}}:{{port}} \
         --rm \
@@ -100,6 +100,9 @@ start *open: stop _build
                 --non-interactive \
                 --trust-tls-cert \
                 --overwrite
+    {{just}} --justfile queries.just \
+        _query \
+        "alter role edgedb set password := 'password';"
     {{ if open =~ "--open" { "{{just}} ui --docker" } else { "" } }}
 
 # Stop the Docker container.
