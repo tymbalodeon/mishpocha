@@ -23,7 +23,9 @@ _query query *instance:
             --volume {{config}}:/.config/edgedb \
             edgedb/edgedb-cli \
                 --instance {{edgedb_instance}} \
-                query "{{query}}"
+                query "{{query}}" \
+                | sed -e $'s/\x1b\[[0-9;]*m//g' \
+                | {{bat}}
     else
         {{edgedb_command}} query "{{query}}" | {{bat}}
     fi
