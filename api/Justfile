@@ -4,8 +4,6 @@ cargo_run_with_db := "env EDGEDB_DSN='${EDGEDB_DSN}' cargo run"
 image := "mishpocha-api"
 port := "8080"
 url := "http://localhost:" + port
-bat := "bat --style plain --language json"
-jq := "jq | " + bat
 
 _help *_from-main:
     #!/usr/bin/env zsh
@@ -105,8 +103,8 @@ clean:
 
 # View people in the database.
 @people: local
-    http {{url}}/people | {{jq}}
+    http {{url}}/people
 
 # View a person in the database.
 @person full_name: local
-    http "{{url}}/person?full_name={{full_name}}" | {{jq}}
+    http "{{url}}/person?full_name={{full_name}}"
