@@ -114,10 +114,10 @@ logs tail="20":
     fi
 
 # Remove the Docker image.
+[no-exit-message]
 clean:
     #!/usr/bin/env zsh
     docker rmi {{image}} >/dev/null 2>&1
-    exit 0
 
 # Show the DSN for the database (optional: "--docker" or "--local").
 dsn *instance:
