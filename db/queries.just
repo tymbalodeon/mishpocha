@@ -1,14 +1,14 @@
 !include helpers.just
 
 query_command := just + " --justfile queries.just _query"
-bat := "bat --style plain --language json --theme gruvbox-dark"
-jq := "jq | " + bat
+bat := "bat --style plain --language json"
 
 @_help:
     {{just}} --justfile queries.just --list
 
 _query query *instance:
     #!/usr/bin/env zsh
+    {{just}} seed
     instance="$({{just}} _get_instance {{instance}})"
     if [ "${instance}" = "docker" ]; then
         {{check_if_docker_running}}
@@ -25,7 +25,7 @@ _query query *instance:
                 --instance {{edgedb_instance}} \
                 query "{{query}}"
     else
-        {{query_command}} "{{query}}"
+        {{edgedb_command}} query "{{query}}" | {{bat}}
     fi
 
 # Delete all objects in the database.

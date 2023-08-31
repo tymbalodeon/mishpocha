@@ -49,6 +49,31 @@ _build:
     fi
     docker build --tag {{image}} .
 
+# Remove the Docker image.
+[no-exit-message]
+clean:
+    #!/usr/bin/env zsh
+    docker rmi {{image}} >/dev/null 2>&1
+
+# Drop the persisted databases (optional: "--docker", or "--local").
+drop *args: stop
+    #!/usr/bin/env zsh
+    if [ "{{args}}" = "--local" ] || [ -z "{{args}}" ]; then
+        edgedb instance destroy \
+            --instance {{edgedb_instance}} \
+            --force \
+            >/dev/null 2>&1
+    fi
+    if [ "{{args}}" = "--docker" ] || [ -z "{{args}}" ]; then
+        {{check_if_docker_running}}
+        volumes=("$(docker volume list --quiet --filter name={{data}})")
+        if [ -n "${volumes}" ]; then
+            for volume in "${volumes}"; do
+                docker volume remove "${volume}"
+            done
+        fi
+    fi
+
 # Start the Docker container.
 start *open: stop _build
     #!/usr/bin/env zsh
@@ -101,12 +126,6 @@ logs tail="20":
     if [ -n "$({{just}} running)" ]; then
         docker logs {{image}} --tail {{tail}}
     fi
-
-# Remove the Docker image.
-[no-exit-message]
-clean:
-    #!/usr/bin/env zsh
-    docker rmi {{image}} >/dev/null 2>&1
 
 # Show the DSN for the database (optional: "--docker" or "--local").
 dsn *instance:
@@ -166,25 +185,6 @@ ui *instance:
         open "http://localhost:{{port}}/ui"
     else
         {{connect_to_edgedb}} ui
-    fi
-
-# Drop the persisted databases (optional: "--docker", or "--local").
-drop *args: stop
-    #!/usr/bin/env zsh
-    if [ "{{args}}" = "--local" ] || [ -z "{{args}}" ]; then
-        edgedb instance destroy \
-            --instance {{edgedb_instance}} \
-            --force \
-            >/dev/null 2>&1
-    fi
-    if [ "{{args}}" = "--docker" ] || [ -z "{{args}}" ]; then
-        {{check_if_docker_running}}
-        volumes=("$(docker volume list --quiet --filter name={{data}})")
-        if [ -n "${volumes}" ]; then
-            for volume in "${volumes}"; do
-                docker volume remove "${volume}"
-            done
-        fi
     fi
 
 # Seed the database.

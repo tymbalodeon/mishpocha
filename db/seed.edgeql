@@ -332,7 +332,7 @@ with artists := <json>(
 ) for artist in json_array_unpack(artists) union (
     with existing_artist := (
         select Artist
-        filter contains(<array<str>>artist["member_names"], .name)
+        filter contains(<array<str>>artist["member_names"], .members.full_name)
         limit 1
     ), inserts := (
         artist if not exists existing_artist else <json>{}
