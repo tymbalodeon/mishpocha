@@ -1,27 +1,23 @@
+!include helpers.just
+
 set fallback
 
-image := "mishpocha-db"
-edgedb_instance := replace(image, "-", "_")
-edgedb_command := "edgedb --instance " + edgedb_instance
-connect_to_edgedb := "just _create;" + edgedb_command
 port := "5656"
 data := "db-config"
 config := "edgedb-config"
 check_if_docker_running := "
 if ! pgrep docker -q &>/dev/null; then
-    just _error_docker_not_running
+    {{just}} _error_docker_not_running
     exit
 fi
 "
-bat := "bat --style plain --language json --theme gruvbox-dark"
-jq := "jq | " + bat
 
 _help *_from-main:
     #!/usr/bin/env zsh
     if [ -z "{{_from-main}}" ]; then
-        just --list
+        {{just}} --list
     else
-        just --list --list-heading $'\nDB: [`just db <COMMAND>`]\n'
+        {{just}} --list --list-heading $'\nDB: [`{{just}} db <COMMAND>`]\n'
     fi
 
 # Install dependencies.
@@ -85,12 +81,12 @@ start *open: stop _build
                 --non-interactive \
                 --trust-tls-cert \
                 --overwrite
-    {{ if open =~ "--open" { "just ui --docker" } else { "" } }}
+    {{ if open =~ "--open" { "{{just}} ui --docker" } else { "" } }}
 
 # Stop the Docker container.
 stop:
     #!/usr/bin/env zsh
-    if [ -n "$(just running)" ]; then
+    if [ -n "$({{just}} running)" ]; then
         docker kill {{image}}
         if docker volume list | grep -q {{config}}; then
             docker volume remove {{config}}
@@ -109,7 +105,7 @@ running *verbose:
 # Show the Docker logs.
 logs tail="20":
     #!/usr/bin/env zsh
-    if [ -n "$(just running)" ]; then
+    if [ -n "$({{just}} running)" ]; then
         docker logs {{image}} --tail {{tail}}
     fi
 
@@ -122,9 +118,9 @@ clean:
 # Show the DSN for the database (optional: "--docker" or "--local").
 dsn *instance:
     #!/usr/bin/env zsh
-    instance="$(just _get_instance {{instance}})"
+    instance="$({{just}} _get_instance {{instance}})"
     if [ "${instance}" = "docker" ]; then
-        if [ -z "$(just running)" ]; then
+        if [ -z "$({{just}} running)" ]; then
             {{check_if_docker_running}}
         fi
         base_dsn=$(
@@ -150,11 +146,11 @@ dsn *instance:
 # Open the edgedb shell (optional: "--docker" or "--local").
 shell *instance:
     #!/usr/bin/env zsh
-    instance="$(just _get_instance {{instance}})"
+    instance="$({{just}} _get_instance {{instance}})"
     if [ "${instance}" = "docker" ]; then
         {{check_if_docker_running}}
-        if [ -z "$(just running)" ]; then
-            just start
+        if [ -z "$({{just}} running)" ]; then
+            {{just}} start
         fi
         docker run \
             --interactive \
@@ -171,7 +167,7 @@ shell *instance:
 # Open the Edgedb UI (optional: "--docker" or "--local")
 ui *instance:
     #!/usr/bin/env zsh
-    instance="$(just _get_instance {{instance}})"
+    instance="$({{just}} _get_instance {{instance}})"
     if [ "${instance}" = "docker" ]; then
         {{check_if_docker_running}}
         open "http://localhost:{{port}}/ui"
@@ -189,10 +185,7 @@ drop *args: stop
             >/dev/null 2>&1
     fi
     if [ "{{args}}" = "--docker" ] || [ -z "{{args}}" ]; then
-        if ! pgrep -q docker; then
-            just _error_docker_not_running
-            exit
-        fi
+        {{check_if_docker_running}}
         volumes=("$(docker volume list --quiet --filter name={{data}})")
         if [ -n "${volumes}" ]; then
             for volume in "${volumes}"; do
@@ -205,221 +198,6 @@ drop *args: stop
 @seed:
     {{connect_to_edgedb}} query --file seed.edgeql
 
-# Delete all objects in the database.
-@delete:
-    {{connect_to_edgedb}} query \
-        "delete Album; \
-        delete Disc; \
-        delete Track; \
-        delete Player; \
-        delete Artist; \
-        delete Person; \
-        delete Composition; \
-        delete Label; \
-        delete Date; \
-        delete Instrument;" \
-        | {{jq}}
-
-select_date := "\
-select Date { \
-    local_date, \
-    birthdays := .births.full_name \
-}"
-
-# View dates in the database.
-@dates:
-    {{connect_to_edgedb}} query "{{select_date}}" | {{jq}}
-
-# View a date in the database.
-@date display:
-    {{connect_to_edgedb}} query \
-        "{{select_date}} filter .display ilike '%{{display}}%'" \
-        | {{jq}}
-
-select_person := "\
-select Person { \
-    full_name, \
-    birthday := .birth_date.local_date, \
-    age, \
-    is_alive, \
-    person_instruments := .instruments.name, \
-    person_groups := .groups.name, \
-    person_compositions := .compositions.title, \
-    person_tracks := .tracks.title, \
-};"
-
-# View people in the database.
-@people:
-    {{connect_to_edgedb}} query "{{select_person}}" | {{jq}}
-
-# View a person in the database.
-@person full_name:
-    {{connect_to_edgedb}} query \
-        "{{select_person}} filter .full_name ilike '%{{full_name}}%'" \
-        | {{jq}}
-
-select_instrument := "\
-select Instrument { \
-    name, \
-    instrument_players := .players.person.full_name \
-};"
-
-# View instruments in the database.
-@instruments:
-    {{connect_to_edgedb}} query "{{select_instrument}}" | {{jq}}
-
-# View an instrument in the database.
-@instrument name:
-    {{connect_to_edgedb}} query \
-        "{{select_instrument}} filter .name ilike '%{{name}}%'" \
-        | {{jq}}
-
-select_composition := "\
-select Composition { \
-    title, \
-    date := .date_composed.local_date, \
-    creators := .composers.full_name, \
-    instruments := .instrumentation.name, \
-};"
-
-# View compositions in the database.
-@compositions:
-    {{connect_to_edgedb}} query \
-        "{{select_composition}}" \
-        | {{jq}}
-
-# View a composition in the database.
-@composition title:
-    {{connect_to_edgedb}} query \
-        "{{select_composition}} filter .title ilike '%{{title}}%'" \
-        | {{jq}}
-
-select_player := "\
-select Player { \
-    instrument_played := .instrument.name, \
-    performer := .person.full_name, \
-};"
-
-# View players in the database.
-@players:
-    {{connect_to_edgedb}} query \
-        "{{select_player}}" \
-        | {{jq}}
-
-# View a player in the database.
-@player name:
-    {{connect_to_edgedb}} query \
-        "{{select_player}} filter .person.full_name ilike '%{{name}}%'" \
-        | {{jq}}
-
-select_artist := "\
-select Artist { \
-    name, \
-    people := .members.full_name, \
-    albums_made := .albums.title, \
-};"
-
-# View artists in the database.
-@artists:
-    {{connect_to_edgedb}} query "{{select_artist}}" | {{jq}}
-
-# View an artist in the database.
-@artist name:
-    {{connect_to_edgedb}} query \
-        "{{select_artist}} filter .name ilike '%{{name}}%'" \
-        | {{jq}}
-
-select_track := "\
-select Track { \
-    title, \
-    duration, \
-    number, \
-    people := .players.display, \
-    track_date_recorded := .date_recorded.local_date, \
-};"
-
-# View tracks in the database.
-@tracks:
-    {{connect_to_edgedb}} query "{{select_track}}" | {{jq}}
-
-# View a track in the database.
-@track title:
-    {{connect_to_edgedb}} query \
-        "{{select_track}} filter .title ilike '%{{title}}%'" \
-        | {{jq}}
-
-select_label := "\
-select Label { \
-    name, \
-    label_series := .series.name, \
-    label_albums := .albums.title, \
-    label_artists := .artists.name \
-};"
-
-# View labels in the database.
-@labels:
-    {{connect_to_edgedb}} query "{{select_label}}" | {{jq}}
-
-# View a label in the database.
-@label name:
-    {{connect_to_edgedb}} query \
-        "{{select_label}} filter .name ilike '%{{name}}%'" \
-        | {{jq}}
-
-select_series := "\
-select Series { \
-    name, \
-    series_label := .label.name, \
-    series_albums := .albums.title, \
-};"
-
-# View series in the database.
-@series:
-    {{connect_to_edgedb}} query "{{select_series}}" | {{jq}}
-
-# View a series in the database.
-@series-single name:
-    {{connect_to_edgedb}} query \
-        "{{select_series}} filter .name ilike '%{{name}}%'" \
-        | {{jq}}
-
-select_disc := "\
-select Disc { \
-    title, \
-    tracks: { title, duration, number} order by .number, \
-    duration, \
-};"
-
-# View discs in the database.
-@discs:
-    {{connect_to_edgedb}} query "{{select_disc}}" | {{jq}}
-
-# View a disc in the database.
-@disc title:
-    {{connect_to_edgedb}} query \
-        "{{select_disc}} filter .title ilike '%{{title}}%'" \
-        | {{jq}}
-
-select_album := "\
-select Album { \
-    title, \
-    album_artists := .artists.name, \
-    disc_total, \
-    album_tracks := .tracks.title, \
-    duration, \
-    album_label := .label.name, \
-    producer := .producers.full_name, \
-    catalog_number, \
-    series_name := .series.name, \
-    series_number, \
-};"
-
-# View albums in the database.
-@albums:
-    {{connect_to_edgedb}} query "{{select_album}}" | {{jq}}
-
-# View an album in the database.
-@album title:
-    {{connect_to_edgedb}} query \
-        "{{select_album}} filter .title ilike '%{{title}}%'" \
-        | {{jq}}
+# Show available queries, or <query> the database.
+@query *query:
+    {{just}} --justfile queries.just {{query}}
