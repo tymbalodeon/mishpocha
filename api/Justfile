@@ -102,9 +102,9 @@ clean:
     exit 0
 
 # View people in the database.
-@people: local
+@people: (local "--background")
     http {{url}}/people
 
 # View a person in the database.
-@person full_name: local
+@person full_name: (local "--background")
     http "{{url}}/person?full_name={{full_name}}"
