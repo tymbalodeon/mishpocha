@@ -93,6 +93,7 @@ start *open: stop _build
         --rm \
         --tty \
         --volume {{config}}:/.config/edgedb \
+        --volume {{data}}:/var/lib/edgedb/data \
         edgedb/edgedb-cli \
             --host {{image}} \
             instance link {{edgedb_instance}} \
@@ -182,7 +183,7 @@ ui *instance:
     instance="$({{just}} _get_instance {{instance}})"
     if [ "${instance}" = "docker" ]; then
         {{check_if_docker_running}}
-        open "http://localhost:{{port}}/ui"
+        open http://localhost:{{port}}/ui
     else
         {{connect_to_edgedb}} ui
     fi
