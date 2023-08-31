@@ -18,7 +18,7 @@ _help *_from-main:
     ../install_dependencies.sh --db
 
 @_error_docker_not_running:
-    echo "Docker not running. Please start Docker and try again"
+    echo "Docker not running. Please start Docker and try again."
 
 _get_instance *instance:
     #!/usr/bin/env zsh
