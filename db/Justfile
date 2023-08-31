@@ -3,6 +3,7 @@ set fallback
 image := "mishpocha-db"
 edgedb_instance := replace(image, "-", "_")
 edgedb_command := "edgedb --instance " + edgedb_instance
+connect_to_edgedb := "just _create;" + edgedb_command
 port := "5656"
 data := "db-config"
 config := "edgedb-config"
@@ -142,8 +143,7 @@ dsn *instance:
             sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//'<<<"${base_dsn}"
         )
     else
-        just _create
-        base_dsn=$({{edgedb_command}} instance credentials --insecure-dsn)
+        base_dsn=$({{connect_to_edgedb}} instance credentials --insecure-dsn)
     fi
     echo "${base_dsn}&tls_security=insecure"
 
@@ -165,8 +165,7 @@ shell *instance:
             edgedb/edgedb-cli \
                 --instance {{edgedb_instance}}
     else
-        just _create
-        {{edgedb_command}}
+        {{connect_to_edgedb}}
     fi
 
 # Open the Edgedb UI (optional: "--docker" or "--local")
@@ -177,8 +176,7 @@ ui *instance:
         {{check_if_docker_running}}
         open "http://localhost:{{port}}/ui"
     else
-        just _create
-        {{edgedb_command}} ui
+        {{connect_to_edgedb}} ui
     fi
 
 # Drop the persisted databases (optional: "--docker", or "--local").
@@ -205,12 +203,11 @@ drop *args: stop
 
 # Seed the database.
 @seed:
-    just _create
-    {{edgedb_command}} query --file seed.edgeql
+    {{connect_to_edgedb}} query --file seed.edgeql
 
 # Delete all objects in the database.
 @delete:
-    {{edgedb_command}} query \
+    {{connect_to_edgedb}} query \
         "delete Album; \
         delete Disc; \
         delete Track; \
@@ -231,11 +228,11 @@ select Date { \
 
 # View dates in the database.
 @dates:
-    {{edgedb_command}} query "{{select_date}}" | {{jq}}
+    {{connect_to_edgedb}} query "{{select_date}}" | {{jq}}
 
 # View a date in the database.
 @date display:
-    {{edgedb_command}} query \
+    {{connect_to_edgedb}} query \
         "{{select_date}} filter .display ilike '%{{display}}%'" \
         | {{jq}}
 
@@ -253,11 +250,11 @@ select Person { \
 
 # View people in the database.
 @people:
-    {{edgedb_command}} query "{{select_person}}" | {{jq}}
+    {{connect_to_edgedb}} query "{{select_person}}" | {{jq}}
 
 # View a person in the database.
 @person full_name:
-    {{edgedb_command}} query \
+    {{connect_to_edgedb}} query \
         "{{select_person}} filter .full_name ilike '%{{full_name}}%'" \
         | {{jq}}
 
@@ -269,11 +266,11 @@ select Instrument { \
 
 # View instruments in the database.
 @instruments:
-    {{edgedb_command}} query "{{select_instrument}}" | {{jq}}
+    {{connect_to_edgedb}} query "{{select_instrument}}" | {{jq}}
 
 # View an instrument in the database.
 @instrument name:
-    {{edgedb_command}} query \
+    {{connect_to_edgedb}} query \
         "{{select_instrument}} filter .name ilike '%{{name}}%'" \
         | {{jq}}
 
@@ -287,13 +284,13 @@ select Composition { \
 
 # View compositions in the database.
 @compositions:
-    {{edgedb_command}} query \
+    {{connect_to_edgedb}} query \
         "{{select_composition}}" \
         | {{jq}}
 
 # View a composition in the database.
 @composition title:
-    {{edgedb_command}} query \
+    {{connect_to_edgedb}} query \
         "{{select_composition}} filter .title ilike '%{{title}}%'" \
         | {{jq}}
 
@@ -305,13 +302,13 @@ select Player { \
 
 # View players in the database.
 @players:
-    {{edgedb_command}} query \
+    {{connect_to_edgedb}} query \
         "{{select_player}}" \
         | {{jq}}
 
 # View a player in the database.
 @player name:
-    {{edgedb_command}} query \
+    {{connect_to_edgedb}} query \
         "{{select_player}} filter .person.full_name ilike '%{{name}}%'" \
         | {{jq}}
 
@@ -324,11 +321,11 @@ select Artist { \
 
 # View artists in the database.
 @artists:
-    {{edgedb_command}} query "{{select_artist}}" | {{jq}}
+    {{connect_to_edgedb}} query "{{select_artist}}" | {{jq}}
 
 # View an artist in the database.
 @artist name:
-    {{edgedb_command}} query \
+    {{connect_to_edgedb}} query \
         "{{select_artist}} filter .name ilike '%{{name}}%'" \
         | {{jq}}
 
@@ -343,11 +340,11 @@ select Track { \
 
 # View tracks in the database.
 @tracks:
-    {{edgedb_command}} query "{{select_track}}" | {{jq}}
+    {{connect_to_edgedb}} query "{{select_track}}" | {{jq}}
 
 # View a track in the database.
 @track title:
-    {{edgedb_command}} query \
+    {{connect_to_edgedb}} query \
         "{{select_track}} filter .title ilike '%{{title}}%'" \
         | {{jq}}
 
@@ -361,11 +358,11 @@ select Label { \
 
 # View labels in the database.
 @labels:
-    {{edgedb_command}} query "{{select_label}}" | {{jq}}
+    {{connect_to_edgedb}} query "{{select_label}}" | {{jq}}
 
 # View a label in the database.
 @label name:
-    {{edgedb_command}} query \
+    {{connect_to_edgedb}} query \
         "{{select_label}} filter .name ilike '%{{name}}%'" \
         | {{jq}}
 
@@ -378,11 +375,11 @@ select Series { \
 
 # View series in the database.
 @series:
-    {{edgedb_command}} query "{{select_series}}" | {{jq}}
+    {{connect_to_edgedb}} query "{{select_series}}" | {{jq}}
 
 # View a series in the database.
 @series-single name:
-    {{edgedb_command}} query \
+    {{connect_to_edgedb}} query \
         "{{select_series}} filter .name ilike '%{{name}}%'" \
         | {{jq}}
 
@@ -395,11 +392,11 @@ select Disc { \
 
 # View discs in the database.
 @discs:
-    {{edgedb_command}} query "{{select_disc}}" | {{jq}}
+    {{connect_to_edgedb}} query "{{select_disc}}" | {{jq}}
 
 # View a disc in the database.
 @disc title:
-    {{edgedb_command}} query \
+    {{connect_to_edgedb}} query \
         "{{select_disc}} filter .title ilike '%{{title}}%'" \
         | {{jq}}
 
@@ -419,10 +416,10 @@ select Album { \
 
 # View albums in the database.
 @albums:
-    {{edgedb_command}} query "{{select_album}}" | {{jq}}
+    {{connect_to_edgedb}} query "{{select_album}}" | {{jq}}
 
 # View an album in the database.
 @album title:
-    {{edgedb_command}} query \
+    {{connect_to_edgedb}} query \
         "{{select_album}} filter .title ilike '%{{title}}%'" \
         | {{jq}}
