@@ -4,13 +4,6 @@ set fallback
 
 port := "5656"
 data := "db-config"
-config := "edgedb-config"
-check_if_docker_running := "
-if ! pgrep docker -q &>/dev/null; then
-" + just + " _error_docker_not_running
-    exit
-fi
-"
 
 _help *_from-main:
     #!/usr/bin/env zsh
@@ -29,11 +22,11 @@ _help *_from-main:
 
 _get_instance *instance:
     #!/usr/bin/env zsh
-    if [ -n "$(pgrep docker -q)" ] && [ -z "{{instance}}"] \
+    if [ -n "$(pgrep docker -q)" ] && [ -z "{{instance}}" ] \
         || [[ "{{instance}}" = *"--docker"* ]]; then
-        printf "docker"
+        echo "docker"
     else
-        printf "local"
+        echo "local"
     fi
 
 _create:
@@ -195,8 +188,27 @@ drop *args: stop
     fi
 
 # Seed the database.
-@seed:
-    {{connect_to_edgedb}} query --file seed.edgeql
+seed *instance:
+    #!/usr/bin/env zsh
+    instance="$({{just}} _get_instance {{instance}})"
+    if [ "${instance}" = "docker" ]; then
+        {{check_if_docker_running}}
+        if [ -z "$({{just}} running)" ]; then
+            {{just}} start
+        fi
+        docker run \
+            --interactive \
+            --link {{image}} \
+            --rm \
+            --tty \
+            --volume {{config}}:/.config/edgedb \
+            --volume ./seed.edgeql:/seed.edgeql \
+            edgedb/edgedb-cli \
+                --instance {{edgedb_instance}} \
+                query --file seed.edgeql
+    else
+        {{connect_to_edgedb}} query --file seed.edgeql
+    fi
 
 # Show available queries, or <query> the database.
 @query *query:
