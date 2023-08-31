@@ -16,6 +16,12 @@ _help *_from-main:
 # Install dependencies.
 @install:
     ../install_dependencies.sh --api
+    cargo build
+
+# Update dependencies.
+@update *_from-main:
+    ../install_dependencies.sh --api --update
+    cargo update
 
 # Run the server locally.
 local *args: stop
