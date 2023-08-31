@@ -62,15 +62,15 @@ clean:
     docker rmi {{image}} >/dev/null 2>&1
 
 # Drop the persisted databases (optional: "--docker", or "--local").
-drop *args: stop
+drop *instance: stop
     #!/usr/bin/env zsh
-    if [ "{{args}}" = "--local" ] || [ -z "{{args}}" ]; then
+    if [ "{{instance}}" = "--local" ] || [ -z "{{instance}}" ]; then
         edgedb instance destroy \
             --instance {{edgedb_instance}} \
             --force \
             >/dev/null 2>&1
     fi
-    if [ "{{args}}" = "--docker" ] || [ -z "{{args}}" ]; then
+    if [ "{{instance}}" = "--docker" ] || [ -z "{{instance}}" ]; then
         {{check_if_docker_running}}
         volumes=("$(docker volume list --quiet --filter name={{data}})")
         if [ -n "${volumes}" ]; then
@@ -80,7 +80,7 @@ drop *args: stop
         fi
     fi
 
-# Start the Docker container.
+# Run the Docker container, and optionally "--open" in the browser.
 start *open: stop _build
     #!/usr/bin/env zsh
     {{check_if_docker_running}}
@@ -121,7 +121,7 @@ stop:
         fi
     fi
 
-# Show if the container is running.
+# Show the container id (or all info with "--verbose") if the container is running.
 running *verbose:
     #!/usr/bin/env zsh
     if pgrep -q docker; then
@@ -130,11 +130,11 @@ running *verbose:
             --filter name={{image}}
     fi
 
-# Show the Docker logs.
-logs tail="20":
+# Show the Docker logs up to <lines> lines.
+logs lines="20":
     #!/usr/bin/env zsh
     if [ -n "$({{just}} running)" ]; then
-        docker logs {{image}} --tail {{tail}}
+        docker logs {{image}} --tail {{lines}}
     fi
 
 # Show the DSN for the database (optional: "--docker" or "--local").
@@ -197,7 +197,7 @@ ui *instance:
         {{connect_to_edgedb}} ui
     fi
 
-# Seed the database.
+# Seed the database (optional: "--docker" or "--local").
 seed *instance:
     #!/usr/bin/env zsh
     instance="$({{just}} _get_instance {{instance}})"
