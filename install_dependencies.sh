@@ -12,9 +12,10 @@ dependencies=(
 IFS=" " read -r -A args <<< "$@"
 
 if ((${args[(I)*--all*]})) \
-    || ((${args[(I)*--api*]})) \
-    || ((${args[(I)*--ui*]})); then
-    dependencies+="rtx"
+    || ((${args[(I)*--api*]})); then
+    dependencies+=(
+        "rustup"
+    )
 fi
 
 if ((${args[(I)*--all*]})) \
@@ -29,6 +30,7 @@ if ((${args[(I)*--all*]})) \
     dependencies+=(
         "node"
         "pnpm"
+        "rtx"
     )
 fi
 
@@ -57,6 +59,9 @@ install_dependency() {
             ;;
         "rtx")
             brew install rtx
+            ;;
+        "rustup")
+            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
             ;;
     esac
 }
@@ -87,6 +92,9 @@ update_dependency() {
             ;;
         "rtx")
             brew upgrade rtx
+            ;;
+        "rustup")
+            rustup update
             ;;
     esac
 }

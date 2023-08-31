@@ -13,6 +13,10 @@ _help *_from-main:
         just --list --list-heading $'\nAPI: [`just api <COMMAND>`]\n'
     fi
 
+# Install dependencies.
+@install:
+    ../install_dependencies.sh --api
+
 # Run the server locally.
 local *args: stop
     #!/usr/bin/env zsh
