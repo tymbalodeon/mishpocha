@@ -25,17 +25,65 @@ _help *_from-main:
     ../install_dependencies.sh --api --update
     cargo update
 
-# Run the server locally.
-local *args: stop
+_get_instance *instance:
     #!/usr/bin/env zsh
-    EDGEDB_DSN="$( \
-        edgedb instance credentials \
-            --insecure-dsn \
-            --instance mishpocha_db \
-        )?tls_security=insecure"
-    if [[ "{{args}}" = *"--background"* ]]; then
-        {{cargo_run_with_db}} &>/dev/null &
+    if [ -n "$(pgrep docker -q)" ] && [ -z "{{instance}}" ] \
+        || [[ "{{instance}}" = *"--docker"* ]]; then
+        echo "docker"
     else
+        echo "local"
+    fi
+
+_build *prod:
+    #!/usr/bin/env zsh
+    if pgrep -q docker; then
+        target={{ if prod =~ "--prod" { "prod" } else { "dev" } }}
+        docker build --target "${target}" --tag {{image}} .
+    fi
+
+# Remove the Docker image.
+clean:
+    #!/usr/bin/env zsh
+    docker rmi {{image}} >/dev/null 2>&1
+    exit 0
+
+# Run the Docker container, and optionally "--open" in the browser.
+start *args: stop (_build args)
+    #!/usr/bin/env zsh
+    if [[ "{{args}}" = *"--docker"* ]]; then
+        instance="--docker"
+    elif [[ "{{args}}" = *"--local"* ]]; then
+        instance="local"
+    else
+        instance=""
+    fi
+    instance="$({{just}} _get_instance ${instance})"
+    {{ if args =~ "--open" { "just open" } else { "" } }}
+    if [ "${instance}" = "docker" ]; then
+        if [ -z "$({{just}} running)" ]; then
+            {{check_if_docker_running}}
+        fi
+        if [[ "{{args}}" = *"--prod"* ]]; then
+            docker run \
+                --detach \
+                --name {{image}} \
+                --publish {{port}}:{{port}} \
+                --rm \
+                {{image}}
+        else
+            docker run \
+                --detach \
+                --name {{image}} \
+                --publish {{port}}:{{port}} \
+                --rm \
+                {{image}}
+        fi
+    else
+        EDGEDB_DSN="$( \
+            edgedb instance credentials \
+                --insecure-dsn \
+                --instance mishpocha_db \
+            )?tls_security=insecure"
         {{cargo_run_with_db}}
     fi
 
@@ -59,65 +107,6 @@ running *verbose:
             --filter name={{image}}
     fi
 
-_build *prod:
-    #!/usr/bin/env zsh
-    if pgrep -q docker; then
-        target={{ if prod =~ "--prod" { "prod" } else { "dev" } }}
-        docker build --target "${target}" --tag {{image}} .
-    fi
-
-# Open the application in the browser.
-@open:
-    open {{url}}
-
-# Ping the application.
-@ping:
-    http get {{url}}
-
-_get_instance *instance:
-    #!/usr/bin/env zsh
-    if [ -n "$(pgrep docker -q)" ] && [ -z "{{instance}}" ] \
-        || [[ "{{instance}}" = *"--docker"* ]]; then
-        echo "docker"
-    else
-        echo "local"
-    fi
-
-# Run the Docker container, and optionally "--open" in the browser.
-start *args: stop (_build args)
-    #!/usr/bin/env zsh
-    if [[ "{{args}}" = *"--docker"* ]]; then
-        instance="--docker"
-    elif [[ "{{args}}" = *"--local"* ]]; then
-        instance="local"
-    else
-        instance=""
-    fi
-    instance="$({{just}} _get_instance ${instance})"
-    if [ "${instance}" = "docker" ]; then
-        if [ -z "$({{just}} running)" ]; then
-            {{check_if_docker_running}}
-        fi
-        if [[ "{{args}}" = *"--prod"* ]]; then
-            docker run \
-                --detach \
-                --name {{image}} \
-                --publish {{port}}:{{port}} \
-                --rm \
-                {{image}}
-        else
-            docker run \
-                --detach \
-                --name {{image}} \
-                --publish {{port}}:{{port}} \
-                --rm \
-                {{image}}
-        fi
-    else
-        cargo run
-    fi
-    {{ if args =~ "--open" { "just open" } else { "" } }}
-
 # Show the Docker logs.
 logs tail="20":
     #!/usr/bin/env zsh
@@ -133,11 +122,13 @@ shell:
     fi
     docker exec --interactive --tty {{image}} bash
 
-# Remove the Docker image.
-clean:
-    #!/usr/bin/env zsh
-    docker rmi {{image}} >/dev/null 2>&1
-    exit 0
+# Open the application in the browser.
+@open:
+    open {{url}}
+
+# Ping the application.
+@ping:
+    http get {{url}}
 
 # View people in the database.
 @people: (local "--background")
