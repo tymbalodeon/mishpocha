@@ -58,7 +58,7 @@ start *args: stop (_build args)
         instance=""
     fi
     instance="$({{just}} _get_instance ${instance})"
-    {{ if args =~ "--open" { "just open" } else { "" } }}
+    {{ if args =~ "--open" { "{{just}} open" } else { "" } }}
     if [ "${instance}" = "docker" ]; then
         if [ -z "$({{just}} running)" ]; then
             {{check_if_docker_running}}
@@ -110,15 +110,16 @@ running *verbose:
 # Show the Docker logs.
 logs tail="20":
     #!/usr/bin/env zsh
-    if [ -n "$(just running)" ]; then
+    if [ -n "$({{just}} running)" ]; then
         docker logs {{image}} --tail {{tail}}
     fi
 
 # Log into the interactive shell in Docker.
 shell:
     #!/usr/bin/env zsh
-    if [ -n "$(just running)" ]; then
-        just start
+    {{check_if_docker_running}}
+    if [ -n "$({{just}} running)" ]; then
+        {{just}} start
     fi
     docker exec --interactive --tty {{image}} bash
 
