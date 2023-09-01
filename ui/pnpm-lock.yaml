@@ -13,7 +13,7 @@ devDependencies:
     version: 1.2.10
   '@tailwindcss/typography':
     specifier: github:tailwindcss/typography
-    version: github.com/tailwindcss/typography/cf15333d2582d1d73d352ee50ad29f35e7a3eb9d(tailwindcss@3.3.3)
+    version: git@github.com+tailwindcss/typography/cf15333d2582d1d73d352ee50ad29f35e7a3eb9d(tailwindcss@3.3.3)
   '@types/compression':
     specifier: ^1.7.2
     version: 1.7.2
@@ -1087,7 +1087,7 @@ packages:
     hasBin: true
     dependencies:
       caniuse-lite: 1.0.30001525
-      electron-to-chromium: 1.4.506
+      electron-to-chromium: 1.4.507
       node-releases: 2.0.13
       update-browserslist-db: 1.0.11(browserslist@4.21.10)
     dev: true
@@ -1617,8 +1617,8 @@ packages:
     resolution: {integrity: sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==}
     dev: true
 
-  /electron-to-chromium@1.4.506:
-    resolution: {integrity: sha512-xxGct4GPAKSRlrLBtJxJFYy74W11zX6PO9GyHgl/U+2s3Dp0ZEwAklDfNHXOWcvH7zWMpsmgbR0ggEuaYAVvHA==}
+  /electron-to-chromium@1.4.507:
+    resolution: {integrity: sha512-brvPFnO1lu3UYBpBht2qWw9qqhdG4htTjT90/9oOJmxQ77VvTxL9+ghErFqQzgj7n8268ONAmlebqjBR/S+qgA==}
     dev: true
 
   /emoji-regex@8.0.0:
@@ -5233,9 +5233,9 @@ packages:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
     dev: true
 
-  github.com/tailwindcss/typography/cf15333d2582d1d73d352ee50ad29f35e7a3eb9d(tailwindcss@3.3.3):
-    resolution: {commit: cf15333d2582d1d73d352ee50ad29f35e7a3eb9d, repo: git+ssh://git@github.com/tailwindcss/typography.git, type: git}
-    id: github.com/tailwindcss/typography/cf15333d2582d1d73d352ee50ad29f35e7a3eb9d
+  git@github.com+tailwindcss/typography/cf15333d2582d1d73d352ee50ad29f35e7a3eb9d(tailwindcss@3.3.3):
+    resolution: {commit: cf15333d2582d1d73d352ee50ad29f35e7a3eb9d, repo: git@github.com:tailwindcss/typography.git, type: git}
+    id: git@github.com+tailwindcss/typography/cf15333d2582d1d73d352ee50ad29f35e7a3eb9d
     name: '@tailwindcss/typography'
     version: 0.5.9
     peerDependencies:
