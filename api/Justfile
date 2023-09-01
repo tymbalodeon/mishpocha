@@ -131,9 +131,9 @@ shell:
     http get {{url}}
 
 # View people in the database.
-@people: (local "--background")
+@people: start
     http {{url}}/people
 
 # View a person in the database.
-@person full_name: (local "--background")
+@person full_name: start
     http "{{url}}/person?full_name={{full_name}}"
