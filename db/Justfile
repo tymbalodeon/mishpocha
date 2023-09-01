@@ -1,3 +1,4 @@
+!include ../helpers.just
 !include helpers.just
 
 set fallback
@@ -22,9 +23,6 @@ _help *_from-main:
 @update *_from-main:
     ../install_dependencies.sh --db --update
     edgedb instance upgrade --instance {{edgedb_instance}}
-
-@_error_docker_not_running:
-    echo "Docker not running. Please start Docker and try again."
 
 _get_instance *instance:
     #!/usr/bin/env zsh

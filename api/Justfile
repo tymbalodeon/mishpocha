@@ -1,3 +1,5 @@
+!include ../helpers.just
+
 set fallback
 
 cargo_run_with_db := "env EDGEDB_DSN='${EDGEDB_DSN}' cargo run"
@@ -8,9 +10,9 @@ url := "http://localhost:" + port
 _help *_from-main:
     #!/usr/bin/env zsh
     if [ -z "{{_from-main}}" ]; then
-        just --list
+        {{just}} --list
     else
-        just --list --list-heading $'\nAPI: [`just api <COMMAND>`]\n'
+        {{just}} --list --list-heading $'\nAPI: [`just api <COMMAND>`]\n'
     fi
 
 # Install dependencies.
@@ -44,7 +46,7 @@ stop:
     if [ -n "${mishpocha}" ]; then
         kill "${mishpocha}" &>/dev/null
     fi
-    if [ -n "$(just running)" ]; then
+    if [ -n "$({{just}} running)" ]; then
         docker kill {{image}}
     fi
 
@@ -59,8 +61,10 @@ running *verbose:
 
 _build *prod:
     #!/usr/bin/env zsh
-    target={{ if prod =~ "--prod" { "prod" } else { "dev" } }}
-    docker build --target "${target}" --tag {{image}} .
+    if pgrep -q docker; then
+        target={{ if prod =~ "--prod" { "prod" } else { "dev" } }}
+        docker build --target "${target}" --tag {{image}} .
+    fi
 
 # Open the application in the browser.
 @open:
@@ -70,23 +74,47 @@ _build *prod:
 @ping:
     http get {{url}}
 
+_get_instance *instance:
+    #!/usr/bin/env zsh
+    if [ -n "$(pgrep docker -q)" ] && [ -z "{{instance}}" ] \
+        || [[ "{{instance}}" = *"--docker"* ]]; then
+        echo "docker"
+    else
+        echo "local"
+    fi
+
 # Run the Docker container, and optionally "--open" in the browser.
 start *args: stop (_build args)
     #!/usr/bin/env zsh
-    if [[ "{{args}}" = *"--prod"* ]]; then
-        docker run \
-            --detach \
-            --name {{image}} \
-            --publish {{port}}:{{port}} \
-            --rm \
-            {{image}}
+    if [[ "{{args}}" = *"--docker"* ]]; then
+        instance="--docker"
+    elif [[ "{{args}}" = *"--local"* ]]; then
+        instance="local"
     else
-        docker run \
-            --detach \
-            --name {{image}} \
-            --publish {{port}}:{{port}} \
-            --rm \
-            {{image}}
+        instance=""
+    fi
+    instance="$({{just}} _get_instance ${instance})"
+    if [ "${instance}" = "docker" ]; then
+        if [ -z "$({{just}} running)" ]; then
+            {{check_if_docker_running}}
+        fi
+        if [[ "{{args}}" = *"--prod"* ]]; then
+            docker run \
+                --detach \
+                --name {{image}} \
+                --publish {{port}}:{{port}} \
+                --rm \
+                {{image}}
+        else
+            docker run \
+                --detach \
+                --name {{image}} \
+                --publish {{port}}:{{port}} \
+                --rm \
+                {{image}}
+        fi
+    else
+        cargo run
     fi
     {{ if args =~ "--open" { "just open" } else { "" } }}
 
