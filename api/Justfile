@@ -2,7 +2,7 @@
 
 set fallback
 
-cargo_run_with_db := 'env EDGEDB_DSN="${EDGEDB_DSN}" cargo run'
+cargo_run_with_db := 'env EDGEDB_DSN="${EDGEDB_DSN}" EDGEDB_CLIENT_TLS_SECURITY="insecure" cargo run'
 image := "mishpocha-api"
 port := "8080"
 url := "http://localhost:" + port
