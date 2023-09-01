@@ -1,3 +1,4 @@
+!include ../helpers.just
 !include helpers.just
 
 query_command := just + " --justfile queries.just _query"

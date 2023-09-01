@@ -46,7 +46,7 @@ _build *prod:
 @clean:
     docker rmi {{image}} >/dev/null 2>&1
 
-# Run the Docker container, and optionally "--open" in the browser.
+# Run the Docker container, optionally in "--prod", and optionally "--open" in the browser.
 start *args: stop (_build args)
     #!/usr/bin/env zsh
     if [[ "{{args}}" = *"--docker"* ]]; then
@@ -89,7 +89,7 @@ stop:
         docker kill {{image}}
     fi
 
-# Show if the container is running.
+# Show the container id (or all info with "--verbose") if the container is running.
 running *verbose:
     #!/usr/bin/env zsh
     if pgrep -q docker; then
@@ -98,7 +98,7 @@ running *verbose:
             --filter name={{image}}
     fi
 
-# Show the Docker logs.
+# Show the Docker logs up to <lines> lines.
 logs tail="20":
     #!/usr/bin/env zsh
     if [ -n "$({{just}} running)" ]; then
@@ -123,9 +123,9 @@ shell:
     http get {{url}}
 
 # View people in the database.
-@people: start
+@people:
     http {{url}}/people
 
 # View a person in the database.
-@person full_name: start
+@person full_name:
     http "{{url}}/person?full_name={{full_name}}"
