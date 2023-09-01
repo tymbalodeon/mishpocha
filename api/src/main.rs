@@ -4,10 +4,13 @@ use actix_web::{
     App, HttpResponse, HttpServer, Responder, Result,
 };
 use serde::{Deserialize, Serialize};
+use std::env::var;
 
 #[get("/")]
 async fn welcome() -> impl Responder {
-    HttpResponse::Ok().body("Welcome to the Mishpocha database!")
+    let edgedb_dsn = var("EDGEDB_DSN").expect("$EDGEDB_DSN is not set");
+    // HttpResponse::Ok().body("Welcome to the Mishpocha database!")
+    HttpResponse::Ok().body(format!("{edgedb_dsn}"))
 }
 
 #[derive(Deserialize)]

@@ -2,7 +2,7 @@
 
 set fallback
 
-cargo_run_with_db := "env EDGEDB_DSN='${EDGEDB_DSN}' cargo run"
+cargo_run_with_db := 'env EDGEDB_DSN="${EDGEDB_DSN}" cargo run'
 image := "mishpocha-api"
 port := "8080"
 url := "http://localhost:" + port
@@ -78,11 +78,7 @@ start *args: stop (_build args)
                 {{image}}
         fi
     else
-        EDGEDB_DSN="$( \
-            edgedb instance credentials \
-                --insecure-dsn \
-                --instance mishpocha_db \
-            )?tls_security=insecure"
+        EDGEDB_DSN="$({{just}} db dsn)"
         {{cargo_run_with_db}}
     fi
 
