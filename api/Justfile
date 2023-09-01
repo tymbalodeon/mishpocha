@@ -42,10 +42,9 @@ _build *prod:
     fi
 
 # Remove the Docker image.
-clean:
-    #!/usr/bin/env zsh
+[no-exit-message]
+@clean:
     docker rmi {{image}} >/dev/null 2>&1
-    exit 0
 
 # Run the Docker container, and optionally "--open" in the browser.
 start *args: stop (_build args)
