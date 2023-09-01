@@ -55,8 +55,7 @@ _build:
 
 # Remove the Docker image.
 [no-exit-message]
-clean:
-    #!/usr/bin/env zsh
+@clean:
     docker rmi {{image}} >/dev/null 2>&1
 
 # Drop the persisted databases (optional: "--docker", or "--local").
