@@ -139,8 +139,9 @@ dsn *instance:
     #!/usr/bin/env zsh
     instance="$({{just}} _get_instance {{instance}})"
     if [ "${instance}" = "docker" ]; then
+        {{check_if_docker_running}}
         if [ -z "$({{just}} running)" ]; then
-            {{check_if_docker_running}}
+            {{just}} start
         fi
         base_dsn=$(
             docker run \
@@ -154,13 +155,10 @@ dsn *instance:
                     instance credentials \
                         --insecure-dsn
         )
-        base_dsn=$(
-            sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//'<<<"${base_dsn}"
-        )
+        sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//'<<<"${base_dsn}"
     else
-        base_dsn=$({{connect_to_edgedb}} instance credentials --insecure-dsn)
+        {{connect_to_edgedb}} instance credentials --insecure-dsn
     fi
-    echo "${base_dsn}&tls_security=insecure"
 
 # Open the edgedb shell (optional: "--docker" or "--local").
 shell *instance:
