@@ -939,6 +939,7 @@ dependencies = [
  "edgedb-protocol",
  "edgedb-tokio",
  "serde",
+ "serde_json",
 ]
 
 [[package]]

@@ -5,13 +5,14 @@ use actix_web::{
 };
 use edgedb_tokio::create_client;
 use serde::{Deserialize, Serialize};
+use serde_json::from_str;
 
 #[get("/")]
 async fn welcome() -> impl Responder {
     HttpResponse::Ok().body("Welcome to the Mishpocha database!")
 }
 
-#[derive(Deserialize)]
+#[derive(Serialize, Deserialize)]
 struct Date {
     day: i16,
     month: i16,
@@ -42,20 +43,21 @@ async fn post_date(date: Json<Date>) -> impl Responder {
 }
 
 #[get("/dates")]
-async fn get_dates() -> impl Responder {
+async fn get_dates() -> Result<impl Responder> {
     let client = create_client()
         .await
         .expect("Failed to connect to database");
-    HttpResponse::Ok().body(
-        client
-            .query_json("select Date { ** };", &())
-            .await
-            .expect("failed to execute query")
-            .to_string(),
-    )
+    let dates = client
+        .query_json("select Date { day, month, year };", &())
+        .await
+        .expect("failed to execute query")
+        .to_string();
+    let dates: Vec<Date> = from_str(&dates)?;
+
+    Ok(Json(dates))
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 struct PersonName {
     full_name: String,
 }
@@ -65,14 +67,14 @@ async fn get_people() -> Result<impl Responder> {
     let client = create_client()
         .await
         .expect("Failed to connect to database");
-    let person = PersonName {
-        full_name: client
-            .query_json("select Person { full_name };", &())
-            .await
-            .expect("failed to execute query")
-            .to_string(),
-    };
-    Ok(Json(person))
+    let people = client
+        .query_json("select Person { full_name };", &())
+        .await
+        .expect("failed to execute query")
+        .to_string();
+    let people: Vec<PersonName> = from_str(&people)?;
+
+    Ok(Json(people))
 }
 
 #[derive(Deserialize)]
