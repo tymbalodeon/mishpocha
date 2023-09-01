@@ -3,6 +3,7 @@ use actix_web::{
     web::{Json, Query},
     App, HttpResponse, HttpServer, Responder, Result,
 };
+use edgedb_tokio::create_client;
 use serde::{Deserialize, Serialize};
 
 #[get("/")]
@@ -19,7 +20,7 @@ struct Date {
 
 #[post("/date")]
 async fn post_date(date: Json<Date>) -> impl Responder {
-    let client = edgedb_tokio::create_client()
+    let client = create_client()
         .await
         .expect("Failed to connect to database");
     HttpResponse::Ok().body(
@@ -42,7 +43,7 @@ async fn post_date(date: Json<Date>) -> impl Responder {
 
 #[get("/dates")]
 async fn get_dates() -> impl Responder {
-    let client = edgedb_tokio::create_client()
+    let client = create_client()
         .await
         .expect("Failed to connect to database");
     HttpResponse::Ok().body(
@@ -61,7 +62,7 @@ struct PersonName {
 
 #[get("/people")]
 async fn get_people() -> Result<impl Responder> {
-    let client = edgedb_tokio::create_client()
+    let client = create_client()
         .await
         .expect("Failed to connect to database");
     let person = PersonName {
@@ -83,7 +84,7 @@ struct Person {
 
 #[post("/person")]
 async fn post_person(person: Json<Person>) -> impl Responder {
-    let client = edgedb_tokio::create_client()
+    let client = create_client()
         .await
         .expect("Failed to connect to database");
     HttpResponse::Ok().body(
@@ -119,7 +120,7 @@ struct FullName {
 
 #[get("/person")]
 async fn get_person(query: Query<FullName>) -> impl Responder {
-    let client = edgedb_tokio::create_client()
+    let client = create_client()
         .await
         .expect("Failed to connect to database");
     HttpResponse::Ok().body(
@@ -146,7 +147,7 @@ struct Instrument {
 
 #[post("/instrument")]
 async fn post_instrument(instrument: Json<Instrument>) -> impl Responder {
-    let client = edgedb_tokio::create_client()
+    let client = create_client()
         .await
         .expect("Failed to connect to database");
     HttpResponse::Ok().body(
@@ -167,7 +168,7 @@ async fn post_instrument(instrument: Json<Instrument>) -> impl Responder {
 
 #[get("/instruments")]
 async fn get_instruments() -> impl Responder {
-    let client = edgedb_tokio::create_client()
+    let client = create_client()
         .await
         .expect("Failed to connect to database");
     HttpResponse::Ok().body(
@@ -187,7 +188,7 @@ struct Player {
 
 #[post("/player")]
 async fn post_player(player: Json<Player>) -> impl Responder {
-    let client = edgedb_tokio::create_client()
+    let client = create_client()
         .await
         .expect("Failed to connect to database");
     HttpResponse::Ok().body(
