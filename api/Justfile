@@ -58,7 +58,7 @@ start *args: stop (_build args)
         instance=""
     fi
     instance="$({{just}} _get_instance ${instance})"
-    {{ if args =~ "--open" { "{{just}} open" } else { "" } }}
+    {{ if args =~ "--open" { just + " open" } else { "" } }}
     if [ "${instance}" = "docker" ]; then
         if [ -z "$({{just}} running)" ]; then
             {{check_if_docker_running}}
@@ -90,10 +90,6 @@ start *args: stop (_build args)
 # Stop the server.
 stop:
     #!/usr/bin/env zsh
-    mishpocha="$(pgrep {{image}})"
-    if [ -n "${mishpocha}" ]; then
-        kill "${mishpocha}" &>/dev/null
-    fi
     if [ -n "$({{just}} running)" ]; then
         docker kill {{image}}
     fi
