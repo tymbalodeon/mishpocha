@@ -14,7 +14,12 @@ export const Date = component$<DateObject>((props) => {
             <p>Month: {date.month}</p>
             <p>Year: {date.year}</p>
             <p>Display: {date.display}</p>
-            <p>Births: {date.births.map((person) => person.full_name)}</p>
+            <p>
+              Births:{" "}
+              {date.births.map((person) => (
+                <a href={"/people/" + person.full_name}>{person.full_name}</a>
+              ))}
+            </p>
             <p>Deaths: {date.deaths.map((person) => person.full_name)}</p>
             <p>
               Artist start: {date.artist_starts.map((artist) => artist.name)}

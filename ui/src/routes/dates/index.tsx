@@ -9,8 +9,12 @@ export const useGetApiData = routeLoader$(async (requestEvent) => {
     return "API_DOMAIN not specified.";
   }
 
-  const response = await fetch(`${apiDomain}/dates`);
-  return await response.json();
+  try {
+    const response = await fetch(`${apiDomain}/dates`);
+    return await response.json();
+  } catch {
+    return [];
+  }
 });
 
 export default component$(() => {
