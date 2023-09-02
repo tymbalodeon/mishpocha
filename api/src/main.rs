@@ -1,14 +1,10 @@
 mod schema;
 
 use actix_web::{
-    get, post,
-    web::{Json, Query},
-    App, HttpResponse, HttpServer, Responder, Result,
+    get, web::Json, App, HttpResponse, HttpServer, Responder, Result,
 };
 use edgedb_tokio::create_client;
 use schema::{Date, Person};
-use serde::{Deserialize, Serialize};
-use serde_json::from_str;
 
 #[get("/")]
 async fn welcome() -> impl Responder {

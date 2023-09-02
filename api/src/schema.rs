@@ -1,5 +1,4 @@
 use edgedb_derive::Queryable;
-use edgedb_protocol::model::Duration;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -11,9 +10,17 @@ pub struct Date {
     pub month: Option<i16>,
     pub year: Option<i32>,
     pub display: Option<String>,
-    pub albums_released: Option<Vec<Album>>,
     pub births: Option<Vec<Person>>,
     pub deaths: Option<Vec<Person>>,
+    pub artist_starts: Option<Vec<Artist>>,
+    pub artist_ends: Option<Vec<Artist>>,
+    pub compositions: Option<Vec<Composition>>,
+    pub arrangements: Option<Vec<Composition>>,
+    pub tracks_recorded: Option<Vec<Track>>,
+    pub tracks_released: Option<Vec<Track>>,
+    pub tracks_mastered: Option<Vec<Track>>,
+    pub tracks_mixed: Option<Vec<Track>>,
+    pub albums_released: Option<Vec<Album>>,
 }
 
 #[derive(Debug, Deserialize, Queryable, Serialize)]
@@ -35,7 +42,8 @@ pub struct Person {
     pub is_producer: Option<bool>,
 }
 
-#[derive(Debug, Queryable)]
+#[derive(Debug, Deserialize, Queryable, Serialize)]
+#[edgedb(json)]
 pub enum NoteName {
     C,
     D,
@@ -46,20 +54,23 @@ pub enum NoteName {
     B,
 }
 
-#[derive(Debug, Queryable)]
+#[derive(Debug, Deserialize, Queryable, Serialize)]
+#[edgedb(json)]
 pub enum Accidental {
     Flat,
     Natural,
     Sharp,
 }
 
-#[derive(Debug, Queryable)]
+#[derive(Debug, Deserialize, Queryable, Serialize)]
+#[edgedb(json)]
 pub struct Note {
     pub name: Option<NoteName>,
     pub accidental: Option<Accidental>,
 }
 
-#[derive(Debug, Queryable)]
+#[derive(Debug, Deserialize, Queryable, Serialize)]
+#[edgedb(json)]
 pub struct Instrument {
     pub name: Option<String>,
     pub aliases: Option<Vec<String>>,
@@ -67,19 +78,22 @@ pub struct Instrument {
     // pub players: Option<Player>,
 }
 
-#[derive(Debug, Queryable)]
+#[derive(Debug, Deserialize, Queryable, Serialize)]
+#[edgedb(json)]
 pub enum Mode {
     Major,
     Minor,
 }
 
-#[derive(Debug, Queryable)]
+#[derive(Debug, Deserialize, Queryable, Serialize)]
+#[edgedb(json)]
 pub struct Key {
     pub root: Option<Note>,
     pub mode: Option<Mode>,
 }
 
-#[derive(Debug, Queryable)]
+#[derive(Debug, Deserialize, Queryable, Serialize)]
+#[edgedb(json)]
 pub enum Denominator {
     One,
     Two,
@@ -90,13 +104,15 @@ pub enum Denominator {
     SixtyFour,
 }
 
-#[derive(Debug, Queryable)]
+#[derive(Debug, Deserialize, Queryable, Serialize)]
+#[edgedb(json)]
 pub struct TimeSignature {
     pub numerator: Option<i32>,
     pub denominator: Option<Denominator>,
 }
 
-#[derive(Debug, Queryable)]
+#[derive(Debug, Deserialize, Queryable, Serialize)]
+#[edgedb(json)]
 pub struct Composition {
     pub title: Option<String>,
     pub composers: Option<Vec<Person>>,
@@ -109,13 +125,15 @@ pub struct Composition {
     pub time_signature: Option<TimeSignature>,
 }
 
-#[derive(Debug, Queryable)]
+#[derive(Debug, Deserialize, Queryable, Serialize)]
+#[edgedb(json)]
 pub struct Player {
     pub person: Option<Person>,
     pub instrument: Option<Instrument>,
 }
 
-#[derive(Debug, Queryable)]
+#[derive(Debug, Deserialize, Queryable, Serialize)]
+#[edgedb(json)]
 pub struct Artist {
     pub name: Option<String>,
     pub members: Option<Vec<Person>>,
@@ -124,7 +142,8 @@ pub struct Artist {
     pub albums: Option<Vec<Album>>,
 }
 
-#[derive(Debug, Queryable)]
+#[derive(Debug, Deserialize, Queryable, Serialize)]
+#[edgedb(json)]
 pub struct Track {
     pub title: Option<String>,
     pub compositions: Option<Vec<Composition>>,
@@ -134,16 +153,18 @@ pub struct Track {
     pub year_mastered: Option<Date>,
     pub year_mixed: Option<Date>,
     pub number: Option<i16>,
-    pub duration: Option<Duration>,
+    pub duration: Option<String>,
 }
 
-#[derive(Debug, Queryable)]
+#[derive(Debug, Deserialize, Queryable, Serialize)]
+#[edgedb(json)]
 pub struct Series {
     pub name: Option<String>,
     pub label: Option<Label>,
 }
 
-#[derive(Debug, Queryable)]
+#[derive(Debug, Deserialize, Queryable, Serialize)]
+#[edgedb(json)]
 pub struct Label {
     pub name: Option<String>,
     pub series: Option<Vec<Series>>,
@@ -151,14 +172,16 @@ pub struct Label {
     pub artists: Option<Vec<Artist>>,
 }
 
-#[derive(Debug, Queryable)]
+#[derive(Debug, Deserialize, Queryable, Serialize)]
+#[edgedb(json)]
 pub struct Disc {
     pub title: Option<String>,
     pub number: Option<i32>,
     pub tracks: Option<Vec<Track>>,
 }
 
-#[derive(Debug, Queryable)]
+#[derive(Debug, Deserialize, Queryable, Serialize)]
+#[edgedb(json)]
 pub struct Album {
     pub id: Option<Uuid>,
     pub title: Option<String>,
