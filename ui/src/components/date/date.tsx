@@ -1,7 +1,7 @@
 import { component$ } from "@builder.io/qwik";
-import { Date } from "../../schema.ts";
+import { Date as DateObject } from "../../schema.ts";
 
-export const Date = component$<Date>((props) => {
+export const Date = component$<DateObject>((props) => {
   const date = props.data;
 
   const data = (
