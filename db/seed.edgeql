@@ -16,27 +16,27 @@ with people := <json>(
     {
         first_name := "Evan",
         last_name := "Parker",
-        birth_date_display := "1944-4-5"
+        birth_date_display := "1944-04-05"
     },
     {
         first_name := "Paul",
         last_name := "Lytton",
-        birth_date_display := "1947-3-8"
+        birth_date_display := "1947-03-08"
     },
     {
         first_name := "Barry",
         last_name := "Guy",
-        birth_date_display := "1947-4-22"
+        birth_date_display := "1947-04-22"
     },
     {
         first_name := "Joe",
         last_name := "McPhee",
-        birth_date_display := "1939-11-3"
+        birth_date_display := "1939-11-03"
     },
     {
         first_name := "Robert",
         last_name := "Rusch",
-        birth_date_display := "1943-4-3"
+        birth_date_display := "1943-04-03"
     },
 ) for person in json_array_unpack(people) union (
     with existing_person := (
