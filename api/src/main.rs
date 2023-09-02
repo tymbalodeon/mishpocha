@@ -1,9 +1,12 @@
+mod schema;
+
 use actix_web::{
     get, post,
     web::{Json, Query},
     App, HttpResponse, HttpServer, Responder, Result,
 };
 use edgedb_tokio::create_client;
+use schema::Date;
 use serde::{Deserialize, Serialize};
 use serde_json::from_str;
 
@@ -12,47 +15,38 @@ async fn welcome() -> impl Responder {
     HttpResponse::Ok().body("Welcome to the Mishpocha database!")
 }
 
-#[derive(Serialize, Deserialize)]
-struct Date {
-    day: i16,
-    month: i16,
-    year: i32,
-}
-
-#[post("/date")]
-async fn post_date(date: Json<Date>) -> impl Responder {
-    let client = create_client()
-        .await
-        .expect("Failed to connect to database");
-    HttpResponse::Ok().body(
-        client
-            .query_json(
-                "
-                insert Date {
-                    day := <int16>$0,
-                    month := <int16>$1,
-                    year := <int32>$2
-                } unless conflict;
-                ",
-                &(&date.day, &date.month, &date.year),
-            )
-            .await
-            .expect("failed to execute query")
-            .to_string(),
-    )
-}
+// #[post("/date")]
+// async fn post_date(date: Json<Date>) -> impl Responder {
+//     let client = create_client()
+//         .await
+//         .expect("Failed to connect to database");
+//     HttpResponse::Ok().body(
+//         client
+//             .query_json(
+//                 "
+//                 insert Date {
+//                     day := <int16>$0,
+//                     month := <int16>$1,
+//                     year := <int32>$2
+//                 } unless conflict;
+//                 ",
+//                 &(&date.day, &date.month, &date.year),
+//             )
+//             .await
+//             .expect("failed to execute query")
+//             .to_string(),
+//     )
+// }
 
 #[get("/dates")]
 async fn get_dates() -> Result<impl Responder> {
     let client = create_client()
         .await
         .expect("Failed to connect to database");
-    let dates = client
-        .query_json("select Date { day, month, year };", &())
+    let dates: Vec<Date> = client
+        .query("select <json>Date { ** };", &())
         .await
-        .expect("failed to execute query")
-        .to_string();
-    let dates: Vec<Date> = from_str(&dates)?;
+        .expect("Bad query");
 
     Ok(Json(dates))
 }
@@ -223,7 +217,6 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(|| {
         App::new()
             .service(welcome)
-            .service(post_date)
             .service(get_dates)
             .service(post_person)
             .service(get_person)

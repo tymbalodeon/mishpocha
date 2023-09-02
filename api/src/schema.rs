@@ -1,14 +1,15 @@
 use edgedb_derive::Queryable;
 use edgedb_protocol::model::{Duration, LocalDate};
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Queryable)]
+#[derive(Debug, Deserialize, Queryable, Serialize)]
+#[edgedb(json)]
 pub struct Date {
     pub day: Option<i16>,
     pub month: Option<i16>,
-    pub year: Option<Vec<i32>>,
-    pub display: Option<String>,
-    pub local_date: Option<LocalDate>,
-    // pub birhtdays: Option<Vec<Person>>,
+    pub year: Option<i32>,
+    pub local_date: Option<String>,
+    // pub births: Option<Vec<String>>,
     // pub deathdays: Option<Vec<Person>>,
     // pub compositions: Option<Vec<Composition>>,
 }
