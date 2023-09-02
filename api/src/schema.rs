@@ -173,7 +173,7 @@ pub struct Track {
 pub struct Series {
     pub id: Option<Uuid>,
     pub name: Option<String>,
-    pub label: Option<Label>,
+    pub label: Option<Vec<Label>>,
     pub albums: Option<Vec<Album>>,
 }
 
@@ -191,11 +191,11 @@ pub struct Label {
 #[edgedb(json)]
 pub struct Disc {
     pub id: Option<Uuid>,
-    pub disc_title: Option<String>,
+    pub disc_title: Option<Vec<String>>,
     pub number: Option<i32>,
     pub tracks: Option<Vec<Track>>,
     pub album: Option<Album>,
-    pub title: Option<String>,
+    pub title: Option<Vec<String>>,
     pub duration: Option<String>,
 }
 
