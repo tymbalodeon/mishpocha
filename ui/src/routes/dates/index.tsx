@@ -21,14 +21,8 @@ export default component$(() => {
       <h2 class="font-bold text-xl pl-4 pt-8">Dates</h2>
       {dates
         ? dates.map((date, index) => {
-            return (
-              <Date
-                key={index}
-                localDate={date.display}
-                births={date.births}
-                compact={true}
-              />
-            );
+            date.compact = true;
+            return <Date key={index} data={date} />;
           })
         : null}
     </>

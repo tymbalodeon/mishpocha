@@ -13,8 +13,11 @@ export const useGetApiData = routeLoader$(async (requestEvent) => {
     return "API_DOMAIN not specified.";
   }
 
-  const response = await fetch(apiDomain);
-  return await response.text();
+  try {
+    return await fetch(apiDomain).then((response) => response.text());
+  } catch {
+    return "API not running.";
+  }
 });
 
 export default component$(() => {
