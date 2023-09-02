@@ -28,6 +28,10 @@ _help *_from-main:
     ../install_dependencies.sh --api --update
     cargo update
 
+# Check code for errors.
+check:
+    cargo check
+
 _get_instance *instance:
     #!/usr/bin/env zsh
     if [ -n "$(pgrep docker -q)" ] && [ -z "{{instance}}" ] \
