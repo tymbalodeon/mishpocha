@@ -55,7 +55,7 @@ module default {
         constraint exclusive on ((.day, .month, .year));
 
         property display := {
-            to_str([<str>.year, <str>.month, <str>.day], "-")
+            <str>.local_date
         };
         property local_date := {
             cal::to_local_date(.year, .month, .day)

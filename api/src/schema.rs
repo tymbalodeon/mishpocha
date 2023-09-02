@@ -1,37 +1,38 @@
 use edgedb_derive::Queryable;
-use edgedb_protocol::model::{Duration, LocalDate};
+use edgedb_protocol::model::Duration;
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 #[derive(Debug, Deserialize, Queryable, Serialize)]
 #[edgedb(json)]
 pub struct Date {
+    pub id: Option<Uuid>,
     pub day: Option<i16>,
     pub month: Option<i16>,
     pub year: Option<i32>,
-    pub local_date: Option<String>,
-    // pub births: Option<Vec<String>>,
-    // pub deathdays: Option<Vec<Person>>,
-    // pub compositions: Option<Vec<Composition>>,
+    pub display: Option<String>,
+    pub albums_released: Option<Vec<Album>>,
+    pub births: Option<Vec<Person>>,
+    pub deaths: Option<Vec<Person>>,
 }
 
-#[derive(Debug, Queryable)]
+#[derive(Debug, Deserialize, Queryable, Serialize)]
+#[edgedb(json)]
 pub struct Person {
+    pub id: Option<Uuid>,
     pub first_name: Option<String>,
     pub last_name: Option<String>,
+    pub full_name: Option<String>,
     pub aliases: Option<Vec<String>>,
     pub birth_date: Option<Date>,
     pub death_date: Option<Date>,
     pub is_alive: Option<bool>,
-    pub full_name: Option<String>,
-    pub age: Option<i32>,
-    // pub compositions: Option<Composition>,
-    // pub arrangements: Option<Composition>,
-    // pub lyrics: Option<Composition>,
+    pub age: Option<Vec<i32>>,
     pub is_composer: Option<bool>,
     pub is_arranger: Option<bool>,
     pub is_lyricist: Option<bool>,
     pub is_player: Option<bool>,
-    // pub instruments: Option<Vec<Instrument>>,
+    pub is_producer: Option<bool>,
 }
 
 #[derive(Debug, Queryable)]
@@ -159,13 +160,18 @@ pub struct Disc {
 
 #[derive(Debug, Queryable)]
 pub struct Album {
+    pub id: Option<Uuid>,
     pub title: Option<String>,
-    pub artists: Option<Vec<Artist>>,
+    pub disc_total: Option<i32>,
+    pub duration: Option<String>,
+    pub catalog_number: Option<i32>,
+    pub series_number: Option<i32>,
+    pub date_recorded: Option<Date>,
+    pub date_released: Option<Date>,
     pub producers: Option<Vec<Person>>,
+    pub artists: Option<Vec<Artist>>,
     pub discs: Option<Vec<Disc>>,
     pub label: Option<Label>,
     pub series: Option<Series>,
-    pub series_number: Option<i32>,
-    pub date_released: Option<Date>,
-    pub disc_total: Option<i32>,
+    pub tracks: Option<Vec<Track>>,
 }
