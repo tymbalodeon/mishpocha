@@ -9,13 +9,12 @@ import {
 export const useGetApiData = routeLoader$(async (requestEvent) => {
   const apiDomain = requestEvent.env.get("API_DOMAIN");
 
-  try {
-    const response = await fetch(`http://${apiDomain}`);
-    const data = await response.json();
-    return data.message;
-  } catch (error) {
-    return "ERROR: Failed to load data.";
+  if (!apiDomain) {
+    return "API_DOMAIN not specified.";
   }
+
+  const response = await fetch(apiDomain);
+  return await response.text();
 });
 
 export default component$(() => {
