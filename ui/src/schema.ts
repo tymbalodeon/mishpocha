@@ -1,9 +1,10 @@
 export interface Date {
   id: string;
+  type_name: string;
+  display: string;
   day: number;
   month: number;
   year: number;
-  display: string;
   births: Person[];
   deaths: Person[];
   artist_starts: Artist[];
@@ -19,6 +20,8 @@ export interface Date {
 
 export interface Person {
   id: string;
+  type_name: string;
+  display: string;
   first_name: string;
   last_name: string;
   aliases: String[];
@@ -37,7 +40,7 @@ export interface Person {
   is_player: boolean;
   is_producer: boolean;
   instruments: Instrument[];
-  groups: Artist[];
+  artists: Artist[];
 }
 
 enum NoteName {
@@ -57,12 +60,17 @@ enum Accidental {
 }
 
 export interface Note {
+  id: string;
+  type_name: string;
+  display: string;
   name: NoteName;
   accidental: Accidental;
 }
 
 export interface Instrument {
   id: string;
+  type_name: string;
+  display: string;
   name: string;
   aliases: string[];
   tuning: Note;
@@ -76,6 +84,9 @@ enum Mode {
 }
 
 export interface Key {
+  id: string;
+  type_name: string;
+  display: string;
   root: Note;
   mode: Mode;
 }
@@ -91,12 +102,17 @@ enum Denominator {
 }
 
 export interface TimeSignature {
+  id: string;
+  type_name: string;
+  display: string;
   numerator: number;
   denominator: Denominator;
 }
 
 export interface Composition {
   id: string;
+  type_name: string;
+  display: string;
   title: string;
   composers: Person[];
   lyricists: Person[];
@@ -110,6 +126,8 @@ export interface Composition {
 
 export interface Player {
   id: string;
+  type_name: string;
+  display: string;
   person: Person;
   instrument: Instrument;
   display: string;
@@ -117,6 +135,8 @@ export interface Player {
 
 export interface Artist {
   id: string;
+  type_name: string;
+  display: string;
   name: string;
   members: Person[];
   date_start: Date;
@@ -126,6 +146,8 @@ export interface Artist {
 
 export interface Track {
   id: string;
+  type_name: string;
+  display: string;
   title: string;
   compositions: Composition[];
   players: Player[];
@@ -139,6 +161,8 @@ export interface Track {
 
 export interface Series {
   id: string;
+  type_name: string;
+  display: string;
   name: string;
   label: Label[];
   albums: Album[];
@@ -146,6 +170,8 @@ export interface Series {
 
 export interface Label {
   id: string;
+  type_name: string;
+  display: string;
   name: string;
   series: Series[];
   albums: Album[];
@@ -154,6 +180,8 @@ export interface Label {
 
 export interface Disc {
   id: string;
+  type_name: string;
+  display: string;
   disc_title: String[];
   number: number;
   tracks: Track[];
@@ -164,6 +192,8 @@ export interface Disc {
 
 export interface Album {
   id: string;
+  type_name: string;
+  display: string;
   title: string;
   artists: Artist[];
   producers: Person[];

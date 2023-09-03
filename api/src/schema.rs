@@ -6,10 +6,11 @@ use uuid::Uuid;
 #[edgedb(json)]
 pub struct Date {
     pub id: Option<Uuid>,
+    pub type_name: Option<String>,
+    pub display: Option<String>,
     pub day: Option<i16>,
     pub month: Option<i16>,
     pub year: Option<i32>,
-    pub display: Option<String>,
     pub births: Option<Vec<Person>>,
     pub deaths: Option<Vec<Person>>,
     pub artist_starts: Option<Vec<Artist>>,
@@ -27,6 +28,8 @@ pub struct Date {
 #[edgedb(json)]
 pub struct Person {
     pub id: Option<Uuid>,
+    pub type_name: Option<String>,
+    pub display: Option<String>,
     pub first_name: Option<String>,
     pub last_name: Option<String>,
     pub aliases: Option<Vec<String>>,
@@ -45,7 +48,7 @@ pub struct Person {
     pub is_player: Option<bool>,
     pub is_producer: Option<bool>,
     pub instruments: Option<Vec<Instrument>>,
-    pub groups: Option<Vec<Artist>>,
+    pub artists: Option<Vec<Artist>>,
 }
 
 #[derive(Debug, Deserialize, Queryable, Serialize)]
@@ -71,6 +74,9 @@ pub enum Accidental {
 #[derive(Debug, Deserialize, Queryable, Serialize)]
 #[edgedb(json)]
 pub struct Note {
+    pub id: Option<Uuid>,
+    pub type_name: Option<String>,
+    pub display: Option<String>,
     pub name: Option<NoteName>,
     pub accidental: Option<Accidental>,
 }
@@ -79,6 +85,8 @@ pub struct Note {
 #[edgedb(json)]
 pub struct Instrument {
     pub id: Option<Uuid>,
+    pub type_name: Option<String>,
+    pub display: Option<String>,
     pub name: Option<String>,
     pub aliases: Option<Vec<String>>,
     pub tuning: Option<Note>,
@@ -96,6 +104,9 @@ pub enum Mode {
 #[derive(Debug, Deserialize, Queryable, Serialize)]
 #[edgedb(json)]
 pub struct Key {
+    pub id: Option<Uuid>,
+    pub type_name: Option<String>,
+    pub display: Option<String>,
     pub root: Option<Note>,
     pub mode: Option<Mode>,
 }
@@ -115,6 +126,9 @@ pub enum Denominator {
 #[derive(Debug, Deserialize, Queryable, Serialize)]
 #[edgedb(json)]
 pub struct TimeSignature {
+    pub id: Option<Uuid>,
+    pub type_name: Option<String>,
+    pub display: Option<String>,
     pub numerator: Option<i32>,
     pub denominator: Option<Denominator>,
 }
@@ -123,6 +137,8 @@ pub struct TimeSignature {
 #[edgedb(json)]
 pub struct Composition {
     pub id: Option<Uuid>,
+    pub type_name: Option<String>,
+    pub display: Option<String>,
     pub title: Option<String>,
     pub composers: Option<Vec<Person>>,
     pub lyricists: Option<Vec<Person>>,
@@ -138,15 +154,18 @@ pub struct Composition {
 #[edgedb(json)]
 pub struct Player {
     pub id: Option<Uuid>,
+    pub type_name: Option<String>,
+    pub display: Option<String>,
     pub person: Option<Person>,
     pub instrument: Option<Instrument>,
-    pub display: Option<String>,
 }
 
 #[derive(Debug, Deserialize, Queryable, Serialize)]
 #[edgedb(json)]
 pub struct Artist {
     pub id: Option<Uuid>,
+    pub type_name: Option<String>,
+    pub display: Option<String>,
     pub name: Option<String>,
     pub members: Option<Vec<Person>>,
     pub date_start: Option<Date>,
@@ -158,6 +177,8 @@ pub struct Artist {
 #[edgedb(json)]
 pub struct Track {
     pub id: Option<Uuid>,
+    pub type_name: Option<String>,
+    pub display: Option<String>,
     pub title: Option<String>,
     pub compositions: Option<Vec<Composition>>,
     pub players: Option<Vec<Player>>,
@@ -173,6 +194,8 @@ pub struct Track {
 #[edgedb(json)]
 pub struct Series {
     pub id: Option<Uuid>,
+    pub type_name: Option<String>,
+    pub display: Option<String>,
     pub name: Option<String>,
     pub label: Option<Vec<Label>>,
     pub albums: Option<Vec<Album>>,
@@ -182,6 +205,8 @@ pub struct Series {
 #[edgedb(json)]
 pub struct Label {
     pub id: Option<Uuid>,
+    pub type_name: Option<String>,
+    pub display: Option<String>,
     pub name: Option<String>,
     pub series: Option<Vec<Series>>,
     pub albums: Option<Vec<Album>>,
@@ -192,6 +217,8 @@ pub struct Label {
 #[edgedb(json)]
 pub struct Disc {
     pub id: Option<Uuid>,
+    pub type_name: Option<String>,
+    pub display: Option<String>,
     pub disc_title: Option<Vec<String>>,
     pub number: Option<i32>,
     pub tracks: Option<Vec<Track>>,
@@ -204,6 +231,8 @@ pub struct Disc {
 #[edgedb(json)]
 pub struct Album {
     pub id: Option<Uuid>,
+    pub type_name: Option<String>,
+    pub display: Option<String>,
     pub title: Option<String>,
     pub artists: Option<Vec<Artist>>,
     pub producers: Option<Vec<Person>>,

@@ -41,7 +41,18 @@ module default {
 }
 
 module default {
+    abstract property type_name {
+        readonly := true;
+    }
+}
+
+module default {
     type Date {
+        type_name: str {
+            extending type_name;
+            default := "date"
+        };
+
         day: int16 {
             constraint min_value(1);
             constraint max_value(31);
@@ -75,6 +86,11 @@ module default {
     }
 
     type Person {
+        type_name: str {
+            extending type_name;
+            default := "person"
+        };
+
         first_name: str;
         last_name: str;
         multi aliases: str;
@@ -86,11 +102,12 @@ module default {
             )
         };
 
+        property display := .full_name;
         property full_name := (
             (
-                .first_name ++ ' '
-                if .first_name != '' else
-                ''
+                .first_name ++ " "
+                if .first_name != "" else
+                ""
             ) ++ .last_name
         );
         property age := (
@@ -131,48 +148,87 @@ module default {
             select Instrument
             filter .players.person.id = id
         );
-        multi link groups := .<members[is Artist];
+        multi link artists := .<members[is Artist];
     }
 
     scalar type NoteName extending enum<C, D, E, F, G, A, B>;
     scalar type Accidental extending enum<flat, natrual, sharp>;
 
     type Note {
+        type_name: str {
+            extending type_name;
+            default := "note"
+        };
+
         name: NoteName;
         accidental: Accidental;
+
+        property display := <str>.name ++ " " ++ <str>.accidental;
 
         constraint exclusive on ((.name, .accidental));
     }
 
     type Instrument {
+        type_name: str {
+            extending type_name;
+            default := "instrument"
+        };
+
         name: str;
         multi aliases: str;
         tuning: Note;
 
         constraint exclusive on ((.name, .tuning));
 
+        property display := (
+            with tuning := .tuning.display
+            select (
+                tuning ++ " "
+                if exists tuning else
+                ""
+            ) ++ .name
+        );
         multi link players := .<instrument[is Player];
     }
 
     scalar type Mode extending enum<major, minor>;
 
     type Key {
+        type_name: str {
+            extending type_name;
+            default := "key"
+        };
+
         root: Note;
         mode: Mode;
 
         constraint exclusive on ((.root, .mode));
+
+        property display := .root.display ++ " " ++ <str>.mode;
     }
 
     scalar type Denominator extending enum<1, 2, 4, 8, 16, 32, 64>;
 
     type TimeSignature {
+        type_name: str {
+            extending type_name;
+            default := "time_signature"
+        };
+
         numerator: int16;
         denominator: Denominator;
 
         constraint exclusive on ((.numerator, .denominator));
+
+        property display := <str>.numerator ++ "/" ++ <str>.denominator;
     }
 
     type Composition {
+        type_name: str {
+            extending type_name;
+            default := "composition"
+        };
+
         title: str;
         multi composers: Person {
             on target delete allow
@@ -186,9 +242,16 @@ module default {
         };
         key: Key;
         time_signature: TimeSignature;
+
+        property display := .title;
     }
 
     type Player {
+        type_name: str {
+            extending type_name;
+            default := "player"
+        };
+
         person: Person {
             on target delete delete source
         };
@@ -198,10 +261,15 @@ module default {
 
         constraint exclusive on ((.person, .instrument));
 
-        property display := .person.full_name ++ " (" ++ .instrument.name ++ ")"
+        property display := .person.display ++ " (" ++ .instrument.display ++ ")"
     }
 
     type Artist {
+        type_name: str {
+            extending type_name;
+            default := "artist"
+        };
+
         name: str {
             rewrite insert, update using (
                 with id := .id
@@ -222,9 +290,16 @@ module default {
         date_start: Date;
         date_end: Date;
         multi link albums := .<artists[is Album];
+
+        property display := .name
     }
 
     type Track {
+        type_name: str {
+            extending type_name;
+            default := "track"
+        };
+
         title: str {
             rewrite insert, update using (
                 with id := .id
@@ -254,24 +329,45 @@ module default {
         date_mixed: Date;
         number: int16;
         duration: duration;
+
+        property display := .title
     }
 
     type Series {
+        type_name: str {
+            extending type_name;
+            default := "series"
+        };
+
         name: str;
 
         link label := .<series[is Label];
         multi link albums := .<series[is Album];
+
+        property display := .name
     }
 
     type Label {
+        type_name: str {
+            extending type_name;
+            default := "label"
+        };
+
         name: str;
         multi series: Series;
 
         multi link albums := .<label[is Album];
         multi link artists := .albums.artists;
+
+        property display := .name;
     }
 
     type Disc {
+        type_name: str {
+            extending type_name;
+            default := "disc"
+        };
+
         disc_title: str;
         number: int32 {
             constraint min_value(1);
@@ -284,9 +380,16 @@ module default {
             with seconds := sum(get_totalseconds(.tracks.duration))
             select get_duration_from_seconds(seconds)
         );
+
+        property display := .title;
     }
 
     type Album {
+        type_name: str {
+            extending type_name;
+            default := "album"
+        };
+
         title: str;
         multi artists: Artist;
         multi producers: Person;
@@ -298,6 +401,7 @@ module default {
         date_released: Date;
         date_recorded: Date;
 
+        property display := .title;
         multi link tracks := .discs.tracks;
         property disc_total := count(.discs);
         property duration := (

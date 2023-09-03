@@ -69,7 +69,7 @@ export const Person = component$<PersonObject>((props) => {
                 </li>
               ))}
             </ul>
-            <p>groups: {person.groups.map((group) => group.name)}</p>
+            <p>artists: {person.artists.map((artist) => artist.name)}</p>
           </>
         ) : null}
       </div>
