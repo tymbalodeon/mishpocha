@@ -31,9 +31,13 @@ export const Person = component$<PersonObject>((props) => {
             <p>Age: {person.age}</p>
             <p>Compositions:</p>
             <ul>
-              {person.compositions.map((composition) => (
+              {person.compositions.map((composition, index) => (
                 <li>
-                  <a href={"/compositions/" + composition.title} class="link">
+                  <a
+                    key={index}
+                    href={"/compositions/" + composition.title}
+                    class="link"
+                  >
                     {composition.title}
                   </a>
                 </li>

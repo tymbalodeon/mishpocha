@@ -16,8 +16,12 @@ export const Instrument = component$<InstrumentObject>((props) => {
             <p>Tuning: {instrument.tuning}</p>
             <p>
               Players:{" "}
-              {instrument.players.map((player) => (
-                <a href={"/people/" + player.person?.full_name} class="link">
+              {instrument.players.map((player, index) => (
+                <a
+                  key={index}
+                  href={"/people/" + player.person?.full_name}
+                  class="link"
+                >
                   {player.person?.full_name}
                 </a>
               ))}
