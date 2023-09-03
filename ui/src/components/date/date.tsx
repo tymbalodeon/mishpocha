@@ -5,7 +5,7 @@ export const Date = component$<DateObject>((props) => {
   const date = props.data;
 
   const data = (
-    <div class="card w-96 bg-neutral shadow-xl m-4">
+    <div class="card bg-neutral shadow-xl m-4">
       <div class="card-body">
         <h2 class="card-title">{date.display}</h2>
         {!date.compact ? (
@@ -17,10 +17,19 @@ export const Date = component$<DateObject>((props) => {
             <p>
               Births:{" "}
               {date.births.map((person) => (
-                <a href={"/people/" + person.full_name}>{person.full_name}</a>
+                <a href={"/people/" + person.full_name} class="link">
+                  {person.full_name}
+                </a>
               ))}
             </p>
-            <p>Deaths: {date.deaths.map((person) => person.full_name)}</p>
+            <p>
+              Deaths:{" "}
+              {date.deaths.map((person) => (
+                <a href={"/people/" + person.full_name} class="link">
+                  {person.full_name}
+                </a>
+              ))}
+            </p>
             <p>
               Artist start: {date.artist_starts.map((artist) => artist.name)}
             </p>
