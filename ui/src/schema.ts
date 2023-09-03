@@ -64,9 +64,10 @@ export interface Note {
 export interface Instrument {
   id: string;
   name: string;
-  aliases: String[];
+  aliases: string[];
   tuning: Note;
   players: Player[];
+  player_names: string[];
 }
 
 enum Mode {

@@ -7,6 +7,7 @@
 - [People](/people)
 - [Instruments](/instruments)
 - [Compositions](/compositions)
+- [Artists](/artists)
 - [Albums](/albums)
 - [Tracks](/tracks)
 - [Labels](/labels)

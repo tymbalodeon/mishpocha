@@ -83,6 +83,7 @@ pub struct Instrument {
     pub aliases: Option<Vec<String>>,
     pub tuning: Option<Note>,
     pub players: Option<Vec<Player>>,
+    pub player_names: Option<Vec<String>>,
 }
 
 #[derive(Debug, Deserialize, Queryable, Serialize)]
