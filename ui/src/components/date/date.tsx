@@ -1,63 +1,110 @@
 import { component$ } from "@builder.io/qwik";
 import { Date as DateObject } from "../../schema.ts";
 
+const getDisplayableValue = (object, key) => {
+  let value = object[key];
+  const allowedTypes = [Array, Number];
+  const isAllowed = allowedTypes
+    .map((type) => [] instanceof type)
+    .some(Boolean);
+  console.log(isAllowed);
+};
+
 export const Date = component$<DateObject>((props) => {
-  const date = props.data;
+  const object = props.data;
 
   const data = (
     <div class="card bg-neutral shadow-xl m-4">
       <div class="card-body">
-        <h2 class="card-title">{date.display}</h2>
-        {!date.compact ? (
+        <h2 class="card-title">{object.display}</h2>
+        {!object.compact ? (
           <>
-            <p>Day: {date.day}</p>
-            <p>Month: {date.month}</p>
-            <p>Year: {date.year}</p>
-            <p>Display: {date.display}</p>
+            {/* {keys.map((key, index) => (
+                <p key={index}>
+                {key.replace("_", " ")}:{" "}
+                <span class="font-bold">
+                {object[key] instanceof Object ? "object" : object[key]}
+                </span>
+                </p>
+                ))} */}
+            <p>
+              Day: <span class="font-bold">{object.day}</span>
+            </p>
+            <p>
+              Month: <span class="font-bold">{object.month}</span>
+            </p>
+            <p>
+              Year: <span class="font-bold">{object.year}</span>
+            </p>
+            <p>
+              Display: <span class="font-bold">{object.display}</span>
+            </p>
             <p>
               Births:{" "}
-              {date.births.map((person) => (
-                <a href={"/people/" + person.full_name} class="link">
-                  {person.full_name}
+              {object.births.map((person, index) => (
+                <a
+                  key={index}
+                  href={"/people/" + person.full_name}
+                  class="link"
+                >
+                  <span class="font-bold">{person.full_name}</span>
                 </a>
               ))}
             </p>
             <p>
               Deaths:{" "}
-              {date.deaths.map((person) => (
-                <a href={"/people/" + person.full_name} class="link">
+              {object.deaths.map((person, index) => (
+                <a
+                  key={index}
+                  href={"/people/" + person.full_name}
+                  class="link"
+                >
                   {person.full_name}
                 </a>
               ))}
             </p>
             <p>
-              Artist start: {date.artist_starts.map((artist) => artist.name)}
+              Artist start: {object.artist_starts.map((artist) => artist.name)}
             </p>
-            <p>Artist end: {date.artist_ends.map((artist) => artist.name)}</p>
-            <p>
-              Compositions:{" "}
-              {date.compositions.map((composition) => composition.title)}
-            </p>
+            <p>Artist end: {object.artist_ends.map((artist) => artist.name)}</p>
+            <p>Compositions: </p>
+            <ul>
+              {object.compositions.map((composition, index) => (
+                <li key={index}>
+                  <a href={"/compositions/" + composition.title} class="link">
+                    <span class="font-bold">{composition.title}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
             <p>
               Arrangements:{" "}
-              {date.arrangements.map((arrangement) => arrangement.title)}
+              {object.arrangements.map((arrangement) => arrangement.title)}
             </p>
-            <p>
-              Tracks recorded:{" "}
-              {date.tracks_recorded.map((track) => track.title)}
-            </p>
+            <p>Tracks recorded: </p>
+            <ul>
+              {object.tracks_recorded.map((track, index) => (
+                <li key={index}>
+                  <a href={"/compositions/" + track.title} class="link">
+                    <span class="font-bold">{track.title}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
             <p>
               Tracks released:{" "}
-              {date.tracks_released.map((track) => track.title)}
+              {object.tracks_released.map((track) => track.title)}
             </p>
             <p>
               Tracks mastered:{" "}
-              {date.tracks_mastered.map((track) => track.title)}
+              {object.tracks_mastered.map((track) => track.title)}
             </p>
-            <p>Tracks mixed: {date.tracks_mixed.map((track) => track.title)}</p>
+            <p>
+              Tracks mixed: {object.tracks_mixed.map((track) => track.title)}
+            </p>
             <p>
               Albums released:{" "}
-              {date.albums_released.map((album) => album.title)}
+              {object.albums_released.map((album) => album.title)}
             </p>
           </>
         ) : null}
@@ -65,9 +112,9 @@ export const Date = component$<DateObject>((props) => {
     </div>
   );
 
-  if (!date.compact) {
+  if (!object.compact) {
     return data;
   }
 
-  return <a href={"/dates/" + date.display}>{data}</a>;
+  return <a href={"/dates/" + object.display}>{data}</a>;
 });

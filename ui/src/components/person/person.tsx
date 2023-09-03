@@ -17,7 +17,7 @@ export const Person = component$<PersonObject>((props) => {
             <p>
               Birth date:{" "}
               <a href={"/dates/" + person.birth_date?.display} class="link">
-                {person.birth_date?.display}
+                <span class="font-bold">{person.birth_date?.display}</span>
               </a>
             </p>
             <p>
@@ -28,16 +28,14 @@ export const Person = component$<PersonObject>((props) => {
             </p>
             <p>Is alive: {person.is_alive.toString()}</p>
             <p>Full name: {person.full_name}</p>
-            <p>Age: {person.age}</p>
+            <p>
+              Age: <span class="font-bold">{person.age}</span>
+            </p>
             <p>Compositions:</p>
             <ul>
               {person.compositions.map((composition, index) => (
-                <li>
-                  <a
-                    key={index}
-                    href={"/compositions/" + composition.title}
-                    class="link"
-                  >
+                <li key={index}>
+                  <a href={"/compositions/" + composition.title} class="link">
                     {composition.title}
                   </a>
                 </li>
@@ -47,8 +45,8 @@ export const Person = component$<PersonObject>((props) => {
             <p>Lyrics: {person.lyrics}</p>
             <p>Tracks:</p>
             <ul>
-              {person.tracks.map((track) => (
-                <li>
+              {person.tracks.map((track, index) => (
+                <li key={index}>
                   <a href={"/tracks/" + track.title} class="link">
                     {track.title}
                   </a>
@@ -62,11 +60,11 @@ export const Person = component$<PersonObject>((props) => {
             <p>Is producer: {person.is_producer.toString()}</p>
             <p>instruments: </p>
             <ul>
-              {person.instruments.map((instrument) => (
-                <li>
+              {person.instruments.map((instrument, index) => (
+                <li key={index}>
                   <a href={"/instruments/" + instrument.name} class="link">
                     {" "}
-                    {instrument.name}
+                    <span class="font-bold">{instrument.name}</span>
                   </a>
                 </li>
               ))}

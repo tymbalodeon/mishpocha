@@ -24,7 +24,7 @@ export const Instrument = component$<InstrumentObject>((props) => {
               Players:{" "}
               {instrument.player_names.map((name, index) => (
                 <a key={index} href={"/people/" + name} class="link">
-                  {name}
+                  <span class="font-bold">{name}</span>
                 </a>
               ))}
             </p>
