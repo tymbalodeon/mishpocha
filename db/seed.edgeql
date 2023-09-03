@@ -4,6 +4,7 @@ with dates := <json>(
     { day := 8, month := 3, year := 1947 },
     { day := 22, month := 4, year := 1947 },
     { day := 18, month := 6, year := 1995 },
+    { day := 3, month := 4, year := 1943 },
 ) for date in json_array_unpack(dates) union (
     insert Date {
         day := <int16>date["day"],
