@@ -4,6 +4,8 @@ import { DatabaseProps } from "../../schema.ts";
 const getBaseUrl = (typeName) => {
   if (typeName == "person") {
     return "/people";
+  } else if (typeName == "series") {
+    return "/series";
   } else {
     return `/${typeName}s`;
   }
