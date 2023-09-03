@@ -16,21 +16,27 @@ const getDisplayableValue = (object, key, typeName) => {
 
   if (!(value instanceof Object)) {
     if (!typeName) {
-      return value;
+      return <span class="font-bold">{value}</span>;
     }
 
     const baseUrl = getBaseUrl(typeName);
 
     return (
-      <a href={`${baseUrl}/${value}`} class="link font-bold">
-        {value}
-      </a>
+      <li>
+        <a href={`${baseUrl}/${value}`} class="link font-bold">
+          {value}
+        </a>
+      </li>
     );
   }
 
   if (value instanceof Array) {
-    return value.map((item) =>
-      getDisplayableValue(item, "display", item.type_name),
+    return (
+      <ul>
+        {value.map((item) =>
+          getDisplayableValue(item, "display", item.type_name),
+        )}
+      </ul>
     );
   }
 };
@@ -46,12 +52,9 @@ export const DatabaseObject = component$<DatabaseProps>((props) => {
         {!object.compact ? (
           <>
             {keys.map((key, index) => (
-              <p key={index}>
-                {key.replace("_", " ")}:{" "}
-                <span class="font-bold">
-                  {getDisplayableValue(object, key)}
-                </span>
-              </p>
+              <div key={index}>
+                {key.replace("_", " ")}: {getDisplayableValue(object, key)}
+              </div>
             ))}
           </>
         ) : null}
