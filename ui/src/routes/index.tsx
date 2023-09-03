@@ -23,7 +23,15 @@ export const useGetApiData = routeLoader$(async (requestEvent) => {
 export default component$(() => {
   const apiMessage = useGetApiData();
 
-  return <>This message has been loaded from the server: {apiMessage.value}</>;
+  return (
+    <div class="hero min-h-screen">
+      <div class="hero-content">
+        <div class="max-w-md">
+          <p class="py-6">{apiMessage.value}</p>
+        </div>
+      </div>
+    </div>
+  );
 });
 
 export const head: DocumentHead = {
