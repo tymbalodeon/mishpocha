@@ -15,7 +15,7 @@ export const useGetApiData = routeLoader$(async (requestEvent) => {
   }
 
   try {
-    const response = await fetch(`${apiDomain}/people`);
+    const response = await fetch(`${apiDomain}/compositions`);
     return await response.json();
   } catch {
     return [];
@@ -23,26 +23,28 @@ export const useGetApiData = routeLoader$(async (requestEvent) => {
 });
 
 export default component$(() => {
-  const people = useGetApiData().value;
+  const compositions = useGetApiData().value;
   const id = useLocation().params.id;
-  const person = people.find((person) => person.full_name == id);
+  const composition = compositions.find(
+    (composition) => composition.display == id,
+  );
 
   return (
     <>
-      {person ? <DatabaseObject data={person} /> : <p>not found</p>}
-      <a href="/people" class="link pl-4">
-        All people
+      {composition ? <DatabaseObject data={composition} /> : <p>not found</p>}
+      <a href="/compositions" class="link pl-4">
+        All compositions
       </a>
     </>
   );
 });
 
 export const head: DocumentHead = {
-  title: "Mishpocha Database | Person",
+  title: "Mishpocha Database | Compositions",
   meta: [
     {
-      name: "Mishpocha Database | Person",
-      content: "Mishpocha Database | Person",
+      name: "Mishpocha Database | Compositions",
+      content: "Mishpocha Database | Compositions",
     },
   ],
 };

@@ -10,7 +10,7 @@ export const useGetApiData = routeLoader$(async (requestEvent) => {
   }
 
   try {
-    const response = await fetch(`${apiDomain}/dates`);
+    const response = await fetch(`${apiDomain}/labels`);
     return await response.json();
   } catch {
     return [];
@@ -18,15 +18,15 @@ export const useGetApiData = routeLoader$(async (requestEvent) => {
 });
 
 export default component$(() => {
-  const dates = useGetApiData().value;
+  const labels = useGetApiData().value;
 
   return (
     <>
-      <h2 class="font-bold text-xl pl-4 pt-8">Dates</h2>
-      {dates
-        ? dates.map((date, index) => {
-            date.compact = true;
-            return <DatabaseObject key={index} data={date} />;
+      <h2 class="font-bold text-xl pl-4 pt-8">Labels</h2>
+      {labels
+        ? labels.map((label, index) => {
+            label.compact = true;
+            return <DatabaseObject key={index} data={label} />;
           })
         : null}
     </>
@@ -34,11 +34,11 @@ export default component$(() => {
 });
 
 export const head: DocumentHead = {
-  title: "Mishpocha Database | Dates",
+  title: "Mishpocha Database | Labels",
   meta: [
     {
-      name: "Mishpocha Database | Dates",
-      content: "Mishpocha Database | Dates",
+      name: "Mishpocha Database | Labels",
+      content: "Mishpocha Database | Labels",
     },
   ],
 };

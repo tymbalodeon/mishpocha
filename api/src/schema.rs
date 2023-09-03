@@ -218,7 +218,7 @@ pub struct Label {
 pub struct Disc {
     pub id: Option<Uuid>,
     pub type_name: Option<String>,
-    pub display: Option<String>,
+    pub display: Option<Vec<String>>,
     pub disc_title: Option<Vec<String>>,
     pub number: Option<i32>,
     pub tracks: Option<Vec<Track>>,

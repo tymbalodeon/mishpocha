@@ -4,8 +4,8 @@ import {
   useLocation,
   routeLoader$,
 } from "@builder.io/qwik-city";
-import { Date } from "../../../components/date/date";
-import { Date as DateObject } from "../../schema.ts";
+import { DatabaseObject } from "../../../components/database-object";
+import { DatabaseProps } from "../../schema.ts";
 
 export const useGetApiData = routeLoader$(async (requestEvent) => {
   const apiDomain = requestEvent.env.get("API_DOMAIN");
@@ -29,7 +29,7 @@ export default component$(() => {
 
   return (
     <>
-      {date ? <Date data={date} /> : <p>not found</p>}
+      {date ? <DatabaseObject data={date} /> : <p>not found</p>}
       <a href="/dates" class="link pl-4">
         All dates
       </a>

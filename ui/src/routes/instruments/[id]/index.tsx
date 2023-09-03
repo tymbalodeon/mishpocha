@@ -4,8 +4,8 @@ import {
   useLocation,
   routeLoader$,
 } from "@builder.io/qwik-city";
-import { Instrument } from "../../../components/instrument/instrument";
-import { Instrument as InstrumentObject } from "../../schema.ts";
+import { DatabaseObject } from "../../../components/database-object";
+import { DatabaseProps } from "../../schema.ts";
 
 export const useGetApiData = routeLoader$(async (requestEvent) => {
   const apiDomain = requestEvent.env.get("API_DOMAIN");
@@ -29,7 +29,7 @@ export default component$(() => {
 
   return (
     <>
-      {instrument ? <Instrument data={instrument} /> : <p>not found</p>}
+      {instrument ? <DatabaseObject data={instrument} /> : <p>not found</p>}
       <a href="/instruments" class="link pl-4">
         All instruments
       </a>

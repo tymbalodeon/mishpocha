@@ -208,3 +208,14 @@ export interface Album {
   disc_total: number;
   duration: string;
 }
+
+export type DatabaseProps =
+  | Date
+  | Person
+  | Instrument
+  | Composition
+  | Artist
+  | Album
+  | Track
+  | Label
+  | Series;
