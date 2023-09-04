@@ -75,7 +75,6 @@ export interface Instrument {
   aliases: string[];
   tuning: Note;
   players: Player[];
-  player_names: string[];
 }
 
 enum Mode {

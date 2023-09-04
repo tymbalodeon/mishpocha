@@ -50,7 +50,7 @@ async fn get_instruments() -> Result<impl Responder> {
             "
             select <json>Instrument {
                 **,
-                player_names := .players.person.full_name
+                players: { display, person: { display } }
             };",
             &(),
         )
