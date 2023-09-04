@@ -55,35 +55,40 @@ _build:
     docker build --tag {{image}} .
 
 # Run the Docker container, and optionally "--open" in the browser.
-start *open: stop _build
+start *args: stop _build
     #!/usr/bin/env zsh
-    {{check_if_docker_running}}
-    docker run \
-        --detach \
-        --env EDGEDB_SERVER_ADMIN_UI=enabled \
-        --env EDGEDB_SERVER_SECURITY=insecure_dev_mode \
-        --name {{image}} \
-        --publish {{port}}:{{port}} \
-        --rm \
-        --volume {{data}}:/var/lib/edgedb/data \
-        {{image}}
-    docker run \
-        --interactive \
-        --link {{image}} \
-        --rm \
-        --tty \
-        --volume {{config}}:/.config/edgedb \
-        --volume {{data}}:/var/lib/edgedb/data \
-        edgedb/edgedb-cli \
-            --host {{image}} \
-            instance link {{edgedb_instance}} \
-                --non-interactive \
-                --trust-tls-cert \
-                --overwrite
-    {{just}} --justfile queries.just \
-        _query \
-        "alter role edgedb set password := 'password';"
-    {{ if open =~ "--open" { "{{just}} ui --docker" } else { "" } }}
+    instance="$({{just}} _get_instance {{args}})"
+    if [ "${instance}" = "docker" ]; then
+        {{check_if_docker_running}}
+        docker run \
+            --detach \
+            --env EDGEDB_SERVER_ADMIN_UI=enabled \
+            --env EDGEDB_SERVER_SECURITY=insecure_dev_mode \
+            --name {{image}} \
+            --publish {{port}}:{{port}} \
+            --rm \
+            --volume {{data}}:/var/lib/edgedb/data \
+            {{image}}
+        docker run \
+            --interactive \
+            --link {{image}} \
+            --rm \
+            --tty \
+            --volume {{config}}:/.config/edgedb \
+            --volume {{data}}:/var/lib/edgedb/data \
+            edgedb/edgedb-cli \
+                --host {{image}} \
+                instance link {{edgedb_instance}} \
+                    --non-interactive \
+                    --trust-tls-cert \
+                    --overwrite
+        {{just}} --justfile queries.just \
+            _query \
+            "alter role edgedb set password := 'password';"
+        {{ if args =~ "--open" { "{{just}} ui --docker" } else { "" } }}
+    else
+        {{just}} seed
+    fi
 
 # Stop the Docker container.
 stop:
