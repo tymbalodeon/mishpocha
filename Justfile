@@ -133,16 +133,16 @@ running *verbose:
 # Show the Docker logs up to <lines> lines.
 logs lines="10":
     #!/usr/bin/env zsh
-    if [ -n "$(just api running)" ]; then
+    if [ -n "$({{just}} api running)" ]; then
         echo "API logs:"
         {{just}} api logs {{lines}}
     fi
-    if [ -n "$(just db running)" ]; then
+    if [ -n "$({{just}} db running)" ]; then
         echo
         echo "DB logs:"
         {{just}} db logs {{lines}}
     fi
-    if [ -n "$(just ui running)" ]; then
+    if [ -n "$({{just}} ui running)" ]; then
         echo
         echo "UI logs:"
         {{just}} ui logs {{lines}}

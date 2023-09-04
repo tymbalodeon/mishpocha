@@ -40,7 +40,7 @@ update *_from-main:
 
 # Format code.
 @format:
-    cargo format
+    cargo fmt
 
 # Add dependencies.
 @add *packages:
