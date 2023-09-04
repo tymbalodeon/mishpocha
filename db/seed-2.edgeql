@@ -288,7 +288,7 @@ with tracks := <json>(
 ) for track in json_array_unpack(tracks) union (
     with existing_track := (
         select Track
-        filter .number = <int16>track["number"]
+        filter .duration = <duration>track["duration"]
         limit 1
     ), inserts := (
         track if not exists existing_track else <json>{}
