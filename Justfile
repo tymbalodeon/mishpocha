@@ -81,11 +81,12 @@ start *args: stop
         instance=""
     fi
     instance="$({{just}} _get_instance ${instance})"
-    {{ if args =~ "--open" { just + " open" } else { "" } }}
+    if [[ "{{args}}" = *"--open"* ]]; then
+        {{just}} open {{ if args =~ "--prod" { "--prod" } else { "" } }}
+    fi
     if [ "${instance}" = "docker" ]; then
         if [[ "{{args}}" = *"--prod"* ]]; then
             docker compose up --build --detach
-            {{ if args =~ "--open" { "just open --prod" } else { "" } }}
         else
             docker compose \
                 --file compose.yaml \
@@ -93,7 +94,6 @@ start *args: stop
                 up \
                     --build \
                     --detach
-            {{ if args =~ "--open" { "just open" } else { "" } }}
         fi
     else
         sub_folders=(api db ui)
