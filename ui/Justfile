@@ -11,7 +11,7 @@ _help *_from-main:
     if [ -z "{{_from-main}}" ]; then
         {{just}} --list
     else
-        {{just}} --list --list-heading $'\nUI: [`just ui <COMMAND>`]\n'
+        {{just}} --list --list-heading $'\nUI: [`{{just}} ui <COMMAND>`]\n'
     fi
 
 # Install dependencies.
@@ -34,6 +34,10 @@ update *_from-main:
 check:
     pnpm lint --fix
 
+# Format code.
+@format:
+    pnpm run format
+
 # Add dependencies.
 @add *packages:
     pnpm add {{packages}}
@@ -54,18 +58,9 @@ check:
 @list:
     pnpm list
 
-# Format code.
-@format:
-    pnpm run format
-
 _get_instance *instance:
     #!/usr/bin/env zsh
-    if [ -n "$(pgrep docker -q)" ] && [ -z "{{instance}}" ] \
-        || [[ "{{instance}}" = *"--docker"* ]]; then
-        echo "docker"
-    else
-        echo "local"
-    fi
+    {{get_instance}}
 
 _build *prod:
     #!/usr/bin/env zsh
@@ -73,11 +68,6 @@ _build *prod:
         target="{{ if prod =~ "--prod" { "prod" } else { "dev" } }}"
         docker build --target "${target}" --tag {{image}} .
     fi
-
-# Remove the Docker image.
-[no-exit-message]
-@clean:
-    docker rmi {{image}} >/dev/null 2>&1
 
 # Run the Docker container, optionally in "--prod", and optionally "--open" in the browser.
 start *args: stop (_build args)
@@ -123,6 +113,11 @@ stop:
     if [ -n "$({{just}} running)" ]; then
         docker kill {{image}}
     fi
+
+# Remove the Docker image.
+[no-exit-message]
+@clean:
+    docker rmi {{image}} >/dev/null 2>&1
 
 # Show the container id (or all info with "--verbose") if the container is running.
 running *verbose:

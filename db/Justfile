@@ -15,14 +15,16 @@ _help *_from-main:
     fi
 
 # Install dependencies.
-@install:
+install *_from-main:
+    #!/usr/bin/env zsh
     if [ -z "{{_from-main}}" ]; then
         ../install_dependencies.sh --db
     fi
     edgedb server install
 
 # Update dependencies.
-@update *_from-main:
+update *_from-main:
+    #!/usr/bin/env zsh
     if [ -z "{{_from-main}}" ]; then
         ../install_dependencies.sh --db --update
     fi
@@ -30,12 +32,7 @@ _help *_from-main:
 
 _get_instance *instance:
     #!/usr/bin/env zsh
-    if [ -n "$(pgrep docker -q)" ] && [ -z "{{instance}}" ] \
-        || [[ "{{instance}}" = *"--docker"* ]]; then
-        echo "docker"
-    else
-        echo "local"
-    fi
+    {{get_instance}}
 
 _create:
     #!/usr/bin/env zsh
@@ -56,30 +53,6 @@ _build:
         exit
     fi
     docker build --tag {{image}} .
-
-# Remove the Docker image.
-[no-exit-message]
-@clean:
-    docker rmi {{image}} >/dev/null 2>&1
-
-# Drop the persisted databases (optional: "--docker", or "--local").
-drop *instance: stop
-    #!/usr/bin/env zsh
-    if [ "{{instance}}" = "--local" ] || [ -z "{{instance}}" ]; then
-        edgedb instance destroy \
-            --instance {{edgedb_instance}} \
-            --force \
-            >/dev/null 2>&1
-    fi
-    if [ "{{instance}}" = "--docker" ] || [ -z "{{instance}}" ]; then
-        {{check_if_docker_running}}
-        volumes=("$(docker volume list --quiet --filter name={{data}})")
-        if [ -n "${volumes}" ]; then
-            for volume in "${volumes}"; do
-                docker volume remove "${volume}"
-            done
-        fi
-    fi
 
 # Run the Docker container, and optionally "--open" in the browser.
 start *open: stop _build
@@ -121,6 +94,31 @@ stop:
             docker volume remove {{config}}
         fi
     fi
+
+# Drop the persisted databases (optional: "--docker", or "--local").
+drop *instance: stop
+    #!/usr/bin/env zsh
+    if [ "{{instance}}" = "--local" ] || [ -z "{{instance}}" ]; then
+        edgedb instance destroy \
+            --instance {{edgedb_instance}} \
+            --force \
+            >/dev/null 2>&1
+    fi
+    if [ "{{instance}}" = "--docker" ] || [ -z "{{instance}}" ]; then
+        if pgrep -q docker; then
+            volumes=("$(docker volume list --quiet --filter name={{data}})")
+            if [ -n "${volumes}" ]; then
+                for volume in "${volumes}"; do
+                    docker volume remove "${volume}"
+                done
+            fi
+        fi
+    fi
+
+# Remove the Docker image.
+[no-exit-message]
+@clean:
+    docker rmi {{image}} >/dev/null 2>&1
 
 # Show the container id (or all info with "--verbose") if the container is running.
 running *verbose:
@@ -197,27 +195,31 @@ ui *instance:
     fi
 
 # Seed the database (optional: "--docker" or "--local").
-seed *instance:
+seed *instance: migrate
     #!/usr/bin/env zsh
+    files=(seed.edgeql seed-2.edgeql)
     instance="$({{just}} _get_instance {{instance}})"
     if [ "${instance}" = "docker" ]; then
         {{check_if_docker_running}}
         if [ -z "$({{just}} running)" ]; then
             {{just}} start
         fi
-        docker run \
-            --interactive \
-            --link {{image}} \
-            --rm \
-            --tty \
-            --volume {{config}}:/.config/edgedb \
-            --volume ./seed.edgeql:/seed.edgeql \
-            edgedb/edgedb-cli \
-                --instance {{edgedb_instance}} \
-                query --file seed.edgeql
+        for file in "${files[@]}"; do
+            docker run \
+                --interactive \
+                --link {{image}} \
+                --rm \
+                --tty \
+                --volume {{config}}:/.config/edgedb \
+                --volume ./seed.edgeql:/seed.edgeql \
+                edgedb/edgedb-cli \
+                    --instance {{edgedb_instance}} \
+                    query --file seed.edgeql
+        done
     else
-        {{connect_to_edgedb}} query --file seed.edgeql
-        {{connect_to_edgedb}} query --file seed-2.edgeql
+        for file in "${files[@]}"; do
+            {{connect_to_edgedb}} query --file "${file}"
+        done
     fi
 
 # Show available queries, or <query> the database.

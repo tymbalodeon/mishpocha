@@ -4,18 +4,22 @@
     {{just}} --list \
         {{ if all == "" { "" } else { "--list-heading $'ALL:\n'"  } }}
 
+[no-exit-message]
 @_run_justfile parent *args:
     {{just}} --justfile ./{{parent}}/Justfile {{args}}
 
 # Run a just command for the API.
+[no-exit-message]
 @api *args:
     {{just}} _run_justfile api {{args}}
 
 # Run a just command for the UI.
+[no-exit-message]
 @ui *args:
     {{just}} _run_justfile ui {{args}}
 
 # Run a just command for the Database.
+[no-exit-message]
 @db *args:
     {{just}} _run_justfile db {{args}}
 
@@ -23,78 +27,129 @@
 help:
     #!/usr/bin/env zsh
     {{just}} _help --all
-    {{just}} api _help --from-main
-    {{just}} db _help --from-main
-    {{just}} ui _help --from-main
+    sub_folders=(api db ui)
+    for folder in "${sub_folders[@]}"; do
+        {{just}} "${folder}" _help --from-main
+    done
 
 # Install dependencies.
-@install:
+install:
+    #!/usr/bin/env zsh
     ./install_dependencies.sh --all
-    {{just}} api install --from-main
-    {{just}} db install --from-main
-    {{just}} ui install --from-main
+    sub_folders=(api db ui)
+    for folder in "${sub_folders[@]}"; do
+        {{just}} "${folder}" install --from-main
+    done
 
 # Update dependencies.
-@update:
+update:
+    #!/usr/bin/env zsh
     ./install_dependencies.sh --all --update
-    {{just}} api update --from-main
-    {{just}} db update --from-main
-    {{just}} ui update --from-main
+    sub_folders=(api db ui)
+    for folder in "${sub_folders[@]}"; do
+        {{just}} "${folder}" update --from-main
+    done
 
-# Run the containers, optionally in "--prod" mode, and optionally "--open" in the browser.
+# Check for code errors.
+check:
+    #!/usr/bin/env zsh
+    sub_folders=(api ui)
+    for folder in "${sub_folders[@]}"; do
+        {{just}} "${folder}" check
+    done
+
+# Format code.
+format:
+    #!/usr/bin/env zsh
+    sub_folders=(api ui)
+    for folder in "${sub_folders[@]}"; do
+        {{just}} "${folder}" format
+    done
+
+_get_instance *instance:
+    #!/usr/bin/env zsh
+    {{get_instance}}
+
+# Run the application (optional: "--docker", "--local", "--prod", "--open").
 start *args: stop
     #!/usr/bin/env zsh
-    if [[ "{{args}}" = *"--prod"* ]]; then
-        docker compose up --build --detach
-        {{ if args =~ "--open" { "just open --prod" } else { "" } }}
+    if [[ "{{args}}" = *"--docker"* ]]; then
+        instance="--docker"
+    elif [[ "{{args}}" = *"--local"* ]]; then
+        instance="local"
     else
-        docker compose \
-            --file compose.yaml \
-            --file compose-dev.yaml \
-            up \
-                --build \
-                --detach
-        {{ if args =~ "--open" { "just open" } else { "" } }}
+        instance=""
+    fi
+    instance="$({{just}} _get_instance ${instance})"
+    {{ if args =~ "--open" { just + " open" } else { "" } }}
+    if [ "${instance}" = "docker" ]; then
+        if [[ "{{args}}" = *"--prod"* ]]; then
+            docker compose up --build --detach
+            {{ if args =~ "--open" { "just open --prod" } else { "" } }}
+        else
+            docker compose \
+                --file compose.yaml \
+                --file compose-dev.yaml \
+                up \
+                    --build \
+                    --detach
+            {{ if args =~ "--open" { "just open" } else { "" } }}
+        fi
+    else
+        # not prod
+        echo local
     fi
 
 # Stop the containers.
-@stop:
-    {{just}} api stop
-    {{just}} db stop
-    {{just}} ui stop
-    docker compose down
-
-# Open the applications in the browser.
-@open *prod:
-    {{just}} api open
-    {{just}} ui open {{prod}}
-
-# List running containers.
-running:
+stop:
     #!/usr/bin/env zsh
-    if pgrep -q docker; then
-        docker container ls
+    if [ -n "$({{just}} running)" ]; then
+        sub_folders=(api db ui)
+        for folder in "${sub_folders[@]}"; do
+            {{just}} "${folder}" stop
+        done
+        docker compose down
     fi
 
-# Show the Docker logs.
-logs tail="10":
+# Remove the Docker image.
+[no-exit-message]
+clean:
+    #!/usr/bin/env zsh
+    sub_folders=(api db ui)
+    for folder in "${sub_folders[@]}"; do
+        {{just}} "${folder}" clean
+    done
+
+# Show the container ids (or all info with "--verbose") if the containers are running.
+running *verbose:
+    #!/usr/bin/env zsh
+    if pgrep -q docker; then
+        docker container ls \
+            {{ if verbose =~ "--verbose" { "" } else { "--quiet" } }}
+    fi
+
+# Show the Docker logs up to <lines> lines.
+logs lines="10":
     #!/usr/bin/env zsh
     if [ -n "$(just api running)" ]; then
         echo "API logs:"
-        {{just}} api logs {{tail}}
+        {{just}} api logs {{lines}}
     fi
     if [ -n "$(just db running)" ]; then
         echo
         echo "DB logs:"
-        {{just}} db logs {{tail}}
+        {{just}} db logs {{lines}}
     fi
     if [ -n "$(just ui running)" ]; then
         echo
         echo "UI logs:"
-        {{just}} ui logs {{tail}}
+        {{just}} ui logs {{lines}}
     fi
 
-# Remove the Docker image.
-@clean:
-    {{just}} db clean
-    {{just}} ui clean
+# Open the applications in the browser.
+open *prod:
+    #!/usr/bin/env zsh
+    sub_folders=(api ui)
+    for folder in "${sub_folders[@]}"; do
+        {{just}} "${folder}" open {{prod}}
+    done

@@ -15,7 +15,7 @@ _help *_from-main:
     if [ -z "{{_from-main}}" ]; then
         {{just}} --list
     else
-        {{just}} --list --list-heading $'\nAPI: [`just api <COMMAND>`]\n'
+        {{just}} --list --list-heading $'\nAPI: [`{{just}} api <COMMAND>`]\n'
     fi
 
 # Install dependencies.
@@ -38,6 +38,10 @@ update *_from-main:
 @check:
     cargo check
 
+# Format code.
+@format:
+    cargo format
+
 # Add dependencies.
 @add *packages:
     cargo add {{packages}}
@@ -52,12 +56,7 @@ update *_from-main:
 
 _get_instance *instance:
     #!/usr/bin/env zsh
-    if [ -n "$(pgrep docker -q)" ] && [ -z "{{instance}}" ] \
-        || [[ "{{instance}}" = *"--docker"* ]]; then
-        echo "docker"
-    else
-        echo "local"
-    fi
+    {{get_instance}}
 
 _build *prod:
     #!/usr/bin/env zsh
@@ -66,12 +65,7 @@ _build *prod:
         docker build --target "${target}" --tag {{image}} .
     fi
 
-# Remove the Docker image.
-[no-exit-message]
-@clean:
-    docker rmi {{image}} >/dev/null 2>&1
-
-# Run the Docker container, optionally in "--prod", and optionally "--open" in the browser.
+# Run the application (optional: "--docker", "--local", "--prod", "--open").
 start *args: stop (_build args)
     #!/usr/bin/env zsh
     if [[ "{{args}}" = *"--docker"* ]]; then
@@ -114,6 +108,11 @@ stop:
         docker kill {{image}}
     fi
 
+# Remove the Docker image.
+[no-exit-message]
+@clean:
+    docker rmi {{image}} >/dev/null 2>&1
+
 # Show the container id (or all info with "--verbose") if the container is running.
 running *verbose:
     #!/usr/bin/env zsh
@@ -124,10 +123,10 @@ running *verbose:
     fi
 
 # Show the Docker logs up to <lines> lines.
-logs tail="20":
+logs lines="20":
     #!/usr/bin/env zsh
     if [ -n "$({{just}} running)" ]; then
-        docker logs {{image}} --tail {{tail}}
+        docker logs {{image}} --tail {{lines}}
     fi
 
 # Log into the interactive shell in Docker.
