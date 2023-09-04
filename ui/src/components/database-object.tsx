@@ -6,20 +6,30 @@ const getBaseUrl = (typeName) => {
     return "/people";
   } else if (typeName == "series") {
     return "/series";
+  } else if (typeName == "player") {
+    return "/people";
   } else {
     return `/${typeName}s`;
   }
 };
 
 const getDisplayableValue = (object, key, typeName) => {
-  let value = object[key];
+  let value = object instanceof Object ? object[key] : object;
+
+  if (!(object instanceof Object)) {
+    return (
+      <li>
+        <span class="font-bold">{object}</span>
+      </li>
+    );
+  }
+
+  const baseUrl = getBaseUrl(typeName);
 
   if (!(value instanceof Object)) {
     if (!typeName) {
       return <span class="font-bold">{value}</span>;
     }
-
-    const baseUrl = getBaseUrl(typeName);
 
     return (
       <li>

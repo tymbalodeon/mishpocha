@@ -213,6 +213,7 @@ seed *instance:
                 query --file seed.edgeql
     else
         {{connect_to_edgedb}} query --file seed.edgeql
+        {{connect_to_edgedb}} query --file seed-2.edgeql
     fi
 
 # Show available queries, or <query> the database.
