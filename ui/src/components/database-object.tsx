@@ -14,21 +14,24 @@ const getBaseUrl = (typeName) => {
 };
 
 const getDisplayableValue = (object, key, typeName) => {
-  const value = object instanceof Object ? object[key] : object;
-
-  if (!(object instanceof Object)) {
-    return (
-      <li>
-        <span class="font-bold">{object}</span>
-      </li>
-    );
-  }
-
-  const baseUrl = getBaseUrl(typeName);
+  let value = object instanceof Object ? object[key] : object;
 
   if (!(value instanceof Object)) {
     if (!typeName) {
+      if (!(value instanceof String)) {
+        value = String(value);
+      }
+
       return <span class="font-bold">{value}</span>;
+    }
+
+    let baseUrl;
+
+    if (typeName == "players") {
+      value = object.person.display;
+      baseUrl = "/people";
+    } else {
+      baseUrl = getBaseUrl(typeName);
     }
 
     return (
@@ -41,14 +44,20 @@ const getDisplayableValue = (object, key, typeName) => {
   }
 
   if (value instanceof Array) {
+    if (!value.length) {
+      return <span class="font-bold">null</span>;
+    }
+
     return (
       <ul>
         {value.map((item) =>
-          getDisplayableValue(item, "display", item.type_name)
+          getDisplayableValue(item, "display", item.type_name || key),
         )}
       </ul>
     );
   }
+
+  return <span class="font-bold">{value.display}</span>;
 };
 
 export const DatabaseObject = component$<DatabaseProps>((props) => {
