@@ -5,7 +5,6 @@ import {
   routeLoader$,
 } from "@builder.io/qwik-city";
 import { DatabaseObject } from "../../../components/database-object";
-import { DatabaseProps } from "../../schema.ts";
 
 export const useGetApiData = routeLoader$(async (requestEvent) => {
   const apiDomain = requestEvent.env.get("API_DOMAIN");
@@ -26,7 +25,7 @@ export default component$(() => {
   const compositions = useGetApiData().value;
   const id = useLocation().params.id;
   const composition = compositions.find(
-    (composition) => composition.display == id,
+    (composition) => composition.display == id
   );
 
   return (

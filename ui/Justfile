@@ -1,28 +1,18 @@
+!include ../helpers.just
+
 set fallback
+
+dev_port := "5173"
+prod_port := "3000"
+image := "mishpocha-ui"
 
 _help *_from-main:
     #!/usr/bin/env zsh
     if [ -z "{{_from-main}}" ]; then
-        just --list
+        {{just}} --list
     else
-        just --list --list-heading $'\nUI: [`just ui <COMMAND>`]\n'
+        {{just}} --list --list-heading $'\nUI: [`just ui <COMMAND>`]\n'
     fi
-
-# Add dependencies.
-@add *packages:
-    pnpm add {{packages}}
-
-# Add dependencies to "dev" group.
-@add-dev *packages:
-    pnpm add --save-dev {{packages}}
-
-# Remove dependencies.
-@remove *packages:
-    pnpm add {{packages}}
-
-# Remove dependencies from "dev" group.
-@remove-dev *packages:
-    pnpm remove --save-dev {{packages}}
 
 # Install dependencies.
 install *_from-main:
@@ -40,100 +30,127 @@ update *_from-main:
     fi
     pnpm update
 
+# Check code for errors.
+check:
+    pnpm lint --fix
+
+# Add dependencies.
+@add *packages:
+    pnpm add {{packages}}
+
+# Add dependencies to "dev" group.
+@add-dev *packages:
+    pnpm add --save-dev {{packages}}
+
+# Remove dependencies.
+@remove *packages:
+    pnpm remove {{packages}}
+
+# Remove dependencies from "dev" group.
+@remove-dev *packages:
+    pnpm remove --save-dev {{packages}}
+
 # List dependencies.
 @list:
     pnpm list
 
-dev_port := "5173"
-prod_port := "3000"
-
-# Open the application in the browser.
-open *prod:
-    #!/usr/bin/env zsh
-    port={{ if prod == "--prod" { prod_port } else { dev_port } }}
-    open "http://localhost:${port}/"
-
-# Run project locally, and optionally "--open" in browser.
-@local *open:
-    pnpm {{ if open == "--open" { "start" } else { "dev" } }}
-
 # Format code.
 @format:
-    pnpm run fmt
+    pnpm run format
 
-image := "mishpocha-ui"
-
-_is_running:
+_get_instance *instance:
     #!/usr/bin/env zsh
-    if pgrep -q docker; then
-        printf "$( \
-            docker ps \
-                --filter "name={{image}}" \
-                --filter "status=running" \
-                --quiet \
-            )"
-    fi
-
-# Show if the container is running.
-running:
-    #!/usr/bin/env zsh
-    if pgrep -q docker; then
-        docker container ls --filter name={{image}}
+    if [ -n "$(pgrep docker -q)" ] && [ -z "{{instance}}" ] \
+        || [[ "{{instance}}" = *"--docker"* ]]; then
+        echo "docker"
+    else
+        echo "local"
     fi
 
 _build *prod:
     #!/usr/bin/env zsh
-    if [ -z "$(just _is_running)" ]; then \
+    if pgrep -q docker; then
         target="{{ if prod =~ "--prod" { "prod" } else { "dev" } }}"
         docker build --target "${target}" --tag {{image}} .
     fi
 
-# Run the Docker container, optionally in "--prod" mode, and optionally "--open" in the browser.
+# Remove the Docker image.
+[no-exit-message]
+@clean:
+    docker rmi {{image}} >/dev/null 2>&1
+
+# Run the Docker container, optionally in "--prod", and optionally "--open" in the browser.
 start *args: stop (_build args)
     #!/usr/bin/env zsh
-    if [[ "{{args}}" = *--prod* ]]; then
-        docker run \
-            --detach \
-            --name {{image}} \
-            --publish {{prod_port}}:{{prod_port}} \
-            --rm \
-            {{image}}
-        {{ if args =~ "--open" { "just open --prod" } else { "" } }}
+    if [[ "{{args}}" = *"--docker"* ]]; then
+        instance="--docker"
+    elif [[ "{{args}}" = *"--local"* ]]; then
+        instance="local"
     else
-        docker run \
-            --detach \
-            --name {{image}} \
-            --publish {{dev_port}}:{{dev_port}} \
-            --rm \
-            --volume "$(pwd)"/src:/ui/src \
-            {{image}}
-        {{ if args =~ "--open" { "just open" } else { "" } }}
+        instance=""
+    fi
+    instance="$({{just}} _get_instance ${instance})"
+    {{ if args =~ "--open" { just + " open" } else { "" } }}
+    if [ "${instance}" = "docker" ]; then
+        if [ -z "$({{just}} running)" ]; then
+            {{check_if_docker_running}}
+        fi
+        if [[ "{{args}}" = *"--prod"* ]]; then
+            docker run \
+                --detach \
+                --name {{image}} \
+                --publish {{prod_port}}:{{prod_port}} \
+                --rm \
+                {{image}}
+            {{ if args =~ "--open" { "{{just}} open --prod" } else { "" } }}
+        else
+            docker run \
+                --detach \
+                --name {{image}} \
+                --publish {{dev_port}}:{{dev_port}} \
+                --rm \
+                --volume "$(pwd)"/src:/ui/src \
+                {{image}}
+            {{ if args =~ "--open" { "{{just}} open" } else { "" } }}
+        fi
+    else
+        pnpm {{ if args == "--open" { "start" } else { "dev" } }}
     fi
 
-# Stop the Docker container.
+# Stop the server.
 stop:
     #!/usr/bin/env zsh
-    if [ -n "$(just _is_running)" ]; then
+    if [ -n "$({{just}} running)" ]; then
         docker kill {{image}}
     fi
 
-# Remove the Docker image.
-clean:
+# Show the container id (or all info with "--verbose") if the container is running.
+running *verbose:
     #!/usr/bin/env zsh
-    docker rmi {{image}} >/dev/null 2>&1
-    exit 0
+    if pgrep -q docker; then
+        docker container ls \
+            {{ if verbose =~ "--verbose" { "" } else { "--quiet" } }} \
+            --filter name={{image}}
+    fi
 
-# Show the Docker logs.
+# Show the Docker logs up to <lines> lines.
 logs tail="20":
     #!/usr/bin/env zsh
-    if [ -n "$(just _is_running)" ]; then
+    if [ -n "$({{just}} running)" ]; then
         docker logs {{image}} --tail {{tail}}
     fi
 
 # Log into the interactive shell in Docker.
 shell:
     #!/usr/bin/env zsh
-    if [ -n "$(just _is_running)" ]; then
-        just start
+    {{check_if_docker_running}}
+    if [ -n "$({{just}} running)" ]; then
+        {{just}} start
     fi
     docker exec --interactive --tty {{image}} bash
+
+# Open the application in the browser.
+open *prod:
+    #!/usr/bin/env zsh
+    port={{ if prod == "--prod" { prod_port } else { dev_port } }}
+    open "http://localhost:${port}/"

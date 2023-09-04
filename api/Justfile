@@ -19,18 +19,36 @@ _help *_from-main:
     fi
 
 # Install dependencies.
-@install:
-    ../install_dependencies.sh --api
+install *_from-main:
+    #!/usr/bin/env zsh
+    if [ -z "{{_from-main}}" ]; then
+        ../install_dependencies.sh --api
+    fi
     cargo build
 
 # Update dependencies.
-@update *_from-main:
-    ../install_dependencies.sh --api --update
+update *_from-main:
+    #!/usr/bin/env zsh
+    if [ -z "{{_from-main}}" ]; then
+        ../install_dependencies.sh --api --update
+    fi
     cargo update
 
 # Check code for errors.
-check:
+@check:
     cargo check
+
+# Add dependencies.
+@add *packages:
+    cargo add {{packages}}
+
+# Remove dependencies.
+@remove *packages:
+    cargo remove {{packages}}
+
+# List dependencies.
+@list:
+    cargo tree --depth 1
 
 _get_instance *instance:
     #!/usr/bin/env zsh

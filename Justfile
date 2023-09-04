@@ -30,11 +30,15 @@ help:
 # Install dependencies.
 @install:
     ./install_dependencies.sh --all
+    {{just}} api install --from-main
+    {{just}} db install --from-main
     {{just}} ui install --from-main
 
 # Update dependencies.
 @update:
     ./install_dependencies.sh --all --update
+    {{just}} api update --from-main
+    {{just}} db update --from-main
     {{just}} ui update --from-main
 
 # Run the containers, optionally in "--prod" mode, and optionally "--open" in the browser.

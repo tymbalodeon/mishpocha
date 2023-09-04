@@ -1,5 +1,5 @@
 import { component$ } from "@builder.io/qwik";
-import { DatabaseProps } from "../../schema.ts";
+import type { DatabaseProps } from "../../schema.ts";
 
 const getBaseUrl = (typeName) => {
   if (typeName == "person") {
@@ -14,7 +14,7 @@ const getBaseUrl = (typeName) => {
 };
 
 const getDisplayableValue = (object, key, typeName) => {
-  let value = object instanceof Object ? object[key] : object;
+  const value = object instanceof Object ? object[key] : object;
 
   if (!(object instanceof Object)) {
     return (
@@ -44,7 +44,7 @@ const getDisplayableValue = (object, key, typeName) => {
     return (
       <ul>
         {value.map((item) =>
-          getDisplayableValue(item, "display", item.type_name),
+          getDisplayableValue(item, "display", item.type_name)
         )}
       </ul>
     );

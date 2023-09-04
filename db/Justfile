@@ -16,12 +16,16 @@ _help *_from-main:
 
 # Install dependencies.
 @install:
-    ../install_dependencies.sh --db
+    if [ -z "{{_from-main}}" ]; then
+        ../install_dependencies.sh --db
+    fi
     edgedb server install
 
 # Update dependencies.
 @update *_from-main:
-    ../install_dependencies.sh --db --update
+    if [ -z "{{_from-main}}" ]; then
+        ../install_dependencies.sh --db --update
+    fi
     edgedb instance upgrade --instance {{edgedb_instance}}
 
 _get_instance *instance:
