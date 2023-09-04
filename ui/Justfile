@@ -69,7 +69,7 @@ _build *prod:
         docker build --target "${target}" --tag {{image}} .
     fi
 
-# Run the Docker container, optionally in "--prod", and optionally "--open" in the browser.
+# Run the application (optional: "--docker", "--local", "--prod", "--open").
 start *args: stop (_build args)
     #!/usr/bin/env zsh
     if [[ "{{args}}" = *"--docker"* ]]; then
