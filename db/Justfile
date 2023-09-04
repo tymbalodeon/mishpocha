@@ -87,12 +87,17 @@ start *args: stop _build
             "alter role edgedb set password := 'password';"
         {{ if args =~ "--open" { "{{just}} ui --docker" } else { "" } }}
     else
-        {{just}} seed
+        if ! $(edgedb instance status --instance {{edgedb_instance}} &>/dev/null); then
+            edgedb instance start --instance {{edgedb_instance}} &>/dev/null
+        fi
     fi
 
 # Stop the Docker container.
 stop:
     #!/usr/bin/env zsh
+    if edgedb instance status --instance {{edgedb_instance}} &>/dev/null; then
+        edgedb instance stop --instance {{edgedb_instance}} &>/dev/null
+    fi
     if [ -n "$({{just}} running)" ]; then
         docker kill {{image}}
         if docker volume list | grep -q {{config}}; then
@@ -100,8 +105,8 @@ stop:
         fi
     fi
 
-# Drop the persisted databases (optional: "--docker", or "--local").
-drop *instance: stop
+# Destroy the persisted databases (optional: "--docker", or "--local").
+destroy *instance: stop
     #!/usr/bin/env zsh
     if [ "{{instance}}" = "--local" ] || [ -z "{{instance}}" ]; then
         edgedb instance destroy \

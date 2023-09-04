@@ -104,6 +104,10 @@ start *args: stop (_build args)
 # Stop the server.
 stop:
     #!/usr/bin/env zsh
+    process="$(pgrep -f {{image}})"
+    if [ -n "${process}" ]; then
+        kill "${process}"
+    fi
     if [ -n "$({{just}} running)" ]; then
         docker kill {{image}}
     fi

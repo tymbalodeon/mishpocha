@@ -98,18 +98,18 @@ start *args: stop
     else
         sub_folders=(api db ui)
         for folder in "${sub_folders[@]}"; do
-            {{just}} "${folder}" start &
+            {{just}} "${folder}" start >/dev/null 2>&1 &
         done
     fi
 
 # Stop the containers.
 stop:
     #!/usr/bin/env zsh
+    sub_folders=(api db ui)
+    for folder in "${sub_folders[@]}"; do
+        {{just}} "${folder}" stop
+    done
     if [ -n "$({{just}} running)" ]; then
-        sub_folders=(api db ui)
-        for folder in "${sub_folders[@]}"; do
-            {{just}} "${folder}" stop
-        done
         docker compose down
     fi
 
