@@ -96,8 +96,10 @@ start *args: stop
             {{ if args =~ "--open" { "just open" } else { "" } }}
         fi
     else
-        # not prod
-        echo local
+        sub_folders=(api db ui)
+        for folder in "${sub_folders[@]}"; do
+            {{just}} "${folder}" start &
+        done
     fi
 
 # Stop the containers.
