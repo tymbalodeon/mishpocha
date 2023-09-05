@@ -1,5 +1,5 @@
  # Mishpocha
- 
+
  A database schema for recording information about music and musicians. Gather
  the "whole [mishpocha ](https://www.merriam-webster.com/dictionary/mishpachah)" in one graph-relational database!
 
@@ -38,21 +38,20 @@
  to see a list of all available commands, which are also listed here:
 
  ALL:
- `api *args` # Run a just command for the API.
- `check` # Check for code errors.
- `clean` # Remove the Docker image.
- `db *args` # Run a just command for the Database.
- `format` # Format code.
- `help` Display help for all commands.
- `install` Install dependencies.
- `logs lines="10"` Show the Docker logs up to <lines> lines.
- `open *prod` Open the applications in the browser.
+ `api *args` # Run a just command for the API.  
+ `check` # Check for code errors.  
+ `clean` # Remove the Docker image.  
+ `db *args` # Run a just command for the Database.  
+ `format` # Format code.  
+ `help` Display help for all commands.  
+ `install` Install dependencies.  
+ `logs lines="10"` Show the Docker logs up to <lines> lines.  
+ `open *prod` Open the applications in the browser.  
  `running *verbose` Show the container ids (or all info with "--verbose") if the
- containers are running.
- `start *args` Run the application (optional: "--docker", "--local", "--prod",
- "--open").
- `stop`Stop the containers.
- `ui *args` Run a just command for the UI.
+ containers are running.  
+ `start *args` Run the application (optional: "--docker", "--local", "--prod", "--open").  
+ `stop`Stop the containers.  
+ `ui *args` Run a just command for the UI.  
  `update` Update dependencies.
 
  API: [`just --unstable api <COMMAND>`]
