@@ -24,9 +24,7 @@ export const useGetApiData = routeLoader$(async (requestEvent) => {
 export default component$(() => {
   const compositions = useGetApiData().value;
   const id = useLocation().params.id;
-  const composition = compositions.find(
-    (composition) => composition.display == id
-  );
+  const composition = compositions.find((composition) => composition.id == id);
 
   return (
     <>

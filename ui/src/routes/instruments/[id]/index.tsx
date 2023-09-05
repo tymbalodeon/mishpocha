@@ -24,7 +24,7 @@ export const useGetApiData = routeLoader$(async (requestEvent) => {
 export default component$(() => {
   const instruments = useGetApiData().value;
   const id = useLocation().params.id;
-  const instrument = instruments.find((instrument) => instrument.name == id);
+  const instrument = instruments.find((instrument) => instrument.id == id);
 
   return (
     <>

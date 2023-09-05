@@ -13,31 +13,15 @@ const getBaseUrl = (typeName) => {
   }
 };
 
-const getDisplayableValue = (object, key, typeName) => {
-  let value = object instanceof Object ? object[key] : object;
-  let id = object.id;
-  let baseUrl = getBaseUrl(typeName);
+const getDisplayableValue = (object, key, typeName, nested) => {
+  let value = nested ? object : object[key];
 
   if (!(value instanceof Object)) {
-    if (!typeName) {
-      if (!(value instanceof String)) {
-        value = String(value);
-      }
-
-      return <span class="font-bold">{value}</span>;
+    if (!(typeof value == "string")) {
+      value = String(value);
     }
 
-    if (typeName == "players") {
-      id = object.person.id;
-    }
-
-    return (
-      <li>
-        <a href={`${baseUrl}/${id}`} class="link font-bold">
-          {value}
-        </a>
-      </li>
-    );
+    return <span class="font-bold">{value}</span>;
   }
 
   if (value instanceof Array) {
@@ -48,24 +32,25 @@ const getDisplayableValue = (object, key, typeName) => {
     return (
       <ul>
         {value.map((item) =>
-          getDisplayableValue(item, "display", item.type_name || typeName),
+          getDisplayableValue(item, "display", item.type_name || key, true),
         )}
       </ul>
     );
   }
 
-  if (object instanceof Object) {
-    baseUrl = getBaseUrl(value.type_name);
-    id = value.id;
+  const baseUrl = getBaseUrl(typeName || value.type_name);
+  const id = value.id;
+  const link = (
+    <a href={`${baseUrl}/${id}`} class="link font-bold">
+      {value.display}
+    </a>
+  );
 
-    return (
-      <a href={`${baseUrl}/${id}`} class="link font-bold">
-        {value.display}
-      </a>
-    );
-  } else {
-    return <span class="font-bold">{value.display}</span>;
+  if (nested) {
+    return <li>{link}</li>;
   }
+
+  return link;
 };
 
 export const DatabaseObject = component$<DatabaseProps>((props) => {
