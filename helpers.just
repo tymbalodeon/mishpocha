@@ -1,4 +1,4 @@
-bat := "bat --style plain --language json"
+bat := "bat --style plain --language json --theme gruvbox-dark"
 check_if_docker_running := "
 if ! pgrep docker -q &>/dev/null; then
 " + error_docker_not_running + "
