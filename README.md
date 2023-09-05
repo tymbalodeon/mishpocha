@@ -1,4 +1,7 @@
  # Mishpocha
+ 
+ A database schema for recording information about music and musicians. Gather
+ the "whole [mishpocha ](https://www.merriam-webster.com/dictionary/mishpachah)" in one graph-relational database!
 
  ## Dependencies
 
