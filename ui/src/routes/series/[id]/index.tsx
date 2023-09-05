@@ -24,7 +24,7 @@ export const useGetApiData = routeLoader$(async (requestEvent) => {
 export default component$(() => {
   let series = useGetApiData().value;
   const id = useLocation().params.id;
-  series = series.find((series) => series.display == id);
+  series = series.find((series) => series.id == id);
 
   return (
     <>

@@ -2,12 +2,12 @@ import { component$ } from "@builder.io/qwik";
 import type { DatabaseProps } from "../../schema.ts";
 
 const getBaseUrl = (typeName) => {
-  if (typeName == "person") {
+  if (!typeName) {
+    return "";
+  } else if (typeName == "person" || typeName.includes("player")) {
     return "/people";
   } else if (typeName == "series") {
     return "/series";
-  } else if (typeName == "player") {
-    return "/people";
   } else {
     return `/${typeName}s`;
   }
@@ -15,6 +15,8 @@ const getBaseUrl = (typeName) => {
 
 const getDisplayableValue = (object, key, typeName) => {
   let value = object instanceof Object ? object[key] : object;
+  let id = object.id;
+  let baseUrl = getBaseUrl(typeName);
 
   if (!(value instanceof Object)) {
     if (!typeName) {
@@ -25,18 +27,13 @@ const getDisplayableValue = (object, key, typeName) => {
       return <span class="font-bold">{value}</span>;
     }
 
-    let baseUrl;
-
     if (typeName == "players") {
-      value = object.person.display;
-      baseUrl = "/people";
-    } else {
-      baseUrl = getBaseUrl(typeName);
+      id = object.person.id;
     }
 
     return (
       <li>
-        <a href={`${baseUrl}/${value}`} class="link font-bold">
+        <a href={`${baseUrl}/${id}`} class="link font-bold">
           {value}
         </a>
       </li>
@@ -57,7 +54,18 @@ const getDisplayableValue = (object, key, typeName) => {
     );
   }
 
-  return <span class="font-bold">{value.display}</span>;
+  if (object instanceof Object) {
+    baseUrl = getBaseUrl(value.type_name);
+    id = value.id;
+
+    return (
+      <a href={`${baseUrl}/${id}`} class="link font-bold">
+        {value.display}
+      </a>
+    );
+  } else {
+    return <span class="font-bold">{value.display}</span>;
+  }
 };
 
 export const DatabaseObject = component$<DatabaseProps>((props) => {
@@ -87,5 +95,5 @@ export const DatabaseObject = component$<DatabaseProps>((props) => {
 
   const baseUrl = getBaseUrl(object.type_name);
 
-  return <a href={`${baseUrl}/${object.display}`}>{data}</a>;
+  return <a href={`${baseUrl}/${object.id}`}>{data}</a>;
 });

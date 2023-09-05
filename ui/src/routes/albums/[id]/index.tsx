@@ -24,7 +24,7 @@ export const useGetApiData = routeLoader$(async (requestEvent) => {
 export default component$(() => {
   const albums = useGetApiData().value;
   const id = useLocation().params.id;
-  const album = albums.find((album) => album.display == id);
+  const album = albums.find((album) => album.id == id);
 
   return (
     <>

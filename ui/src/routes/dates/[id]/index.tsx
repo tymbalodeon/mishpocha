@@ -24,7 +24,7 @@ export const useGetApiData = routeLoader$(async (requestEvent) => {
 export default component$(() => {
   const dates = useGetApiData().value;
   const id = useLocation().params.id;
-  const date = dates.find((date) => date.display == id);
+  const date = dates.find((date) => date.id == id);
 
   return (
     <>

@@ -24,7 +24,7 @@ export const useGetApiData = routeLoader$(async (requestEvent) => {
 export default component$(() => {
   const people = useGetApiData().value;
   const id = useLocation().params.id;
-  const person = people.find((person) => person.full_name == id);
+  const person = people.find((person) => person.id == id);
 
   return (
     <>
