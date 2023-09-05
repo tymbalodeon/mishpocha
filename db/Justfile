@@ -210,7 +210,6 @@ ui *instance:
 # Seed the database (optional: "--docker" or "--local").
 seed *instance: migrate
     #!/usr/bin/env zsh
-    files=(seed.edgeql seed-2.edgeql)
     instance="$({{just}} _get_instance {{instance}})"
     if [ "${instance}" = "docker" ]; then
         {{check_if_docker_running}}
@@ -230,7 +229,7 @@ seed *instance: migrate
                     query --file seed.edgeql
         done
     else
-        for file in "${files[@]}"; do
+        for file in *.edgeql; do
             {{connect_to_edgedb}} query --file "${file}"
         done
     fi
