@@ -90,8 +90,8 @@
  `seed *instance` Seed the database (optional: "--docker" or "--local").  
  `shell *instance` Open the edgedb shell (optional: "--docker" or "--local").  
  `start *args` Run the Docker container, and optionally "--open" in the browser.  
- `stop` Stop the Docker container.
- `ui *instance` Open the Edgedb UI (optional: "--docker" or "--local")
+ `stop` Stop the Docker container.  
+ `ui *instance` Open the Edgedb UI (optional: "--docker" or "--local")  
  `update *_from-main` Update dependencies.
 
  UI: [`just --unstable ui <COMMAND>`]  
@@ -111,5 +111,5 @@
  `shell` Log into the interactive shell in Docker.  
  `start *args` Run the application (optional: "--docker", "--local", "--prod",
  "--open").  
- `stop` Stop the server.
+ `stop` Stop the server.  
  `update *_from-main` Update dependencies.
