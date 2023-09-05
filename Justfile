@@ -117,14 +117,21 @@ stop:
         docker compose down
     fi
 
-# Remove the Docker images.
+# Remove the log files and/or Docker images
 [no-exit-message]
-clean:
+clean *args:
     #!/usr/bin/env zsh
-    sub_folders=(api db ui)
-    for folder in "${sub_folders[@]}"; do
-        {{just}} "${folder}" clean
-    done
+    if [[ "{{args}}" = *"--logs"* ]] || [ -z "{{args}}" ]; then
+        for file in logs/*(N); do
+            rm "${file}"
+        done
+    fi
+    if [[ "{{args}}" = *"--docker"* ]] || [ -z "{{args}}" ]; then
+        sub_folders=(api db ui)
+        for folder in "${sub_folders[@]}"; do
+            {{just}} "${folder}" clean
+        done
+    fi
 
 # Show the container ids (or all info with "--verbose") if the containers are running.
 running *verbose:

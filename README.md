@@ -40,12 +40,12 @@
  ALL:  
  `api *args` # Run a just command for the API.  
  `check` # Check for code errors.  
- `clean` # Remove the Docker images.  
+ `clean *args` # Remove the log files and/or Docker images.  
  `db *args` # Run a just command for the Database.  
  `format` # Format code.  
  `help` Display help for all commands.  
  `install` Install dependencies.  
- `logs lines="10"` Show the Docker logs up to <lines> lines.  
+ `logs lines="10"` Show the Docker logs up to \<lines\> lines.  
  `open *prod` Open the applications in the browser.  
  `running *verbose` Show the container ids (or all info with "--verbose") if the
  containers are running.  
@@ -62,7 +62,7 @@
  `format` Format code.  
  `install *_from-main` Install dependencies.  
  `list` List dependencies.  
- `logs lines="20"` Show the Docker logs up to <lines> lines.  
+ `logs lines="20"` Show the Docker logs up to \<lines\> lines.  
  `open` Open the application in the browser.  
  `people` View people in the database.  
  `person full_name` View a person in the database.  
@@ -83,9 +83,9 @@
  `dsn *instance` Show the DSN for the database (optional: "--docker" or
  "--local").  
  `install *_from-main` Install dependencies.  
- `logs lines="20"` Show the Docker logs up to <lines> lines.  
+ `logs lines="20"` Show the Docker logs up to \<lines\> lines.  
  `migrate` Migrate the (local) database.  
- `query *query` Show available queries, or <query> the database.  
+ `query *query` Show available queries, or \<query\> the database.  
  `running *verbose` Show the container id (or all info with "--verbose") if the
  container is running.  
  `seed *instance` Seed the database (optional: "--docker" or "--local").  
@@ -103,7 +103,7 @@
  `format` Format code.  
  `install *_from-main` Install dependencies.  
  `list` List dependencies.  
- `logs tail="20"` Show the Docker logs up to <lines> lines.  
+ `logs tail="20"` Show the Docker logs up to \<lines\> lines.  
  `open *prod` Open the application in the browser.  
  `remove *packages` Remove dependencies.  
  `remove-dev *packages` Remove dependencies from "dev" group.  

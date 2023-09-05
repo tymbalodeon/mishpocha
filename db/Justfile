@@ -127,8 +127,11 @@ destroy *instance: stop
 
 # Remove the Docker image.
 [no-exit-message]
-@clean:
-    docker rmi {{image}} >/dev/null 2>&1
+clean:
+    #!/usr/bin/env zsh
+    if pgrep -q docker; then
+        docker rmi {{image}} >/dev/null 2>&1
+    fi
 
 # Show the container id (or all info with "--verbose") if the container is running.
 running *verbose:
@@ -235,3 +238,7 @@ seed *instance: migrate
 # Show available queries, or <query> the database.
 @query *query:
     {{just}} --justfile queries.just {{query}}
+
+# Delete all objects from the database.
+@delete *query:
+    {{just}} query delete
