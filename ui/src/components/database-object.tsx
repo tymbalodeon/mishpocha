@@ -48,7 +48,7 @@ const getDisplayableValue = (object, key, typeName) => {
     return (
       <ul>
         {value.map((item) =>
-          getDisplayableValue(item, "display", item.type_name || key),
+          getDisplayableValue(item, "display", item.type_name || typeName),
         )}
       </ul>
     );

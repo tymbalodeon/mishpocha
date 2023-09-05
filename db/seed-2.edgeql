@@ -404,9 +404,7 @@ with albums := <json>(
                 filter .name = <str>album["artist_name"]
                 limit 1
             ),
-            discs := (
-                select Disc
-            ),
+            discs := select Disc filter .tracks.title = "Sarah's Theme",
             producers := (
                 select Person
                 filter .full_name = <str>album["producer_name"]
@@ -420,4 +418,3 @@ with albums := <json>(
         }
     )
 );
-
