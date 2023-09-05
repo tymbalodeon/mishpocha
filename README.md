@@ -37,7 +37,7 @@
  available commands relevant to the current directory you are in, or `just help`
  to see a list of all available commands, which are also listed here:
 
- ALL:
+ ALL:  
  `api *args` # Run a just command for the API.  
  `check` # Check for code errors.  
  `clean` # Remove the Docker image.  
@@ -54,55 +54,62 @@
  `ui *args` Run a just command for the UI.  
  `update` Update dependencies.
 
- API: [`just --unstable api <COMMAND>`]
- `add *packages` Add dependencies.
- `check` Check code for errors.
- `clean` Remove the Docker image.
- `format` Format code.
- `install *_from-main` Install dependencies.
- `list` List dependencies.
- `logs lines="20"` Show the Docker logs up to <lines> lines.
- `open` Open the application in the browser.
- `people` View people in the database.
- `person full_name` View a person in the database.
- `ping` Ping the application.
- `remove *packages` Remove dependencies.
- `running *verbose` Show the container id (or all info with "--verbose") if the container is running.
- `shell` Log into the interactive shell in Docker.
- `start *args` Run the application (optional: "--docker", "--local", "--prod", "--open").
- `stop` Stop the server.
+ API: [`just --unstable api <COMMAND>`]  
+ `add *packages` Add dependencies.  
+ `check` Check code for errors.  
+ `clean` Remove the Docker image.  
+ `format` Format code.  
+ `install *_from-main` Install dependencies.  
+ `list` List dependencies.  
+ `logs lines="20"` Show the Docker logs up to <lines> lines.  
+ `open` Open the application in the browser.  
+ `people` View people in the database.  
+ `person full_name` View a person in the database.  
+ `ping` Ping the application.  
+ `remove *packages` Remove dependencies.  
+ `running *verbose` Show the container id (or all info with "--verbose") if the
+ container is running.  
+ `shell` Log into the interactive shell in Docker.  
+ `start *args` Run the application (optional: "--docker", "--local", "--prod",
+ "--open").  
+ `stop` Stop the server.  
  `update *_from-main` Update dependencies.
 
- DB: [`just --unstable db <COMMAND>`]
- `clean` Remove the Docker image.
- `destroy *instance` Destroy the persisted databases (optional: "--docker", or "--local").
- `dsn *instance` Show the DSN for the database (optional: "--docker" or "--local").
- `install *_from-main` Install dependencies.
- `logs lines="20"` Show the Docker logs up to <lines> lines.
- `migrate` Migrate the (local) database.
- `query *query` Show available queries, or <query> the database.
- `running *verbose` Show the container id (or all info with "--verbose") if the container is running.
- `seed *instance` Seed the database (optional: "--docker" or "--local").
- `shell *instance` Open the edgedb shell (optional: "--docker" or "--local").
- `start *args` Run the Docker container, and optionally "--open" in the browser.
+ DB: [`just --unstable db <COMMAND>`]  
+ `clean` Remove the Docker image.  
+ `destroy *instance` Destroy the persisted databases (optional: "--docker", or
+ "--local").  
+ `dsn *instance` Show the DSN for the database (optional: "--docker" or
+ "--local").  
+ `install *_from-main` Install dependencies.  
+ `logs lines="20"` Show the Docker logs up to <lines> lines.  
+ `migrate` Migrate the (local) database.  
+ `query *query` Show available queries, or <query> the database.  
+ `running *verbose` Show the container id (or all info with "--verbose") if the
+ container is running.  
+ `seed *instance` Seed the database (optional: "--docker" or "--local").  
+ `shell *instance` Open the edgedb shell (optional: "--docker" or "--local").  
+ `start *args` Run the Docker container, and optionally "--open" in the browser.  
  `stop` Stop the Docker container.
  `ui *instance` Open the Edgedb UI (optional: "--docker" or "--local")
  `update *_from-main` Update dependencies.
 
- UI: [`just --unstable ui <COMMAND>`]
- `add *packages` Add dependencies.
- `add-dev *packages` Add dependencies to "dev" group.
- `check` Check code for errors.
- `clean` Remove the Docker image.
- `format` Format code.
- `install *_from-main` Install dependencies.
- `list` List dependencies.
- `logs tail="20"` Show the Docker logs up to <lines> lines.
- `open *prod` Open the application in the browser.
- `remove *packages` Remove dependencies.
- `remove-dev *packages` Remove dependencies from "dev" group.
- `running *verbose` Show the container id (or all info with "--verbose") if the container is running.
- `shell` Log into the interactive shell in Docker.
- `start *args` Run the application (optional: "--docker", "--local", "--prod", "--open").
+ UI: [`just --unstable ui <COMMAND>`]  
+ `add *packages` Add dependencies.  
+ `add-dev *packages` Add dependencies to "dev" group.  
+ `check` Check code for errors.  
+ `clean` Remove the Docker image.  
+ `format` Format code.  
+ `install *_from-main` Install dependencies.  
+ `list` List dependencies.  
+ `logs tail="20"` Show the Docker logs up to <lines> lines.  
+ `open *prod` Open the application in the browser.  
+ `remove *packages` Remove dependencies.  
+ `remove-dev *packages` Remove dependencies from "dev" group.  
+ `running *verbose` Show the container id (or all info with "--verbose") if the
+ container is running.  
+ `shell` Log into the interactive shell in Docker.  
+ `start *args` Run the application (optional: "--docker", "--local", "--prod",
+ "--open").  
  `stop` Stop the server.
  `update *_from-main` Update dependencies.
