@@ -51,6 +51,7 @@
  containers are running.  
  `start *args` Run the application (optional: "--docker", "--local", "--prod", "--open").  
  `stop`Stop the containers.  
+ `tail *log` Tail the logs for \<log\> ("api" or "ui").
  `ui *args` Run a just command for the UI.  
  `update` Update dependencies.
 

@@ -96,10 +96,14 @@ start *args: stop
                     --detach
         fi
     else
-        sub_folders=(api db ui)
+        mkdir -p logs
+        sub_folders=(api ui)
         for folder in "${sub_folders[@]}"; do
-            {{just}} "${folder}" start >/dev/null 2>&1 &
+            (
+                {{just}} "${folder}" start > logs/"${folder}".log 2>&1
+            ) &
         done
+        {{just}} db start
     fi
 
 # Stop the containers.
@@ -133,19 +137,35 @@ running *verbose:
 # Show the Docker logs up to <lines> lines.
 logs lines="10":
     #!/usr/bin/env zsh
-    if [ -n "$({{just}} api running)" ]; then
-        echo "API logs:"
-        {{just}} api logs {{lines}}
+    instance="$({{just}} _get_instance "")"
+    if [ "${instance}" = "docker" ]; then
+        if [ -n "$({{just}} api running)" ]; then
+            echo "API logs:"
+            {{just}} api logs {{lines}}
+        fi
+        if [ -n "$({{just}} db running)" ]; then
+            echo
+            echo "DB logs:"
+            {{just}} db logs {{lines}}
+        fi
+        if [ -n "$({{just}} ui running)" ]; then
+            echo
+            echo "UI logs:"
+            {{just}} ui logs {{lines}}
+        fi
+    else
+       for file in $(ls logs); do
+            {{bat}} "logs/${file}"
+       done
     fi
-    if [ -n "$({{just}} db running)" ]; then
-        echo
-        echo "DB logs:"
-        {{just}} db logs {{lines}}
-    fi
-    if [ -n "$({{just}} ui running)" ]; then
-        echo
-        echo "UI logs:"
-        {{just}} ui logs {{lines}}
+
+# Tail the logs for <log> ("api" or "ui").
+tail *log:
+    #!/usr/bin/env zsh
+    if [ -f "logs/{{log}}.log" ]; then
+        tail -F logs/{{log}}.log
+    else
+        echo 'Please choose one of "api" or "ui".'
     fi
 
 # Open the applications in the browser.

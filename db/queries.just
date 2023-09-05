@@ -2,7 +2,6 @@
 !include helpers.just
 
 query_command := just + " --justfile queries.just _query"
-bat := "bat --style plain --language json"
 
 @_help:
     {{just}} --justfile queries.just --list
