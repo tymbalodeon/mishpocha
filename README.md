@@ -40,7 +40,7 @@
  ALL:  
  `api *args` # Run a just command for the API.  
  `check` # Check for code errors.  
- `clean` # Remove the Docker image.  
+ `clean` # Remove the Docker images.  
  `db *args` # Run a just command for the Database.  
  `format` # Format code.  
  `help` Display help for all commands.  

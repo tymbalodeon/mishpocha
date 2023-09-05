@@ -113,7 +113,7 @@ stop:
         docker compose down
     fi
 
-# Remove the Docker image.
+# Remove the Docker images.
 [no-exit-message]
 clean:
     #!/usr/bin/env zsh
