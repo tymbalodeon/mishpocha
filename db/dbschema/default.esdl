@@ -181,12 +181,15 @@ module default {
         constraint exclusive on ((.name, .tuning));
 
         property display := (
-            with tuning := .tuning.display
-            select (
-                tuning ++ " "
-                if exists tuning else
-                ""
-            ) ++ .name
+            with tuning := .tuning.display,
+            name := (
+                select (
+                    tuning ++ " "
+                    if exists tuning else
+                    ""
+                ) ++ .name
+            )
+            select str_title(name)
         );
         multi link players := .<instrument[is Player];
     }
