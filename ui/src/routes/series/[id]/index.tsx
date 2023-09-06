@@ -8,13 +8,14 @@ import { DatabaseObject } from "../../../components/database-object";
 
 export const useGetApiData = routeLoader$(async (requestEvent) => {
   const apiDomain = requestEvent.env.get("API_DOMAIN");
+  const id = requestEvent.params.id;
 
   if (!apiDomain) {
     return "API_DOMAIN not specified.";
   }
 
   try {
-    const response = await fetch(`${apiDomain}/series`);
+    const response = await fetch(`${apiDomain}/series/${id}`);
     return await response.json();
   } catch {
     return [];
@@ -23,8 +24,6 @@ export const useGetApiData = routeLoader$(async (requestEvent) => {
 
 export default component$(() => {
   let series = useGetApiData().value;
-  const id = useLocation().params.id;
-  series = series.find((series) => series.id == id);
 
   return <>{series ? <DatabaseObject data={series} /> : <p>not found</p>}</>;
 });

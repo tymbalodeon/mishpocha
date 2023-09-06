@@ -8,13 +8,14 @@ import { DatabaseObject } from "../../../components/database-object";
 
 export const useGetApiData = routeLoader$(async (requestEvent) => {
   const apiDomain = requestEvent.env.get("API_DOMAIN");
+  const id = requestEvent.params.id;
 
   if (!apiDomain) {
     return "API_DOMAIN not specified.";
   }
 
   try {
-    const response = await fetch(`${apiDomain}/compositions`);
+    const response = await fetch(`${apiDomain}/compositions/${id}`);
     return await response.json();
   } catch {
     return [];
@@ -22,9 +23,7 @@ export const useGetApiData = routeLoader$(async (requestEvent) => {
 });
 
 export default component$(() => {
-  const compositions = useGetApiData().value;
-  const id = useLocation().params.id;
-  const composition = compositions.find((composition) => composition.id == id);
+  const composition = useGetApiData().value;
 
   return (
     <>
@@ -34,11 +33,11 @@ export default component$(() => {
 });
 
 export const head: DocumentHead = {
-  title: "Mishpocha Database | Compositions",
+  title: "Mishpocha Database | Composition",
   meta: [
     {
-      name: "Mishpocha Database | Compositions",
-      content: "Mishpocha Database | Compositions",
+      name: "Mishpocha Database | Composition",
+      content: "Mishpocha Database | Composition",
     },
   ],
 };

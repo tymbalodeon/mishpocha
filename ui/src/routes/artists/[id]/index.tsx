@@ -8,13 +8,14 @@ import { DatabaseObject } from "../../../components/database-object";
 
 export const useGetApiData = routeLoader$(async (requestEvent) => {
   const apiDomain = requestEvent.env.get("API_DOMAIN");
+  const id = requestEvent.params.id;
 
   if (!apiDomain) {
     return "API_DOMAIN not specified.";
   }
 
   try {
-    const response = await fetch(`${apiDomain}/artists`);
+    const response = await fetch(`${apiDomain}/artists/${id}`);
     return await response.json();
   } catch {
     return [];
@@ -22,19 +23,17 @@ export const useGetApiData = routeLoader$(async (requestEvent) => {
 });
 
 export default component$(() => {
-  const artists = useGetApiData().value;
-  const id = useLocation().params.id;
-  const artist = artists.find((artist) => artist.id == id);
+  const artist = useGetApiData().value;
 
   return <>{artist ? <DatabaseObject data={artist} /> : <p>not found</p>}</>;
 });
 
 export const head: DocumentHead = {
-  title: "Mishpocha Database | Artists",
+  title: "Mishpocha Database | Artist",
   meta: [
     {
-      name: "Mishpocha Database | Artists",
-      content: "Mishpocha Database | Artists",
+      name: "Mishpocha Database | Artist",
+      content: "Mishpocha Database | Artist",
     },
   ],
 };

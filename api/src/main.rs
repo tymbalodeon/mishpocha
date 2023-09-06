@@ -39,7 +39,6 @@ async fn get_dates() -> Result<impl Responder> {
 #[get("/dates/{id}")]
 async fn get_date(path: Path<Uuid>) -> Result<impl Responder> {
     let date_id = path.into_inner();
-    dbg!(&date_id);
     let client = create_client()
         .await
         .expect("Failed to connect to database");
@@ -70,6 +69,26 @@ async fn get_people() -> Result<impl Responder> {
     Ok(Json(dates))
 }
 
+#[get("/people/{id}")]
+async fn get_person(path: Path<Uuid>) -> Result<impl Responder> {
+    let person_id = path.into_inner();
+    let client = create_client()
+        .await
+        .expect("Failed to connect to database");
+    let person: Option<Person> = client
+        .query_single(
+            "select <json>(
+                select Person { ** }
+                filter .id = <uuid>$0
+            );",
+            &(person_id,),
+        )
+        .await
+        .unwrap();
+
+    Ok(Json(person))
+}
+
 #[get("/instruments")]
 async fn get_instruments() -> Result<impl Responder> {
     let client = create_client()
@@ -90,6 +109,26 @@ async fn get_instruments() -> Result<impl Responder> {
     Ok(Json(instruments))
 }
 
+#[get("/instruments/{id}")]
+async fn get_instrument(path: Path<Uuid>) -> Result<impl Responder> {
+    let instrument_id = path.into_inner();
+    let client = create_client()
+        .await
+        .expect("Failed to connect to database");
+    let instrument: Option<Instrument> = client
+        .query_single(
+            "select <json>(
+                select Instrument { ** }
+                filter .id = <uuid>$0
+            );",
+            &(instrument_id,),
+        )
+        .await
+        .unwrap();
+
+    Ok(Json(instrument))
+}
+
 #[get("/compositions")]
 async fn get_compositions() -> Result<impl Responder> {
     let client = create_client()
@@ -97,6 +136,26 @@ async fn get_compositions() -> Result<impl Responder> {
         .expect("Failed to connect to database");
     let compositions: Vec<Composition> = client
         .query("select <json>Composition { ** };", &())
+        .await
+        .unwrap();
+
+    Ok(Json(compositions))
+}
+
+#[get("/compositions/{id}")]
+async fn get_composition(path: Path<Uuid>) -> Result<impl Responder> {
+    let composition_id = path.into_inner();
+    let client = create_client()
+        .await
+        .expect("Failed to connect to database");
+    let compositions: Option<Composition> = client
+        .query_single(
+            "select <json>(
+                select Composition { ** }
+                filter .id = <uuid>$0
+            );",
+            &(composition_id,),
+        )
         .await
         .unwrap();
 
@@ -116,6 +175,26 @@ async fn get_players() -> Result<impl Responder> {
     Ok(Json(players))
 }
 
+#[get("/players/{id}")]
+async fn get_player(path: Path<Uuid>) -> Result<impl Responder> {
+    let player_id = path.into_inner();
+    let client = create_client()
+        .await
+        .expect("Failed to connect to database");
+    let player: Option<Player> = client
+        .query_single(
+            "select <json>(
+                select Player { ** }
+                filter .id = <uuid>$0
+            );",
+            &(player_id,),
+        )
+        .await
+        .unwrap();
+
+    Ok(Json(player))
+}
+
 #[get("/artists")]
 async fn get_artists() -> Result<impl Responder> {
     let client = create_client()
@@ -127,6 +206,26 @@ async fn get_artists() -> Result<impl Responder> {
         .unwrap();
 
     Ok(Json(artists))
+}
+
+#[get("/artists/{id}")]
+async fn get_artist(path: Path<Uuid>) -> Result<impl Responder> {
+    let artist_id = path.into_inner();
+    let client = create_client()
+        .await
+        .expect("Failed to connect to database");
+    let artist: Option<Artist> = client
+        .query_single(
+            "select <json>(
+                select Artist { ** }
+                filter .id = <uuid>$0
+            );",
+            &(artist_id,),
+        )
+        .await
+        .unwrap();
+
+    Ok(Json(artist))
 }
 
 #[get("/tracks")]
@@ -148,6 +247,26 @@ async fn get_tracks() -> Result<impl Responder> {
     Ok(Json(tracks))
 }
 
+#[get("/tracks/{id}")]
+async fn get_track(path: Path<Uuid>) -> Result<impl Responder> {
+    let track_id = path.into_inner();
+    let client = create_client()
+        .await
+        .expect("Failed to connect to database");
+    let track: Option<Track> = client
+        .query_single(
+            "select <json>(
+                select Track { ** }
+                filter .id = <uuid>$0
+            );",
+            &(track_id,),
+        )
+        .await
+        .unwrap();
+
+    Ok(Json(track))
+}
+
 #[get("/series")]
 async fn get_series() -> Result<impl Responder> {
     let client = create_client()
@@ -155,6 +274,26 @@ async fn get_series() -> Result<impl Responder> {
         .expect("Failed to connect to database");
     let series: Vec<Series> = client
         .query("select <json>Series { ** };", &())
+        .await
+        .unwrap();
+
+    Ok(Json(series))
+}
+
+#[get("/series/{id}")]
+async fn get_series_by_id(path: Path<Uuid>) -> Result<impl Responder> {
+    let series_id = path.into_inner();
+    let client = create_client()
+        .await
+        .expect("Failed to connect to database");
+    let series: Option<Series> = client
+        .query_single(
+            "select <json>(
+                select Series { ** }
+                filter .id = <uuid>$0
+            );",
+            &(series_id,),
+        )
         .await
         .unwrap();
 
@@ -174,6 +313,26 @@ async fn get_labels() -> Result<impl Responder> {
     Ok(Json(labels))
 }
 
+#[get("/labels/{id}")]
+async fn get_label(path: Path<Uuid>) -> Result<impl Responder> {
+    let label_id = path.into_inner();
+    let client = create_client()
+        .await
+        .expect("Failed to connect to database");
+    let label: Option<Label> = client
+        .query_single(
+            "select <json>(
+                select Label { ** }
+                filter .id = <uuid>$0
+            );",
+            &(label_id,),
+        )
+        .await
+        .unwrap();
+
+    Ok(Json(label))
+}
+
 #[get("/albums")]
 async fn get_albums() -> Result<impl Responder> {
     let client = create_client()
@@ -187,6 +346,26 @@ async fn get_albums() -> Result<impl Responder> {
     Ok(Json(albums))
 }
 
+#[get("/albums/{id}")]
+async fn get_album(path: Path<Uuid>) -> Result<impl Responder> {
+    let album_id = path.into_inner();
+    let client = create_client()
+        .await
+        .expect("Failed to connect to database");
+    let album: Option<Album> = client
+        .query_single(
+            "select <json>(
+                select Album { ** }
+                filter .id = <uuid>$0
+            );",
+            &(album_id,),
+        )
+        .await
+        .unwrap();
+
+    Ok(Json(album))
+}
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     HttpServer::new(|| {
@@ -195,14 +374,23 @@ async fn main() -> std::io::Result<()> {
             .service(get_dates)
             .service(get_date)
             .service(get_people)
+            .service(get_person)
             .service(get_instruments)
+            .service(get_instrument)
             .service(get_compositions)
+            .service(get_composition)
             .service(get_players)
+            .service(get_player)
             .service(get_artists)
+            .service(get_artist)
             .service(get_tracks)
+            .service(get_track)
             .service(get_series)
+            .service(get_series_by_id)
             .service(get_labels)
+            .service(get_label)
             .service(get_albums)
+            .service(get_album)
     })
     .bind(("0.0.0.0", 8080))?
     .run()
