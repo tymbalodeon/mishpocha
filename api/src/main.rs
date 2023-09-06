@@ -1,7 +1,10 @@
 mod schema;
+use uuid::Uuid;
 
 use actix_web::{
-    get, web::Json, App, HttpResponse, HttpServer, Responder, Result,
+    get,
+    web::{Json, Path},
+    App, HttpResponse, HttpServer, Responder, Result,
 };
 use edgedb_tokio::create_client;
 use schema::{
@@ -22,14 +25,36 @@ async fn get_dates() -> Result<impl Responder> {
     let dates: Vec<Date> = client
         .query(
             "select <json>(
-                select Date { ** } order by .local_date
-        );",
+                select Date { ** }
+                order by .local_date
+            );",
             &(),
         )
         .await
         .unwrap();
 
     Ok(Json(dates))
+}
+
+#[get("/dates/{id}")]
+async fn get_date(path: Path<Uuid>) -> Result<impl Responder> {
+    let date_id = path.into_inner();
+    dbg!(&date_id);
+    let client = create_client()
+        .await
+        .expect("Failed to connect to database");
+    let date: Option<Date> = client
+        .query_single(
+            "select <json>(
+                select Date { ** }
+                filter .id = <uuid>$0
+            );",
+            &(date_id,),
+        )
+        .await
+        .unwrap();
+
+    Ok(Json(date))
 }
 
 #[get("/people")]
@@ -168,6 +193,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .service(welcome)
             .service(get_dates)
+            .service(get_date)
             .service(get_people)
             .service(get_instruments)
             .service(get_compositions)
