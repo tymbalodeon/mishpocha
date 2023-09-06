@@ -26,14 +26,7 @@ export default component$(() => {
   const id = useLocation().params.id;
   series = series.find((series) => series.id == id);
 
-  return (
-    <>
-      {series ? <DatabaseObject data={series} /> : <p>not found</p>}
-      <a href="/series" class="link pl-4">
-        All series
-      </a>
-    </>
-  );
+  return <>{series ? <DatabaseObject data={series} /> : <p>not found</p>}</>;
 });
 
 export const head: DocumentHead = {

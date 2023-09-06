@@ -27,12 +27,7 @@ export default component$(() => {
   const instrument = instruments.find((instrument) => instrument.id == id);
 
   return (
-    <>
-      {instrument ? <DatabaseObject data={instrument} /> : <p>not found</p>}
-      <a href="/instruments" class="link pl-4">
-        All instruments
-      </a>
-    </>
+    <>{instrument ? <DatabaseObject data={instrument} /> : <p>not found</p>}</>
   );
 });
 

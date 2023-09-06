@@ -29,9 +29,6 @@ export default component$(() => {
   return (
     <>
       {composition ? <DatabaseObject data={composition} /> : <p>not found</p>}
-      <a href="/compositions" class="link pl-4">
-        All compositions
-      </a>
     </>
   );
 });

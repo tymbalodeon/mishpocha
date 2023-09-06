@@ -26,14 +26,7 @@ export default component$(() => {
   const id = useLocation().params.id;
   const album = albums.find((album) => album.id == id);
 
-  return (
-    <>
-      {album ? <DatabaseObject data={album} /> : <p>not found</p>}
-      <a href="/albums" class="link pl-4">
-        All albums
-      </a>
-    </>
-  );
+  return <>{album ? <DatabaseObject data={album} /> : <p>not found</p>}</>;
 });
 
 export const head: DocumentHead = {

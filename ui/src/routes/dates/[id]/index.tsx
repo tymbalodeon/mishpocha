@@ -26,14 +26,7 @@ export default component$(() => {
   const id = useLocation().params.id;
   const date = dates.find((date) => date.id == id);
 
-  return (
-    <>
-      {date ? <DatabaseObject data={date} /> : <p>not found</p>}
-      <a href="/dates" class="link pl-4">
-        All dates
-      </a>
-    </>
-  );
+  return <>{date ? <DatabaseObject data={date} /> : <p>not found</p>}</>;
 });
 
 export const head: DocumentHead = {

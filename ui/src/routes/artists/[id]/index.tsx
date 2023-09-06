@@ -26,14 +26,7 @@ export default component$(() => {
   const id = useLocation().params.id;
   const artist = artists.find((artist) => artist.id == id);
 
-  return (
-    <>
-      {artist ? <DatabaseObject data={artist} /> : <p>not found</p>}
-      <a href="/artists" class="link pl-4">
-        All artists
-      </a>
-    </>
-  );
+  return <>{artist ? <DatabaseObject data={artist} /> : <p>not found</p>}</>;
 });
 
 export const head: DocumentHead = {

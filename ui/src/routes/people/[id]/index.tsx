@@ -26,14 +26,7 @@ export default component$(() => {
   const id = useLocation().params.id;
   const person = people.find((person) => person.id == id);
 
-  return (
-    <>
-      {person ? <DatabaseObject data={person} /> : <p>not found</p>}
-      <a href="/people" class="link pl-4">
-        All people
-      </a>
-    </>
-  );
+  return <>{person ? <DatabaseObject data={person} /> : <p>not found</p>}</>;
 });
 
 export const head: DocumentHead = {

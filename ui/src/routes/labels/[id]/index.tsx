@@ -26,14 +26,7 @@ export default component$(() => {
   const id = useLocation().params.id;
   const label = labels.find((label) => label.id == id);
 
-  return (
-    <>
-      {label ? <DatabaseObject data={label} /> : <p>not found</p>}
-      <a href="/labels" class="link pl-4">
-        All labels
-      </a>
-    </>
-  );
+  return <>{label ? <DatabaseObject data={label} /> : <p>not found</p>}</>;
 });
 
 export const head: DocumentHead = {

@@ -26,14 +26,7 @@ export default component$(() => {
   const id = useLocation().params.id;
   const track = tracks.find((track) => track.id == id);
 
-  return (
-    <>
-      {track ? <DatabaseObject data={track} /> : <p>not found</p>}
-      <a href="/tracks" class="link pl-4">
-        All tracks
-      </a>
-    </>
-  );
+  return <>{track ? <DatabaseObject data={track} /> : <p>not found</p>}</>;
 });
 
 export const head: DocumentHead = {
