@@ -70,7 +70,7 @@ export const DatabaseObject = component$<DatabaseProps>((props) => {
               key = key.replace("_", " ");
               const values = getDisplayableValue(object, key);
 
-              if (values.type == "ul" && key != "age") {
+              if (values.type == "ul" && !["age", "label"].includes(key)) {
                 return (
                   <div key={index} class="collapse collapse-arrow bg-base-200">
                     <input type="checkbox" />
