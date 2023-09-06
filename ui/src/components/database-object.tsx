@@ -63,11 +63,26 @@ export const DatabaseObject = component$<DatabaseProps>((props) => {
         <h2 class="card-title">{object.display}</h2>
         {!object.compact ? (
           <>
-            {keys.map((key, index) => (
-              <div key={index}>
-                {key.replace("_", " ")}: {getDisplayableValue(object, key)}
-              </div>
-            ))}
+            {keys.map((key, index) => {
+              key = key.replace("_", " ");
+              const values = getDisplayableValue(object, key);
+
+              if (values.type == "ul") {
+                return (
+                  <div key={index} class="collapse collapse-arrow bg-base-200">
+                    <input type="checkbox" />
+                    <div class="collapse-title text-xl font-medium">{key}</div>
+                    <div class="collapse-content">{values}</div>
+                  </div>
+                );
+              }
+
+              return (
+                <div key={index}>
+                  {key}: {values}
+                </div>
+              );
+            })}
           </>
         ) : null}
       </div>
