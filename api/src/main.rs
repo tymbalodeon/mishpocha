@@ -20,7 +20,12 @@ async fn get_dates() -> Result<impl Responder> {
         .await
         .expect("Failed to connect to database");
     let dates: Vec<Date> = client
-        .query("select <json>Date { ** };", &())
+        .query(
+            "select <json>(
+                select Date { ** } order by .local_date
+        );",
+            &(),
+        )
         .await
         .unwrap();
 
