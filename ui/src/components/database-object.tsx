@@ -39,7 +39,7 @@ const getDisplayableValue = (object, key, typeName, nested) => {
   }
 
   const baseUrl = getBaseUrl(typeName || value.type_name);
-  const id = value.id;
+  const id = typeName == "players" ? value.person.id : value.id;
   const link = (
     <a href={`${baseUrl}/${id}`} class="link font-bold">
       {value.display}
