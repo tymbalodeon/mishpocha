@@ -105,7 +105,13 @@ async fn get_tracks() -> Result<impl Responder> {
         .await
         .expect("Failed to connect to database");
     let tracks: Vec<Track> = client
-        .query("select <json>Track { ** };", &())
+        .query(
+            "select <json>Track {
+            **,
+            players: { person: { id, display } }
+        };",
+            &(),
+        )
         .await
         .unwrap();
 
