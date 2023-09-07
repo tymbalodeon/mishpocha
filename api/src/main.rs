@@ -62,7 +62,13 @@ async fn get_people() -> Result<impl Responder> {
         .await
         .expect("Failed to connect to database");
     let dates: Vec<Person> = client
-        .query("select <json>Person { ** };", &())
+        .query(
+            "select <json>(
+                select Person { ** }
+                order by .last_name
+            );",
+            &(),
+        )
         .await
         .unwrap();
 
@@ -97,10 +103,12 @@ async fn get_instruments() -> Result<impl Responder> {
     let instruments: Vec<Instrument> = client
         .query(
             "
-            select <json>Instrument {
-                **,
-                players: { display, person: { id, display } }
-            };",
+            select <json>(
+                select Instrument {
+                    **,
+                    players: { display, person: { id, display } }
+                } order by .display
+            );",
             &(),
         )
         .await
@@ -135,7 +143,13 @@ async fn get_compositions() -> Result<impl Responder> {
         .await
         .expect("Failed to connect to database");
     let compositions: Vec<Composition> = client
-        .query("select <json>Composition { ** };", &())
+        .query(
+            "select <json>(
+                select Composition { ** }
+                order by .title
+            );",
+            &(),
+        )
         .await
         .unwrap();
 
@@ -168,7 +182,13 @@ async fn get_players() -> Result<impl Responder> {
         .await
         .expect("Failed to connect to database");
     let players: Vec<Player> = client
-        .query("select <json>Player { ** };", &())
+        .query(
+            "select <json>(
+                select Player { ** }
+                order by .person.last_name
+            );",
+            &(),
+        )
         .await
         .unwrap();
 
@@ -201,7 +221,7 @@ async fn get_artists() -> Result<impl Responder> {
         .await
         .expect("Failed to connect to database");
     let artists: Vec<Artist> = client
-        .query("select <json>Artist { ** };", &())
+        .query("select <json>(select Artist { ** } order by .name);", &())
         .await
         .unwrap();
 
@@ -235,10 +255,14 @@ async fn get_tracks() -> Result<impl Responder> {
         .expect("Failed to connect to database");
     let tracks: Vec<Track> = client
         .query(
-            "select <json>Track {
-            **,
-            players: { person: { id, display } }
-        };",
+            "select <json>(
+                select Track {
+                    **,
+                    players: {
+                        person: { id, display }
+                    }
+                } order by .title
+            );",
             &(),
         )
         .await
@@ -273,7 +297,7 @@ async fn get_series() -> Result<impl Responder> {
         .await
         .expect("Failed to connect to database");
     let series: Vec<Series> = client
-        .query("select <json>Series { ** };", &())
+        .query("select <json>(select Series { ** } order by .name);", &())
         .await
         .unwrap();
 
@@ -306,7 +330,7 @@ async fn get_labels() -> Result<impl Responder> {
         .await
         .expect("Failed to connect to database");
     let labels: Vec<Label> = client
-        .query("select <json>Label { ** };", &())
+        .query("select <json>(select Label { ** } order by .name);", &())
         .await
         .unwrap();
 
@@ -339,7 +363,7 @@ async fn get_albums() -> Result<impl Responder> {
         .await
         .expect("Failed to connect to database");
     let albums: Vec<Album> = client
-        .query("select <json>Album { ** };", &())
+        .query("select <json>(select Album { ** } order by .title);", &())
         .await
         .unwrap();
 
