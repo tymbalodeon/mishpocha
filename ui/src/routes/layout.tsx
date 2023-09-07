@@ -43,27 +43,29 @@ export default component$(() => {
                   const items = item.items;
 
                   return (
-                    <>
-                      <p class="menu-label font-bold text-lg">{title}</p>
-                      <ul class="menu bg-base-200 w-56 rounded-box">
-                        {items?.map((item) => {
-                          const href = item.href;
+                    <li key={index}>
+                      <details open>
+                        <summary>{title}</summary>
+                        <ul class="">
+                          {items?.map((item, index) => {
+                            const href = item.href;
 
-                          return (
-                            <li key={index}>
-                              <a
-                                href={item.href}
-                                class={{
-                                  "is-active": pathname === href,
-                                }}
-                              >
-                                {item.text}
-                              </a>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    </>
+                            return (
+                              <li key={index}>
+                                <a
+                                  href={item.href}
+                                  class={{
+                                    "is-active": pathname === href,
+                                  }}
+                                >
+                                  {item.text}
+                                </a>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      </details>
+                    </li>
                   );
                 })
               : null}
