@@ -126,7 +126,10 @@ async fn get_instrument(path: Path<Uuid>) -> Result<impl Responder> {
     let instrument: Option<Instrument> = client
         .query_single(
             "select <json>(
-                select Instrument { ** }
+                select Instrument {
+                    **,
+                    players: { display, person: { id, display } }
+                }
                 filter .id = <uuid>$0
             );",
             &(instrument_id,),
