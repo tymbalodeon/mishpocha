@@ -169,10 +169,15 @@ logs lines="10":
 # Tail the logs for <log> ("api" or "ui").
 tail *log:
     #!/usr/bin/env zsh
-    if [ -f "logs/{{log}}.log" ]; then
+    if [[ "{{log}}" != *("api"|"ui")* ]]; then
+        echo 'Please choose one of "api" or "ui".'
+    elif [ -f "logs/{{log}}.log" ]; then
         tail -F logs/{{log}}.log
     else
-        echo 'Please choose one of "api" or "ui".'
+        mkdir -p logs
+        file="logs/{{log}}.log"
+        touch "${file}"
+        tail -F "${file}"
     fi
 
 # Open the applications in the browser.
