@@ -64,7 +64,7 @@ export const DatabaseObject = component$<DatabaseProps>((props) => {
     const baseUrl = getBaseUrl(object.type_name);
 
     return (
-      <tr class="hover">
+      <tr>
         <td>
           <a href={`${baseUrl}/${object.id}`}>{object.display}</a>
         </td>
