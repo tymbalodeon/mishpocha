@@ -22,13 +22,19 @@ export default component$(() => {
 
   return (
     <>
-      <h2 class="font-bold text-xl pl-4 pt-8">Instruments</h2>
-      {instruments
-        ? instruments.map((instrument, index) => {
-            instrument.compact = true;
-            return <DatabaseObject key={index} data={instrument} />;
-          })
-        : null}
+      <h3 class="font-bold text-xl pl-4 pt-8">Instruments</h3>
+      <div class="overflow-x-auto">
+        <table class="table">
+          <tbody>
+            {instruments
+              ? instruments.map((instrument, index) => {
+                  instrument.compact = true;
+                  return <DatabaseObject key={index} data={instrument} />;
+                })
+              : null}
+          </tbody>
+        </table>
+      </div>
     </>
   );
 });

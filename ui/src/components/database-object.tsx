@@ -32,7 +32,7 @@ const getDisplayableValue = (object, key, typeName, nested) => {
     return (
       <ul>
         {value.map((item) =>
-          getDisplayableValue(item, "display", item.type_name || key, true)
+          getDisplayableValue(item, "display", item.type_name || key, true),
         )}
       </ul>
     );
@@ -60,43 +60,43 @@ export const DatabaseObject = component$<DatabaseProps>((props) => {
   const object = props.data;
   const keys = Object.keys(object);
 
-  const data = (
+  if (object.compact) {
+    const baseUrl = getBaseUrl(object.type_name);
+
+    return (
+      <tr>
+        <td>
+          <a href={`${baseUrl}/${object.id}`}>{object.display}</a>
+        </td>
+      </tr>
+    );
+  }
+
+  return (
     <div class="card bg-neutral shadow-xl m-4">
       <div class="card-body">
-        <h2 class="card-title">{object.display}</h2>
-        {!object.compact ? (
-          <>
-            {keys.map((key, index) => {
-              key = key.replace("_", " ");
-              const values = getDisplayableValue(object, key);
+        <h3 class="card-title">{object.display}</h3>
+        {keys.map((key, index) => {
+          key = key.replace("_", " ");
+          const values = getDisplayableValue(object, key);
 
-              if (values.type == "ul" && !["age", "label"].includes(key)) {
-                return (
-                  <div key={index} class="collapse collapse-arrow bg-base-200">
-                    <input type="checkbox" />
-                    <div class="collapse-title text-xl font-medium">{key}</div>
-                    <div class="collapse-content">{values}</div>
-                  </div>
-                );
-              }
+          if (values.type == "ul" && !["age", "label"].includes(key)) {
+            return (
+              <div key={index} class="collapse collapse-arrow bg-base-200">
+                <input type="checkbox" />
+                <div class="collapse-title text-xl font-medium">{key}</div>
+                <div class="collapse-content">{values}</div>
+              </div>
+            );
+          }
 
-              return (
-                <div key={index}>
-                  {key}: {values}
-                </div>
-              );
-            })}
-          </>
-        ) : null}
+          return (
+            <div key={index}>
+              {key}: {values}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
-
-  if (!object.compact) {
-    return data;
-  }
-
-  const baseUrl = getBaseUrl(object.type_name);
-
-  return <a href={`${baseUrl}/${object.id}`}>{data}</a>;
 });

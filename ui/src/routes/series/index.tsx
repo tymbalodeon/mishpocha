@@ -22,13 +22,19 @@ export default component$(() => {
 
   return (
     <>
-      <h2 class="font-bold text-xl pl-4 pt-8">Series</h2>
-      {series
-        ? series.map((series, index) => {
-            series.compact = true;
-            return <DatabaseObject key={index} data={series} />;
-          })
-        : null}
+      <h3 class="font-bold text-xl pl-4 pt-8">Series</h3>
+      <div class="overflow-x-auto">
+        <table class="table">
+          <tbody>
+            {series
+              ? series.map((series, index) => {
+                  series.compact = true;
+                  return <DatabaseObject key={index} data={series} />;
+                })
+              : null}
+          </tbody>
+        </table>
+      </div>
     </>
   );
 });
