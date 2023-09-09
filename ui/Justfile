@@ -50,10 +50,6 @@ check:
 @remove *packages:
     pnpm remove {{packages}}
 
-# Remove dependencies from "dev" group.
-@remove-dev *packages:
-    pnpm remove --save-dev {{packages}}
-
 # List dependencies.
 @list:
     pnpm list
