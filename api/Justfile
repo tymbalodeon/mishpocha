@@ -98,7 +98,7 @@ start *args: stop (_build args)
         fi
     else
         EDGEDB_DSN="$({{just}} db dsn)"
-        {{cargo_run_with_db}}
+        env $(cat .env | xargs) {{cargo_run_with_db}}
     fi
 
 # Stop the server.
