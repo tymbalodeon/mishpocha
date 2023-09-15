@@ -239,5 +239,6 @@ seed *instance: migrate
     {{just}} --justfile queries.just {{query}}
 
 # Delete all objects from the database.
-@delete *query:
-    {{just}} query delete
+@delete:
+    {{edgedb_command}} database wipe --non-interactive
+    {{just}} migrate

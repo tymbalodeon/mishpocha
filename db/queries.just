@@ -30,21 +30,6 @@ _query query *instance:
         {{edgedb_command}} query "{{query}}" | {{bat}}
     fi
 
-# Delete all objects in the database.
-@delete *instance:
-    {{query_command}} \
-        "delete Album; \
-        delete Disc; \
-        delete Track; \
-        delete Player; \
-        delete Artist; \
-        delete Person; \
-        delete Composition; \
-        delete Label; \
-        delete Date; \
-        delete Instrument;" \
-        {{instance}}
-
 select_date := "\
 select Date { \
     local_date, \
