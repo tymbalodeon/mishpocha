@@ -78,6 +78,7 @@
 
  DB: [`just --unstable db <COMMAND>`]  
  `clean` Remove the Docker image.  
+ `delete` Delete all objects from the database.  
  `destroy *instance` Destroy the persisted databases (optional: "--docker", or
  "--local").  
  `dsn *instance` Show the DSN for the database (optional: "--docker" or
