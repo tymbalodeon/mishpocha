@@ -87,8 +87,9 @@ start *args: stop _build
             "alter role edgedb set password := 'password';"
         {{ if args =~ "--open" { "{{just}} ui --docker" } else { "" } }}
     else
-        if ! $(edgedb instance status --instance {{edgedb_instance}} &>/dev/null); then
-            edgedb instance start --instance {{edgedb_instance}} &>/dev/null
+        if ! edgedb instance status --instance {{edgedb_instance}} &>/dev/null; then
+            edgedb instance start --instance {{edgedb_instance}} &>/dev/null \
+                || {{just}} migrate
         fi
     fi
 
