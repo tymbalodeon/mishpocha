@@ -1,5 +1,9 @@
 lockfileVersion: '6.0'
 
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
 devDependencies:
   '@builder.io/qwik':
     specifier: ^1.2.11
@@ -35,8 +39,8 @@ devDependencies:
     specifier: ^1.7.4
     version: 1.7.4
   daisyui:
-    specifier: ^3.7.4
-    version: 3.7.4
+    specifier: ^3.7.5
+    version: 3.7.5
   eslint:
     specifier: 8.45.0
     version: 8.45.0
@@ -1453,8 +1457,8 @@ packages:
     resolution: {integrity: sha512-I7K1Uu0MBPzaFKg4nI5Q7Vs2t+3gWWW648spaF+Rg7pI9ds18Ugn+lvg4SHczUdKlHI5LWBXyqfS8+DufyBsgQ==}
     dev: true
 
-  /daisyui@3.7.4:
-    resolution: {integrity: sha512-hAgTomIK8RDQ/RLH9Z2NxZiNVAO40w08FlhgYS/8CTFF+wggeHeNJ0qNBHWAJJzhjD8UU2u4PZ4nc4r9rwfTLw==}
+  /daisyui@3.7.5:
+    resolution: {integrity: sha512-udhiBJYVvcPGXa+mL5IElke6EdddKecjbbz6m43+9IVqzK8GBwetg092Edclo42TkNboLD9nzodeesJygqZt2A==}
     engines: {node: '>=16.9.0'}
     dependencies:
       colord: 2.9.3
@@ -5263,7 +5267,3 @@ packages:
       postcss-selector-parser: 6.0.10
       tailwindcss: 3.3.3
     dev: true
-
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false

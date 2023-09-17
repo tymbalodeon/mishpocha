@@ -107,8 +107,8 @@ start *args: stop (_build args)
         fi
     else
         {{just}} _link_cloud &>/dev/null
-        EDGEDB_DSN="$({{just}} db dsn ${instance})"
-        EDGEDB_CLIENT_TLS_SECURITY="insecure"
+        export EDGEDB_DSN="$({{just}} db dsn ${instance})"
+        export EDGEDB_CLIENT_TLS_SECURITY="insecure"
         cargo run
     fi
 
