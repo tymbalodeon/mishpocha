@@ -61,8 +61,6 @@ export const DatabaseObject = component$<DatabaseProps>((props) => {
   const keys = Object.keys(object);
 
   if (object.compact) {
-    const baseUrl = getBaseUrl(object.type_name);
-
     return (
       <tr>
         {keys.map((key, index) => {
