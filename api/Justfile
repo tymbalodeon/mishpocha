@@ -84,14 +84,7 @@ _build *prod:
 # Run the application (optional: "--docker", "--local", "--prod", "--open").
 start *args: stop (_build args)
     #!/usr/bin/env zsh
-    if [[ "{{args}}" = *"--cloud"* ]]; then
-        instance="--cloud"
-    elif [[ "{{args}}" = *"--docker"* ]]; then
-        instance="--docker"
-    else
-        instance=""
-    fi
-    instance="$({{just}} _get_instance ${instance})"
+    instance="$({{just}} _get_instance {{args}})"
     {{ if args =~ "--open" { just + " open" } else { "" } }}
     if [ "${instance}" = "docker" ]; then
         if [ -z "$({{just}} running)" ]; then
@@ -114,7 +107,7 @@ start *args: stop (_build args)
         fi
     else
         {{just}} _link_cloud &>/dev/null
-        EDGEDB_DSN="$({{just}} db dsn ${instance}))"
+        EDGEDB_DSN="$({{just}} db dsn ${instance})"
         EDGEDB_CLIENT_TLS_SECURITY="insecure"
         cargo run
     fi

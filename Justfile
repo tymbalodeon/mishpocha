@@ -71,6 +71,8 @@ _get_instance *instance:
     if [ -n "$(pgrep docker -q)" ] && [ -z "{{instance}}" ] \
         || [[ "{{instance}}" = *"--docker"* ]]; then
         echo "docker"
+    elif [[ "{{instance}}" = *"--cloud"* ]]; then
+        echo "cloud"
     else
         echo "local"
     fi
@@ -78,14 +80,7 @@ _get_instance *instance:
 # Run the application (optional: "--docker", "--local", "--prod", "--open").
 start *args: stop
     #!/usr/bin/env zsh
-    if [[ "{{args}}" = *"--docker"* ]]; then
-        instance="--docker"
-    elif [[ "{{args}}" = *"--local"* ]]; then
-        instance="local"
-    else
-        instance=""
-    fi
-    instance="$({{just}} _get_instance ${instance})"
+    instance="$({{just}} _get_instance {{args}})"
     if [[ "{{args}}" = *"--open"* ]]; then
         {{just}} open {{ if args =~ "--prod" { "--prod" } else { "" } }}
     fi
@@ -105,10 +100,10 @@ start *args: stop
         sub_folders=(api ui)
         for folder in "${sub_folders[@]}"; do
             (
-                {{just}} "${folder}" start > logs/"${folder}".log 2>&1
+                {{just}} "${folder}" start "--${instance}" > logs/"${folder}".log 2>&1
             ) &
         done
-        {{just}} db start
+        {{just}} db start "--${instance}"
     fi
 
 # Stop the containers.

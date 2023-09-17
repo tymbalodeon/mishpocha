@@ -1,9 +1,5 @@
 import { component$ } from "@builder.io/qwik";
-import {
-  type DocumentHead,
-  useLocation,
-  routeLoader$,
-} from "@builder.io/qwik-city";
+import { type DocumentHead, routeLoader$ } from "@builder.io/qwik-city";
 import { DatabaseObject } from "../../../components/database-object";
 
 export const useGetApiData = routeLoader$(async (requestEvent) => {

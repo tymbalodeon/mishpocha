@@ -31,7 +31,9 @@ export default component$(() => {
           <div class="drawer-button lg:hidden">
             <div class="navbar bg-base-200">
               <div class="flex-1">
-                <a class="btn btn-ghost normal-case text-xl">{menu?.text}</a>
+                <a href="/" class="btn btn-ghost normal-case text-xl">
+                  {menu?.text}
+                </a>
               </div>
               <div class="flex-none">
                 <label for="drawer">

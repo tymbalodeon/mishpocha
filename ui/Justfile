@@ -73,14 +73,7 @@ _build *prod:
 # Run the application (optional: "--docker", "--local", "--prod", "--open").
 start *args: stop (_build args)
     #!/usr/bin/env zsh
-    if [[ "{{args}}" = *"--docker"* ]]; then
-        instance="--docker"
-    elif [[ "{{args}}" = *"--local"* ]]; then
-        instance="local"
-    else
-        instance=""
-    fi
-    instance="$({{just}} _get_instance ${instance})"
+    instance="$({{just}} _get_instance {{args}})"
     {{ if args =~ "--open" { just + " open" } else { "" } }}
     if [ "${instance}" = "docker" ]; then
         if [ -z "$({{just}} running)" ]; then

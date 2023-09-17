@@ -53,7 +53,7 @@ select Person { \
     age, \
     is_alive, \
     person_instruments := .instruments.name, \
-    person_groups := .groups.name, \
+    person_artists := .artists.name, \
     person_compositions := .compositions.title, \
     person_tracks := .tracks.title, \
 }"
