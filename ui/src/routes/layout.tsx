@@ -58,7 +58,7 @@ export default component$(() => {
           </div>
           <Slot />
         </div>
-        <div class="drawer-side bg-base-200">
+        <div class="drawer-side lg:bg-base-200">
           <label for="drawer" class="drawer-overlay"></label>
           <h1 class="text-4xl p-8 font-bold">{menu?.text}</h1>
           <ul class="menu p-8 w-62 h-full text-base-content">
