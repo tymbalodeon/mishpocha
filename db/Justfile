@@ -35,11 +35,11 @@ _get_instance *instance:
     #!/usr/bin/env zsh
     if [ -n "$(pgrep docker -q)" ] && [ -z "{{instance}}" ] \
         || [[ "{{instance}}" = *"--docker"* ]]; then
-        echo "docker"
+        echo "--docker"
     elif [[ "{{instance}}" = *"--cloud"* ]]; then
-        echo "cloud"
+        echo "--cloud"
     else
-        echo "local"
+        echo "--local"
     fi
 
 _create:
@@ -78,7 +78,7 @@ _build:
 start *args: stop _build
     #!/usr/bin/env zsh
     instance="$({{just}} _get_instance {{args}})"
-    if [ "${instance}" = "docker" ]; then
+    if [ "${instance}" = "--docker" ]; then
         {{check_if_docker_running}}
         docker run \
             --detach \
@@ -174,7 +174,7 @@ logs lines="20":
 dsn *instance:
     #!/usr/bin/env zsh
     instance="$({{just}} _get_instance {{instance}})"
-    if [ "${instance}" = "docker" ]; then
+    if [ "${instance}" = "--docker" ]; then
         {{check_if_docker_running}}
         if [ -z "$({{just}} running)" ]; then
             {{just}} start
@@ -192,7 +192,7 @@ dsn *instance:
                         --insecure-dsn
         )
         sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//'<<<"${base_dsn}"
-    elif [ "${instance}" = "cloud" ]; then
+    elif [ "${instance}" = "--cloud" ]; then
         {{connect_to_edgedb_cloud}} instance credentials \
             --insecure-dsn \
             --database {{edgedb_instance}}
@@ -204,7 +204,7 @@ dsn *instance:
 shell *instance: migrate
     #!/usr/bin/env zsh
     instance="$({{just}} _get_instance {{instance}})"
-    if [ "${instance}" = "docker" ]; then
+    if [ "${instance}" = "--docker" ]; then
         {{check_if_docker_running}}
         if [ -z "$({{just}} running)" ]; then
             {{just}} start
@@ -225,7 +225,7 @@ shell *instance: migrate
 ui *instance:
     #!/usr/bin/env zsh
     instance="$({{just}} _get_instance {{instance}})"
-    if [ "${instance}" = "docker" ]; then
+    if [ "${instance}" = "--docker" ]; then
         {{check_if_docker_running}}
         open http://localhost:{{port}}/ui
     else
@@ -236,7 +236,7 @@ ui *instance:
 seed *instance: migrate
     #!/usr/bin/env zsh
     instance="$({{just}} _get_instance {{instance}})"
-    if [ "${instance}" = "docker" ]; then
+    if [ "${instance}" = "--docker" ]; then
         {{check_if_docker_running}}
         if [ -z "$({{just}} running)" ]; then
             {{just}} start

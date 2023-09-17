@@ -70,11 +70,11 @@ _get_instance *instance:
     #!/usr/bin/env zsh
     if [ -n "$(pgrep docker -q)" ] && [ -z "{{instance}}" ] \
         || [[ "{{instance}}" = *"--docker"* ]]; then
-        echo "docker"
+        echo "--docker"
     elif [[ "{{instance}}" = *"--cloud"* ]]; then
-        echo "cloud"
+        echo "--cloud"
     else
-        echo "local"
+        echo "--local"
     fi
 
 # Run the application (optional: "--docker", "--local", "--prod", "--open").
@@ -84,7 +84,7 @@ start *args: stop
     if [[ "{{args}}" = *"--open"* ]]; then
         {{just}} open {{ if args =~ "--prod" { "--prod" } else { "" } }}
     fi
-    if [ "${instance}" = "docker" ]; then
+    if [ "${instance}" = "--docker" ]; then
         if [[ "{{args}}" = *"--prod"* ]]; then
             docker compose up --build --detach
         else
@@ -100,10 +100,10 @@ start *args: stop
         sub_folders=(api ui)
         for folder in "${sub_folders[@]}"; do
             (
-                {{just}} "${folder}" start "--${instance}" > logs/"${folder}".log 2>&1
+                {{just}} "${folder}" start "${instance}" > logs/"${folder}".log 2>&1
             ) &
         done
-        {{just}} db start "--${instance}"
+        {{just}} db start "${instance}"
     fi
 
 # Stop the containers.
@@ -145,7 +145,7 @@ running *verbose:
 logs lines="10":
     #!/usr/bin/env zsh
     instance="$({{just}} _get_instance "")"
-    if [ "${instance}" = "docker" ]; then
+    if [ "${instance}" = "--docker" ]; then
         if [ -n "$({{just}} api running)" ]; then
             echo "API logs:"
             {{just}} api logs {{lines}}

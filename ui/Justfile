@@ -58,9 +58,9 @@ _get_instance *instance:
     #!/usr/bin/env zsh
     if [ -n "$(pgrep docker -q)" ] && [ -z "{{instance}}" ] \
         || [[ "{{instance}}" = *"--docker"* ]]; then
-        echo "docker"
+        echo "--docker"
     else
-        echo "local"
+        echo "--local"
     fi
 
 _build *prod:
@@ -75,7 +75,7 @@ start *args: stop (_build args)
     #!/usr/bin/env zsh
     instance="$({{just}} _get_instance {{args}})"
     {{ if args =~ "--open" { just + " open" } else { "" } }}
-    if [ "${instance}" = "docker" ]; then
+    if [ "${instance}" = "--docker" ]; then
         if [ -z "$({{just}} running)" ]; then
             {{check_if_docker_running}}
         fi
