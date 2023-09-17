@@ -100,7 +100,8 @@ start *args: stop
         sub_folders=(api ui)
         for folder in "${sub_folders[@]}"; do
             (
-                {{just}} "${folder}" start "${instance}" > logs/"${folder}".log 2>&1
+                {{just}} "${folder}" start "${instance}" \
+                    > logs/"${folder}".log 2>&1
             ) &
         done
         {{just}} db start "${instance}"
