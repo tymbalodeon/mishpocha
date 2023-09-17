@@ -9,7 +9,7 @@ export const Header = component$<HeaderProps>((props) => {
 
   return (
     <a href="/">
-      <h1 class="text-2xl lg:text-4xl p-8 font-bold">{text}</h1>
+      <h1 class="text-2xl lg:text-4xl p-4 lg:p-8 font-bold">{text}</h1>
     </a>
   );
 });
