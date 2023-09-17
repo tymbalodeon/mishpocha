@@ -32,7 +32,7 @@ const getDisplayableValue = (object, key, typeName, nested) => {
     return (
       <ul>
         {value.map((item) =>
-          getDisplayableValue(item, "display", item.type_name || key, true),
+          getDisplayableValue(item, "display", item.type_name || key, true)
         )}
       </ul>
     );
