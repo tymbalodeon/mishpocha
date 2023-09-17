@@ -36,7 +36,7 @@ _get_instance *instance:
 
 _create:
     #!/usr/bin/env zsh
-    if ! edgedb instance list | grep -q \b{{edgedb_instance}}; then
+    if ! edgedb instance list | grep -q " {{edgedb_instance}}"; then
         edgedb instance create {{edgedb_instance}}
         {{edgedb_command}} migrate
     fi
