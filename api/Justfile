@@ -1,11 +1,8 @@
 !include ../helpers.just
 
+set dotenv-load
 set fallback
 
-cargo_run_with_db := '\
-env EDGEDB_DSN="${EDGEDB_DSN}" \
-    EDGEDB_CLIENT_TLS_SECURITY="insecure" \
-    cargo run'
 image := "mishpocha-api"
 port := "8080"
 url := "http://localhost:" + port
@@ -56,7 +53,18 @@ update *_from-main:
 
 _get_instance *instance:
     #!/usr/bin/env zsh
-    {{get_instance}}
+    if [ -n "$(pgrep docker -q)" ] && [ -z "{{instance}}" ] \
+        || [[ "{{instance}}" = *"--docker"* ]]; then
+        echo "docker"
+    elif [[ "{{instance}}" = *"--cloud"* ]]; then
+        echo "cloud"
+    else
+        echo "local"
+    fi
+
+[no-exit-message]
+@_link_cloud:
+    {{just}} _run_justfile db _link_cloud --api
 
 _build *prod:
     #!/usr/bin/env zsh
@@ -68,10 +76,10 @@ _build *prod:
 # Run the application (optional: "--docker", "--local", "--prod", "--open").
 start *args: stop (_build args)
     #!/usr/bin/env zsh
-    if [[ "{{args}}" = *"--docker"* ]]; then
+    if [[ "{{args}}" = *"--cloud"* ]]; then
+        instance="--cloud"
+    elif [[ "{{args}}" = *"--docker"* ]]; then
         instance="--docker"
-    elif [[ "{{args}}" = *"--local"* ]]; then
-        instance="local"
     else
         instance=""
     fi
@@ -98,7 +106,8 @@ start *args: stop (_build args)
         fi
     else
         EDGEDB_DSN="$({{just}} db dsn)"
-        env $(cat .env | xargs) {{cargo_run_with_db}}
+        EDGEDB_CLIENT_TLS_SECURITY="insecure"
+        cargo run
     fi
 
 # Stop the server.

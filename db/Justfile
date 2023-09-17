@@ -1,6 +1,7 @@
 !include ../helpers.just
 !include helpers.just
 
+set dotenv-load
 set fallback
 
 port := "5656"
@@ -32,7 +33,14 @@ update *_from-main:
 
 _get_instance *instance:
     #!/usr/bin/env zsh
-    {{get_instance}}
+    if [ -n "$(pgrep docker -q)" ] && [ -z "{{instance}}" ] \
+        || [[ "{{instance}}" = *"--docker"* ]]; then
+        echo "docker"
+    elif [[ "{{instance}}" = *"--cloud"* ]]; then
+        echo "cloud"
+    else
+        echo "local"
+    fi
 
 _create:
     #!/usr/bin/env zsh
@@ -40,6 +48,18 @@ _create:
         edgedb instance create {{edgedb_instance}}
         {{edgedb_command}} migrate
     fi
+
+[no-exit-message]
+_link_cloud *_directory:
+    #!/usr/bin/env zsh
+    if [[ "{{_directory}}" = *"--api"* ]]; then
+        cd ../api
+    fi
+    edgedb project init \
+        --server-instance "${EDGEDB_CLOUD_INSTANCE}" \
+        --link \
+        --database {{edgedb_instance}} \
+        --non-interactive
 
 # Migrate the (local) database.
 migrate: _create
@@ -172,6 +192,10 @@ dsn *instance:
                         --insecure-dsn
         )
         sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//'<<<"${base_dsn}"
+    elif [ "${instance}" = "cloud" ]; then
+        {{connect_to_edgedb_cloud}} instance credentials \
+            --insecure-dsn \
+            --database {{edgedb_instance}}
     else
         {{connect_to_edgedb}} instance credentials --insecure-dsn
     fi

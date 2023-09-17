@@ -68,7 +68,12 @@ format:
 
 _get_instance *instance:
     #!/usr/bin/env zsh
-    {{get_instance}}
+    if [ -n "$(pgrep docker -q)" ] && [ -z "{{instance}}" ] \
+        || [[ "{{instance}}" = *"--docker"* ]]; then
+        echo "docker"
+    else
+        echo "local"
+    fi
 
 # Run the application (optional: "--docker", "--local", "--prod", "--open").
 start *args: stop
