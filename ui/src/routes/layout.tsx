@@ -58,10 +58,10 @@ export default component$(() => {
           </div>
           <Slot />
         </div>
-        <div class="drawer-side">
+        <div class="drawer-side bg-base-200">
           <label for="drawer" class="drawer-overlay"></label>
-          <ul class="menu p-8 w-62 h-full bg-base-200 text-base-content">
-            <h1 class="text-4xl pb-12 font-bold">{menu?.text}</h1>
+          <h1 class="text-4xl p-8 font-bold">{menu?.text}</h1>
+          <ul class="menu p-8 w-62 h-full text-base-content">
             {menu
               ? menu.items?.map((item, index) => {
                   const title = item.text;
