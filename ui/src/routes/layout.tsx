@@ -4,6 +4,7 @@ import {
   useContent,
   useLocation,
 } from "@builder.io/qwik-city";
+import { Header } from "../components/header.tsx";
 
 import styles from "./styles.css?inline";
 
@@ -31,9 +32,7 @@ export default component$(() => {
           <div class="drawer-button lg:hidden">
             <div class="navbar bg-base-200">
               <div class="flex-1">
-                <a href="/" class="btn btn-ghost normal-case text-xl">
-                  {menu?.text}
-                </a>
+                <Header text={menu?.text} />
               </div>
               <div class="flex-none">
                 <label for="drawer">
@@ -60,7 +59,7 @@ export default component$(() => {
         </div>
         <div class="drawer-side lg:bg-base-200">
           <label for="drawer" class="drawer-overlay"></label>
-          <h1 class="text-4xl p-8 font-bold">{menu?.text}</h1>
+          <Header text={menu?.text} />
           <ul class="menu p-8 w-62 h-full text-base-content">
             {menu
               ? menu.items?.map((item, index) => {
