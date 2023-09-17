@@ -22,18 +22,29 @@ export default component$(() => {
 
   return (
     <>
-      <h3 class="font-bold text-xl pl-4 pt-8">Compositions</h3>
-      <div class="overflow-x-auto">
-        <table class="table">
-          <tbody>
-            {compositions
-              ? compositions.map((composition, index) => {
-                  composition.compact = true;
-                  return <DatabaseObject key={index} data={composition} />;
-                })
-              : null}
-          </tbody>
-        </table>
+      <div class="p-8">
+        <h3 class="font-bold text-xl pl-4 pt-8">Compositions</h3>
+        <div class="overflow-x-auto">
+          <table class="table table-zebra">
+            <thead>
+              <tr>
+                {keys.map((key, index) => {
+                  key = key.replace("_", " ");
+
+                  return <th key={index}>{key}</th>;
+                })}
+              </tr>
+            </thead>
+            <tbody>
+              {compositions
+                ? compositions.map((composition, index) => {
+                    composition.compact = true;
+                    return <DatabaseObject key={index} data={composition} />;
+                  })
+                : null}
+            </tbody>
+          </table>
+        </div>
       </div>
     </>
   );

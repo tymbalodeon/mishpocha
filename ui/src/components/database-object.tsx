@@ -65,9 +65,12 @@ export const DatabaseObject = component$<DatabaseProps>((props) => {
 
     return (
       <tr>
-        <td>
-          <a href={`${baseUrl}/${object.id}`}>{object.display}</a>
-        </td>
+        {keys.map((key, index) => {
+          key = key.replace("_", " ");
+          const values = getDisplayableValue(object, key);
+
+          return <td key={index}>{values}</td>;
+        })}
       </tr>
     );
   }
