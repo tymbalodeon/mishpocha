@@ -63,8 +63,16 @@ _get_instance *instance:
     fi
 
 [no-exit-message]
-@_link_cloud:
-    {{just}} _run_justfile db _link_cloud --api
+_link_cloud:
+    #!/usr/bin/env zsh
+    {{just}} _run_justfile db _link_cloud --api \
+    && echo EDGEDB_SECRET_KEY=$(
+        edgedb cloud secretkey create \
+            --name api \
+            --expires never \
+            --inherit-scopes \
+            --non-interactive
+    ) > .env
 
 _build *prod:
     #!/usr/bin/env zsh
@@ -105,7 +113,8 @@ start *args: stop (_build args)
                 {{image}}
         fi
     else
-        EDGEDB_DSN="$({{just}} db dsn)"
+        {{just}} _link_cloud &>/dev/null
+        EDGEDB_DSN="$({{just}} db dsn ${instance}))"
         EDGEDB_CLIENT_TLS_SECURITY="insecure"
         cargo run
     fi
