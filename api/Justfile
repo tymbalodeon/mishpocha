@@ -4,7 +4,7 @@ set dotenv-load
 set fallback
 
 image := "mishpocha-api"
-port := "8080"
+port := "8000"
 url := "http://localhost:" + port
 
 _help *_from-main:
