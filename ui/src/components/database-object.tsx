@@ -16,8 +16,8 @@ const getBaseUrl = (typeName: string): string => {
 const getDisplayableValue = (
   object: object,
   key: string,
-  typeName: string,
-  nested: boolean
+  typeName?: string,
+  nested?: boolean
 ) => {
   let value = nested ? object : object[key];
 
@@ -70,7 +70,7 @@ export const DatabaseObject = component$<DatabaseProps>((props) => {
       <tr>
         {keys.map((key, index) => {
           key = key.replace("_", " ");
-          const values = getDisplayableValue(object, key, null, null);
+          const values = getDisplayableValue(object, key);
 
           return <td key={index}>{values}</td>;
         })}
@@ -84,7 +84,7 @@ export const DatabaseObject = component$<DatabaseProps>((props) => {
         <h3 class="card-title">{object.display}</h3>
         {keys.map((key, index) => {
           key = key.replace("_", " ");
-          const values = getDisplayableValue(object, key, null, null);
+          const values = getDisplayableValue(object, key);
 
           if (values.type == "ul" && !["age", "label"].includes(key)) {
             return (
