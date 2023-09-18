@@ -1,7 +1,7 @@
 import { component$, Slot, useStyles$, $ } from "@builder.io/qwik";
 import { type RequestHandler, useContent } from "@builder.io/qwik-city";
-import { Header } from "../components/header.tsx";
-import { NavBarItems } from "../components/navbar-items.tsx";
+import { Header } from "../components/header";
+import { NavBarItems } from "../components/navbar-items";
 
 import styles from "./styles.css?inline";
 
