@@ -31,7 +31,7 @@ update *_from-main:
     pnpm update
 
 # Check code for errors.
-check:
+@check:
     pnpm lint --fix
 
 # Format code.
