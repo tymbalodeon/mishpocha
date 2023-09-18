@@ -12,8 +12,8 @@ devDependencies:
     specifier: ^1.2.11
     version: 1.2.11
   '@tailwindcss/typography':
-    specifier: github:tailwindcss/typography
-    version: git@github.com+tailwindcss/typography/12c8db5717ec2a00c857de74e4cc9bab09f412d4(tailwindcss@3.3.3)
+    specifier: ^0.5.10
+    version: 0.5.10(tailwindcss@3.3.3)
   '@types/compression':
     specifier: ^1.7.3
     version: 1.7.3
@@ -518,6 +518,18 @@ packages:
       '@types/estree': 1.0.1
       estree-walker: 2.0.2
       picomatch: 2.3.1
+    dev: true
+
+  /@tailwindcss/typography@0.5.10(tailwindcss@3.3.3):
+    resolution: {integrity: sha512-Pe8BuPJQJd3FfRnm6H0ulKIGoMEQS+Vq01R6M5aCrFB/ccR/shT+0kXLjouGC1gFLm9hopTFN+DMP0pfwRWzPw==}
+    peerDependencies:
+      tailwindcss: '>=3.0.0 || insiders'
+    dependencies:
+      lodash.castarray: 4.4.0
+      lodash.isplainobject: 4.0.6
+      lodash.merge: 4.6.2
+      postcss-selector-parser: 6.0.10
+      tailwindcss: 3.3.3
     dev: true
 
   /@tootallnate/once@1.1.2:
@@ -5251,19 +5263,4 @@ packages:
 
   /zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
-    dev: true
-
-  git@github.com+tailwindcss/typography/12c8db5717ec2a00c857de74e4cc9bab09f412d4(tailwindcss@3.3.3):
-    resolution: {commit: 12c8db5717ec2a00c857de74e4cc9bab09f412d4, repo: git@github.com:tailwindcss/typography.git, type: git}
-    id: git@github.com+tailwindcss/typography/12c8db5717ec2a00c857de74e4cc9bab09f412d4
-    name: '@tailwindcss/typography'
-    version: 0.5.10
-    peerDependencies:
-      tailwindcss: '>=3.0.0 || insiders'
-    dependencies:
-      lodash.castarray: 4.4.0
-      lodash.isplainobject: 4.0.6
-      lodash.merge: 4.6.2
-      postcss-selector-parser: 6.0.10
-      tailwindcss: 3.3.3
     dev: true
