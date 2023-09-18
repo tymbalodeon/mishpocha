@@ -1,10 +1,11 @@
 mod schema;
+use shuttle_actix_web::ShuttleActixWeb;
 use uuid::Uuid;
 
 use actix_web::{
     get,
-    web::{Json, Path},
-    App, HttpResponse, HttpServer, Responder, Result,
+    web::{Json, Path, ServiceConfig},
+    HttpResponse, Responder, Result,
 };
 use edgedb_tokio::create_client;
 use schema::{
@@ -393,11 +394,13 @@ async fn get_album(path: Path<Uuid>) -> Result<impl Responder> {
     Ok(Json(album))
 }
 
-#[actix_web::main]
-async fn main() -> std::io::Result<()> {
-    HttpServer::new(|| {
-        App::new()
-            .service(welcome)
+// #[actix_web::main]
+#[shuttle_runtime::main]
+async fn main(
+) -> ShuttleActixWeb<impl FnOnce(&mut ServiceConfig) + Send + Clone + 'static>
+{
+    let config = move |cfg: &mut ServiceConfig| {
+        cfg.service(welcome)
             .service(get_dates)
             .service(get_date)
             .service(get_people)
@@ -417,9 +420,8 @@ async fn main() -> std::io::Result<()> {
             .service(get_labels)
             .service(get_label)
             .service(get_albums)
-            .service(get_album)
-    })
-    .bind(("0.0.0.0", 8080))?
-    .run()
-    .await
+            .service(get_album);
+    };
+
+    Ok(config.into())
 }
