@@ -72,7 +72,7 @@ _link_cloud:
             --expires never \
             --inherit-scopes \
             --non-interactive
-    ) > .env
+    ) | tee .env Secrets.toml
 
 _build *prod:
     #!/usr/bin/env zsh

@@ -1,5 +1,6 @@
 mod schema;
 use shuttle_actix_web::ShuttleActixWeb;
+use std::path::PathBuf;
 use uuid::Uuid;
 
 use actix_web::{
@@ -394,9 +395,9 @@ async fn get_album(path: Path<Uuid>) -> Result<impl Responder> {
     Ok(Json(album))
 }
 
-// #[actix_web::main]
 #[shuttle_runtime::main]
 async fn main(
+    #[shuttle_env_vars::EnvVars()] _env_folder: PathBuf,
 ) -> ShuttleActixWeb<impl FnOnce(&mut ServiceConfig) + Send + Clone + 'static>
 {
     let config = move |cfg: &mut ServiceConfig| {
