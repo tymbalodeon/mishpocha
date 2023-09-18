@@ -166,8 +166,14 @@ open *shuttle:
     fi
 
 # Ping the application.
-@ping:
-    http get {{url}}
+ping *shuttle:
+    #!/usr/bin/env zsh
+    if [[ "{{shuttle}}" = *"--shuttle"* ]]; then
+        url=https://mishpocha-api.shuttleapp.rs/
+    else
+        url={{url}}
+    fi
+    http get "${url}"
 
 # View people in the database.
 @people:
