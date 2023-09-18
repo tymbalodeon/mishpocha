@@ -1,5 +1,6 @@
 mod schema;
 use shuttle_actix_web::ShuttleActixWeb;
+use std::env::var_os;
 use std::path::PathBuf;
 use uuid::Uuid;
 
@@ -16,7 +17,12 @@ use schema::{
 
 #[get("/")]
 async fn welcome() -> impl Responder {
-    HttpResponse::Ok().body("Welcome to the Mishpocha database!")
+    let key = "CHECK_ONE_TWO";
+    let value = match var_os(key) {
+        Some(val) => format!("{key}: {val:?}"),
+        None => format!("{key} is not defined in the environment."),
+    };
+    HttpResponse::Ok().body(value)
 }
 
 #[get("/dates")]
