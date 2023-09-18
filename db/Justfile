@@ -55,6 +55,11 @@ _link_cloud *_directory:
     if [[ "{{_directory}}" = *"--api"* ]]; then
         cd ../api
     fi
+    if [ -z "${EDGEDB_CLOUD_INSTANCE}" ]; then
+        echo "No value for EDDGEDB_CLOUD_INSTANCE provided."
+        echo "Use a .env file to provide one (see .env.example for reference)."
+        exit
+    fi
     edgedb project init \
         --server-instance "${EDGEDB_CLOUD_INSTANCE}" \
         --link \
