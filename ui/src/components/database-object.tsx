@@ -1,7 +1,7 @@
 import { component$ } from "@builder.io/qwik";
-import type { DatabaseProps } from "../../schema.ts";
+import type { DatabaseProps } from "../schema.ts";
 
-const getBaseUrl = (typeName) => {
+const getBaseUrl = (typeName: string): string => {
   if (!typeName) {
     return "";
   } else if (typeName == "person" || typeName.includes("player")) {
@@ -13,7 +13,12 @@ const getBaseUrl = (typeName) => {
   }
 };
 
-const getDisplayableValue = (object, key, typeName, nested) => {
+const getDisplayableValue = (
+  object: object,
+  key: string,
+  typeName: string,
+  nested: boolean
+): JSX.Element => {
   let value = nested ? object : object[key];
 
   if (!(value instanceof Object)) {
@@ -65,7 +70,7 @@ export const DatabaseObject = component$<DatabaseProps>((props) => {
       <tr>
         {keys.map((key, index) => {
           key = key.replace("_", " ");
-          const values = getDisplayableValue(object, key);
+          const values = getDisplayableValue(object, key, null, null);
 
           return <td key={index}>{values}</td>;
         })}
@@ -79,7 +84,7 @@ export const DatabaseObject = component$<DatabaseProps>((props) => {
         <h3 class="card-title">{object.display}</h3>
         {keys.map((key, index) => {
           key = key.replace("_", " ");
-          const values = getDisplayableValue(object, key);
+          const values = getDisplayableValue(object, key, null, null);
 
           if (values.type == "ul" && !["age", "label"].includes(key)) {
             return (
