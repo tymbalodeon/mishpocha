@@ -1,14 +1,10 @@
 mod schema;
-use shuttle_actix_web::ShuttleActixWeb;
-use shuttle_env_vars::EnvVars;
-use std::env::var_os;
-use std::path::PathBuf;
 use uuid::Uuid;
 
 use actix_web::{
     get,
-    web::{Json, Path, ServiceConfig},
-    HttpResponse, Responder, Result,
+    web::{Json, Path},
+    App, HttpResponse, HttpServer, Responder, Result,
 };
 use edgedb_tokio::create_client;
 use schema::{
@@ -18,14 +14,8 @@ use schema::{
 
 #[get("/")]
 async fn welcome() -> impl Responder {
-    let key = "CHECK_ONE_TWO";
-    let value = match var_os(key) {
-        Some(val) => format!("{key}: {val:?}"),
-        None => format!("{key} is not defined in the environment."),
-    };
-    HttpResponse::Ok().body(value)
+    HttpResponse::Ok().body("Welcome to the Mishpocha database!")
 }
-
 #[get("/dates")]
 async fn get_dates() -> Result<impl Responder> {
     let client = create_client()
@@ -402,13 +392,11 @@ async fn get_album(path: Path<Uuid>) -> Result<impl Responder> {
     Ok(Json(album))
 }
 
-#[shuttle_runtime::main]
-async fn main(
-    #[EnvVars(env_local = ".env")] _env_folder: PathBuf,
-) -> ShuttleActixWeb<impl FnOnce(&mut ServiceConfig) + Send + Clone + 'static>
-{
-    let config = move |cfg: &mut ServiceConfig| {
-        cfg.service(welcome)
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
+    HttpServer::new(|| {
+        App::new()
+            .service(welcome)
             .service(get_dates)
             .service(get_date)
             .service(get_people)
@@ -428,8 +416,9 @@ async fn main(
             .service(get_labels)
             .service(get_label)
             .service(get_albums)
-            .service(get_album);
-    };
-
-    Ok(config.into())
+            .service(get_album)
+    })
+    .bind(("0.0.0.0", 8080))?
+    .run()
+    .await
 }

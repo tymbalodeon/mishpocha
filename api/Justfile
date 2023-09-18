@@ -4,7 +4,7 @@ set dotenv-load
 set fallback
 
 image := "mishpocha-api"
-port := "8000"
+port := "8080"
 url := "http://localhost:" + port
 
 _help *_from-main:
@@ -156,24 +156,13 @@ shell:
     fi
     docker exec --interactive --tty {{image}} bash
 
-# Open the application (running locally or in "--shuttle") in the browser.
-open *shuttle:
-    #!/usr/bin/env zsh
-    if [[ "{{shuttle}}" = *"--shuttle"* ]]; then
-        open https://mishpocha-api.shuttleapp.rs/
-    else
-        open {{url}}
-    fi
+# Open the application in the browser.
+@open:
+    open {{url}}
 
-# Ping the application (running locally or in "--shuttle").
-ping *shuttle:
-    #!/usr/bin/env zsh
-    if [[ "{{shuttle}}" = *"--shuttle"* ]]; then
-        url=https://mishpocha-api.shuttleapp.rs/
-    else
-        url={{url}}
-    fi
-    http get "${url}"
+# Ping the application.
+@ping:
+    http get {{url}}
 
 # View people in the database.
 @people:

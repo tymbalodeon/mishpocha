@@ -63,10 +63,10 @@
  `install *_from-main` Install dependencies.  
  `list` List dependencies.  
  `logs lines="20"` Show the Docker logs up to \<lines\> lines.  
- `open *shuttle` Open the application (running locally or in "--shuttle") in the browser.  
+ `open` Open the application in the browser.  
  `people` View people in the database.  
  `person full_name` View a person in the database.  
- `ping *shuttle` Ping the application (running locally or in "--shuttle").  
+ `ping` Ping the application.  
  `remove *packages` Remove dependencies.  
  `running *verbose` Show the container id (or all info with "--verbose") if the
  container is running.  
