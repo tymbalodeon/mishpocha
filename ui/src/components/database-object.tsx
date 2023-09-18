@@ -18,7 +18,7 @@ const getDisplayableValue = (
   key: string,
   typeName: string,
   nested: boolean
-): JSX.Element => {
+) => {
   let value = nested ? object : object[key];
 
   if (!(value instanceof Object)) {
