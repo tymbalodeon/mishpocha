@@ -1,5 +1,5 @@
 import { component$ } from "@builder.io/qwik";
-import type { DatabaseProps } from "../schema.ts";
+import type { DatabaseProps } from "../schema";
 
 const getBaseUrl = (typeName: string): string => {
   if (!typeName) {
