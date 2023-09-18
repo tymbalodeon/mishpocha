@@ -1,5 +1,9 @@
 lockfileVersion: '6.0'
 
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
 devDependencies:
   '@builder.io/qwik':
     specifier: ^1.2.11
@@ -9,7 +13,7 @@ devDependencies:
     version: 1.2.11
   '@tailwindcss/typography':
     specifier: github:tailwindcss/typography
-    version: github.com/tailwindcss/typography/12c8db5717ec2a00c857de74e4cc9bab09f412d4(tailwindcss@3.3.3)
+    version: git@github.com+tailwindcss/typography/12c8db5717ec2a00c857de74e4cc9bab09f412d4(tailwindcss@3.3.3)
   '@types/compression':
     specifier: ^1.7.3
     version: 1.7.3
@@ -992,7 +996,7 @@ packages:
       postcss: ^8.1.0
     dependencies:
       browserslist: 4.21.10
-      caniuse-lite: 1.0.30001534
+      caniuse-lite: 1.0.30001535
       fraction.js: 4.3.6
       normalize-range: 0.1.2
       picocolors: 1.0.0
@@ -1083,7 +1087,7 @@ packages:
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
     dependencies:
-      caniuse-lite: 1.0.30001534
+      caniuse-lite: 1.0.30001535
       electron-to-chromium: 1.4.523
       node-releases: 2.0.13
       update-browserslist-db: 1.0.11(browserslist@4.21.10)
@@ -1196,8 +1200,8 @@ packages:
     engines: {node: '>=6'}
     dev: true
 
-  /caniuse-lite@1.0.30001534:
-    resolution: {integrity: sha512-vlPVrhsCS7XaSh2VvWluIQEzVhefrUQcEsQWSS5A5V+dM07uv1qHeQzAOTGIMy9i3e9bH15+muvI/UHojVgS/Q==}
+  /caniuse-lite@1.0.30001535:
+    resolution: {integrity: sha512-48jLyUkiWFfhm/afF7cQPqPjaUmSraEhK4j+FCTJpgnGGEZHqyLe3hmWH7lIooZdSzXL0ReMvHz0vKDoTBsrwg==}
     dev: true
 
   /ccount@2.0.1:
@@ -5249,9 +5253,9 @@ packages:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
     dev: true
 
-  github.com/tailwindcss/typography/12c8db5717ec2a00c857de74e4cc9bab09f412d4(tailwindcss@3.3.3):
-    resolution: {commit: 12c8db5717ec2a00c857de74e4cc9bab09f412d4, repo: git+ssh://git@github.com/tailwindcss/typography.git, type: git}
-    id: github.com/tailwindcss/typography/12c8db5717ec2a00c857de74e4cc9bab09f412d4
+  git@github.com+tailwindcss/typography/12c8db5717ec2a00c857de74e4cc9bab09f412d4(tailwindcss@3.3.3):
+    resolution: {commit: 12c8db5717ec2a00c857de74e4cc9bab09f412d4, repo: git@github.com:tailwindcss/typography.git, type: git}
+    id: git@github.com+tailwindcss/typography/12c8db5717ec2a00c857de74e4cc9bab09f412d4
     name: '@tailwindcss/typography'
     version: 0.5.10
     peerDependencies:
@@ -5263,7 +5267,3 @@ packages:
       postcss-selector-parser: 6.0.10
       tailwindcss: 3.3.3
     dev: true
-
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false
