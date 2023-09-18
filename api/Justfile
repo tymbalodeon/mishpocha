@@ -63,7 +63,7 @@ _get_instance *instance:
     fi
 
 [no-exit-message]
-_link_cloud:
+cloud:
     #!/usr/bin/env zsh
     {{just}} db _link_cloud --api \
     && echo EDGEDB_SECRET_KEY=$(
@@ -106,7 +106,7 @@ start *args: stop (_build args)
                 {{image}}
         fi
     else
-        {{just}} _link_cloud &>/dev/null
+        {{just}} cloud &>/dev/null
         export EDGEDB_DSN="$({{just}} db dsn ${instance})"
         export EDGEDB_CLIENT_TLS_SECURITY="insecure"
         cargo run
