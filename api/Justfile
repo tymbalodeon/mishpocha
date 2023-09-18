@@ -156,7 +156,7 @@ shell:
     fi
     docker exec --interactive --tty {{image}} bash
 
-# Open the application in the browser.
+# Open the application (running locally or in "--shuttle") in the browser.
 open *shuttle:
     #!/usr/bin/env zsh
     if [[ "{{shuttle}}" = *"--shuttle"* ]]; then
@@ -165,7 +165,7 @@ open *shuttle:
         open {{url}}
     fi
 
-# Ping the application.
+# Ping the application (running locally or in "--shuttle").
 ping *shuttle:
     #!/usr/bin/env zsh
     if [[ "{{shuttle}}" = *"--shuttle"* ]]; then
