@@ -157,8 +157,13 @@ shell:
     docker exec --interactive --tty {{image}} bash
 
 # Open the application in the browser.
-@open:
-    open {{url}}
+open *shuttle:
+    #!/usr/bin/env zsh
+    if [[ "{{shuttle}}" = *"--shuttle"* ]]; then
+        open https://mishpocha-api.shuttleapp.rs/
+    else
+        open {{url}}
+    fi
 
 # Ping the application.
 @ping:
