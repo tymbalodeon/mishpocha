@@ -93,7 +93,7 @@ start *args: stop (_build args)
                 --publish {{prod_port}}:{{prod_port}} \
                 --rm \
                 {{image}}
-            {{ if args =~ "--open" { "{{just}} open --prod" } else { "" } }}
+            {{ if args =~ "--open" { just + " open --prod" } else { "" } }}
         else
             docker run \
                 --detach \
@@ -102,7 +102,7 @@ start *args: stop (_build args)
                 --rm \
                 --volume "$(pwd)"/src:/ui/src \
                 {{image}}
-            {{ if args =~ "--open" { "{{just}} open" } else { "" } }}
+            {{ if args =~ "--open" { just +  " open" } else { "" } }}
         fi
     else
         pnpm {{ if args == "--open" { "start" } else { "dev" } }}
