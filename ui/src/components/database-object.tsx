@@ -19,7 +19,7 @@ const getDisplayableValue = (
     typeName?: string,
     nested?: boolean,
 ) => {
-    let value: object = nested ? object : object[key];
+    let value: string | object = nested ? object : object[key];
 
     if (!(value instanceof Object)) {
         if (!(typeof value === "string")) {
