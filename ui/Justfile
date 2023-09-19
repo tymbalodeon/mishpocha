@@ -31,7 +31,7 @@ update *_from-main:
     pnpm update
 
 # Check code for errors.
-check *files:
+check *files: format
     #!/usr/bin/env zsh
     if [ -n "{{files}}" ]; then
         pnpx rome check "{{files}}"
