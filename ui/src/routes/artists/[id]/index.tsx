@@ -3,33 +3,33 @@ import { type DocumentHead, routeLoader$ } from "@builder.io/qwik-city";
 import { DatabaseObject } from "../../../components/database-object";
 
 export const useGetApiData = routeLoader$(async (requestEvent) => {
-  const apiDomain = requestEvent.env.get("API_DOMAIN");
-  const id = requestEvent.params.id;
+    const apiDomain = requestEvent.env.get("API_DOMAIN");
+    const id = requestEvent.params.id;
 
-  if (!apiDomain) {
-    return "API_DOMAIN not specified.";
-  }
+    if (!apiDomain) {
+        return "API_DOMAIN not specified.";
+    }
 
-  try {
-    const response = await fetch(`${apiDomain}/artists/${id}`);
-    return await response.json();
-  } catch {
-    return [];
-  }
+    try {
+        const response = await fetch(`${apiDomain}/artists/${id}`);
+        return await response.json();
+    } catch {
+        return [];
+    }
 });
 
 export default component$(() => {
-  const artist = useGetApiData().value;
+    const artist = useGetApiData().value;
 
-  return <>{artist ? <DatabaseObject data={artist} /> : <p>not found</p>}</>;
+    return <>{artist ? <DatabaseObject data={artist} /> : <p>not found</p>}</>;
 });
 
 export const head: DocumentHead = {
-  title: "Mishpocha Database | Artist",
-  meta: [
-    {
-      name: "Mishpocha Database | Artist",
-      content: "Mishpocha Database | Artist",
-    },
-  ],
+    title: "Mishpocha Database | Artist",
+    meta: [
+        {
+            name: "Mishpocha Database | Artist",
+            content: "Mishpocha Database | Artist",
+        },
+    ],
 };

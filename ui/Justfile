@@ -31,8 +31,13 @@ update *_from-main:
     pnpm update
 
 # Check code for errors.
-@check:
-    pnpm lint --fix
+check *files:
+    #!/usr/bin/env zsh
+    if [ -n "{{files}}" ]; then
+        pnpx rome check "{{files}}"
+    else
+        pnpm lint
+    fi
 
 # Format code.
 @format:

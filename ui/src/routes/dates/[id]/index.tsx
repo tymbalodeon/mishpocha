@@ -3,33 +3,33 @@ import { type DocumentHead, routeLoader$ } from "@builder.io/qwik-city";
 import { DatabaseObject } from "../../../components/database-object";
 
 export const useGetApiData = routeLoader$(async (requestEvent) => {
-  const apiDomain = requestEvent.env.get("API_DOMAIN");
-  const id = requestEvent.params.id;
+    const apiDomain = requestEvent.env.get("API_DOMAIN");
+    const id = requestEvent.params.id;
 
-  if (!apiDomain) {
-    return "API_DOMAIN not specified.";
-  }
+    if (!apiDomain) {
+        return "API_DOMAIN not specified.";
+    }
 
-  try {
-    const response = await fetch(`${apiDomain}/dates/${id}`);
-    return await response.json();
-  } catch {
-    return [];
-  }
+    try {
+        const response = await fetch(`${apiDomain}/dates/${id}`);
+        return await response.json();
+    } catch {
+        return [];
+    }
 });
 
 export default component$(() => {
-  const date = useGetApiData().value;
+    const date = useGetApiData().value;
 
-  return <>{date ? <DatabaseObject data={date} /> : <p>not found</p>}</>;
+    return <>{date ? <DatabaseObject data={date} /> : <p>not found</p>}</>;
 });
 
 export const head: DocumentHead = {
-  title: "Mishpocha Database | Date",
-  meta: [
-    {
-      name: "Mishpocha Database | Date",
-      content: "Mishpocha Database | Date",
-    },
-  ],
+    title: "Mishpocha Database | Date",
+    meta: [
+        {
+            name: "Mishpocha Database | Date",
+            content: "Mishpocha Database | Date",
+        },
+    ],
 };

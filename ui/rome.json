@@ -1,0 +1,14 @@
+{
+    "formatter": {
+        "indentStyle": "space",
+        "indentSize": 4,
+        "lineWidth": 79
+    },
+    "linter": {
+        "rules": {
+            "security": {
+                "all": false
+            }
+        }
+    }
+}
