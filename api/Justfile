@@ -6,6 +6,7 @@ set fallback
 image := "mishpocha-api"
 port := "8080"
 url := "http://localhost:" + port
+cloud_url := "${CLOUD_URL}"
 
 _help *_from-main:
     #!/usr/bin/env zsh
@@ -156,18 +157,22 @@ shell:
     fi
     docker exec --interactive --tty {{image}} bash
 
+_get_url arg:
+    #!/usr/bin/env zsh
+    if [ "{{arg}}" = "--cloud" ]; then
+        printf {{cloud_url}}
+    else
+        printf {{url}}
+    fi
+
 # Open the application in the browser.
-@open:
-    open {{url}}
+@open *instance:
+    open $({{just}} _get_url "{{instance}}")
 
 # Ping the application.
-@ping:
-    http get {{url}}
+@ping *instance:
+    http get $({{just}} _get_url "{{instance}}")
 
 # View people in the database.
-@people:
-    http {{url}}/people
-
-# View a person in the database.
-@person full_name:
-    http "{{url}}/person?full_name={{full_name}}"
+@people *instance:
+    http get $({{just}} _get_url "{{instance}}")/people
