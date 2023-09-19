@@ -36,13 +36,15 @@ check *files:
     if [ -n "{{files}}" ]; then
         pnpx rome check "{{files}}"
     else
-        pnpm lint
+        files=(src/**/*.ts*)
+        pnpx rome check --apply "${files[@]}" \
+            || pnpx rome check "${files[@]}"
     fi
     pnpm run build.types
 
 # Format code.
 @format:
-    pnpm run format
+    pnpx rome format --write .
 
 # Add dependencies.
 @add *packages:

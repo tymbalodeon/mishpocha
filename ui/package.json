@@ -14,9 +14,6 @@
                 "deploy": "vercel deploy",
                 "dev": "env API_DOMAIN=http://0.0.0.0:8080 vite --mode ssr",
                 "dev.debug": "node --inspect-brk ./node_modules/vite/bin/vite.js --mode ssr --force",
-                "format": "rome format --write .",
-                "format.check": "rome format --check .",
-                "lint": "rome check --apply src/**/*.ts*",
                 "preview": "qwik build preview && vite preview --open",
                 "serve": "node server/entry.express",
                 "start": "env API_DOMAIN=http://0.0.0.0:8080 vite --open --mode ssr",
@@ -47,8 +44,5 @@
                 "vercel": "^29.4.0",
                 "vite": "4.3.9",
                 "vite-tsconfig-paths": "4.2.0"
-        },
-        "optionalDependencies": {
-                "rome": "^12.1.3"
         }
 }

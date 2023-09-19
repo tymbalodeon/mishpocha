@@ -8,6 +8,9 @@
         "rules": {
             "security": {
                 "all": false
+            },
+            "suspicious": {
+                "noShadowRestrictedNames": "off"
             }
         }
     }
