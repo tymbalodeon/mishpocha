@@ -1,6 +1,7 @@
 import { component$ } from "@builder.io/qwik";
 import { type DocumentHead, routeLoader$ } from "@builder.io/qwik-city";
 import { DatabaseObject } from "../../../components/database-object";
+import { type Series } from "../../../schema";
 
 export const useGetApiData = routeLoader$(async (requestEvent) => {
     const apiDomain = requestEvent.env.get("API_DOMAIN");
@@ -19,7 +20,7 @@ export const useGetApiData = routeLoader$(async (requestEvent) => {
 });
 
 export default component$(() => {
-    const series = useGetApiData().value;
+    const series = useGetApiData().value as Series;
 
     return <>{series ? <DatabaseObject data={series} /> : <p>not found</p>}</>;
 });

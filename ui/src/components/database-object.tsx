@@ -1,5 +1,5 @@
 import { component$ } from "@builder.io/qwik";
-import type { DatabaseProps } from "../schema";
+import type { DatabaseProps, MishpochaObject, Player } from "../schema";
 
 const getBaseUrl = (typeName: string): string => {
     if (!typeName) {
@@ -14,12 +14,14 @@ const getBaseUrl = (typeName: string): string => {
 };
 
 const getDisplayableValue = (
-    object: object,
+    mishpochaObject: MishpochaObject,
     key: string,
     typeName?: string,
     nested?: boolean,
 ) => {
-    let value: any = nested ? object : object[key];
+    let value: object | string = nested
+        ? mishpochaObject
+        : mishpochaObject[key as unknown as keyof typeof mishpochaObject];
 
     if (!(value instanceof Object)) {
         if (!(typeof value === "string")) {
@@ -40,7 +42,7 @@ const getDisplayableValue = (
                     getDisplayableValue(
                         item,
                         "display",
-                        item.type_name || key,
+                        (item as MishpochaObject).type_name || key,
                         true,
                     ),
                 )}
@@ -49,13 +51,18 @@ const getDisplayableValue = (
     }
 
     if (typeName === "players") {
-        value = value.person;
+        value = (value as unknown as Player).person;
     }
 
-    const baseUrl = getBaseUrl(typeName || value.type_name);
+    const baseUrl = getBaseUrl(
+        typeName || (value as MishpochaObject).type_name,
+    );
     const link = (
-        <a href={`${baseUrl}/${value.id}`} class="link font-bold">
-            {value.display}
+        <a
+            href={`${baseUrl}/${(value as MishpochaObject).id}`}
+            class="link font-bold"
+        >
+            {(value as MishpochaObject).display}
         </a>
     );
 
@@ -70,11 +77,11 @@ export const DatabaseObject = component$<DatabaseProps>((props) => {
     const object = props.data;
     const keys = Object.keys(object);
 
-    if (object.compact) {
+    if (props.compact) {
         return (
             <tr>
                 {keys.map((key) => {
-                    keyDisplay = key.replace("_", " ");
+                    const keyDisplay = key.replace("_", " ");
                     const values = getDisplayableValue(object, keyDisplay);
 
                     return <td key={keyDisplay}>{values}</td>;
@@ -88,7 +95,7 @@ export const DatabaseObject = component$<DatabaseProps>((props) => {
             <div class="card-body">
                 <h3 class="card-title">{object.display}</h3>
                 {keys.map((key) => {
-                    keyDisplay = key.replace("_", " ");
+                    const keyDisplay = key.replace("_", " ");
                     const values = getDisplayableValue(object, keyDisplay);
 
                     if (

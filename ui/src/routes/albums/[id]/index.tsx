@@ -1,6 +1,7 @@
 import { component$ } from "@builder.io/qwik";
 import { type DocumentHead, routeLoader$ } from "@builder.io/qwik-city";
 import { DatabaseObject } from "../../../components/database-object";
+import { type Album } from "../../../schema";
 
 export const useGetApiData = routeLoader$(async (requestEvent) => {
     const apiDomain = requestEvent.env.get("API_DOMAIN");
@@ -19,7 +20,7 @@ export const useGetApiData = routeLoader$(async (requestEvent) => {
 });
 
 export default component$(() => {
-    const album = useGetApiData().value;
+    const album = useGetApiData().value as Album;
 
     return <>{album ? <DatabaseObject data={album} /> : <p>not found</p>}</>;
 });

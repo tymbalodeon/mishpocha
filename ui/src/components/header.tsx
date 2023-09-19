@@ -1,11 +1,11 @@
 import { component$ } from "@builder.io/qwik";
 
 interface HeaderProps {
-    text: string;
+    text: string | undefined;
 }
 
 export const Header = component$<HeaderProps>((props) => {
-    const text = props.text;
+    const text = props.text || "";
 
     return (
         <a href="/">

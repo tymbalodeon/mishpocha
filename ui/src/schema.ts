@@ -129,7 +129,6 @@ export interface Player {
     display: string;
     person: Person;
     instrument: Instrument;
-    display: string;
 }
 
 export interface Artist {
@@ -208,7 +207,7 @@ export interface Album {
     duration: string;
 }
 
-export type DatabaseProps =
+export type MishpochaObject =
     | Date
     | Person
     | Instrument
@@ -218,3 +217,8 @@ export type DatabaseProps =
     | Track
     | Label
     | Series;
+
+export interface DatabaseProps {
+    data: MishpochaObject;
+    compact?: boolean;
+}

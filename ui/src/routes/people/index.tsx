@@ -1,6 +1,7 @@
 import { component$ } from "@builder.io/qwik";
 import { type DocumentHead, routeLoader$ } from "@builder.io/qwik-city";
 import { DatabaseObject } from "../../components/database-object";
+import { type Person } from "../../schema";
 
 export const useGetApiData = routeLoader$(async (requestEvent) => {
     const apiDomain = requestEvent.env.get("API_DOMAIN");
@@ -27,12 +28,12 @@ export default component$(() => {
                 <table class="table">
                     <tbody>
                         {people
-                            ? people.map((person, index) => {
-                                  person.compact = true;
+                            ? people.map((person: Person) => {
                                   return (
                                       <DatabaseObject
-                                          key={index}
+                                          key={person.id}
                                           data={person}
+                                          compact={true}
                                       />
                                   );
                               })

@@ -1,6 +1,7 @@
 import { component$ } from "@builder.io/qwik";
 import { type DocumentHead, routeLoader$ } from "@builder.io/qwik-city";
 import { DatabaseObject } from "../../components/database-object";
+import { type Composition } from "../../schema";
 
 export const useGetApiData = routeLoader$(async (requestEvent) => {
     const apiDomain = requestEvent.env.get("API_DOMAIN");
@@ -26,26 +27,19 @@ export default component$(() => {
                 <h3 class="font-bold text-xl pl-4 pt-8">Compositions</h3>
                 <div class="overflow-x-auto">
                     <table class="table table-zebra">
-                        <thead>
-                            <tr>
-                                {keys.map((key, index) => {
-                                    key = key.replace("_", " ");
-
-                                    return <th key={index}>{key}</th>;
-                                })}
-                            </tr>
-                        </thead>
                         <tbody>
                             {compositions
-                                ? compositions.map((composition, index) => {
-                                      composition.compact = true;
-                                      return (
-                                          <DatabaseObject
-                                              key={index}
-                                              data={composition}
-                                          />
-                                      );
-                                  })
+                                ? compositions.map(
+                                      (composition: Composition) => {
+                                          return (
+                                              <DatabaseObject
+                                                  key={composition.id}
+                                                  data={composition}
+                                                  compact={true}
+                                              />
+                                          );
+                                      },
+                                  )
                                 : null}
                         </tbody>
                     </table>

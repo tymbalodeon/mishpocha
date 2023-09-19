@@ -1,18 +1,18 @@
 import { component$ } from "@builder.io/qwik";
-import { useLocation } from "@builder.io/qwik-city";
+import { useLocation, type ContentMenu } from "@builder.io/qwik-city";
 
 interface MenuLink {
-    text: string;
+    text: string | undefined;
     href: string;
 }
 
 interface NavBarItem {
-    text: string;
+    text: string | undefined;
     items: MenuLink[];
 }
 
 interface NavBarItemsProps {
-    items?: NavBarItem[];
+    items: ContentMenu[] | undefined;
     navbar?: boolean;
 }
 
@@ -30,40 +30,57 @@ export const NavBarItems = component$<NavBarItemsProps>((props) => {
                         : "menu-horizontal bg-base-200 hidden lg:hidden"
                 }`}
             >
-                {items?.map((item) => {
-                    const title = item.text;
-                    const items = item.items;
+                {items
+                    ? items.map((item) => {
+                          const title = item.text || "";
+                          const items = item.items || "";
 
-                    return (
-                        <li key={title}>
-                            <div>
-                                <details open>
-                                    <summary>{title}</summary>
-                                    <ul>
-                                        {items?.map((item) => {
-                                            const href = item.href;
+                          return (
+                              <li key={title}>
+                                  <div>
+                                      <details open>
+                                          <summary>{title}</summary>
+                                          <ul>
+                                              {items
+                                                  ? items?.map(
+                                                          (
+                                                              item: ContentMenu,
+                                                          ) => {
+                                                              const href =
+                                                                  item.href;
 
-                                            return (
-                                                <li key={href}>
-                                                    <a
-                                                        href={href}
-                                                        class={{
-                                                            "is-active":
-                                                                pathname ===
-                                                                href,
-                                                        }}
-                                                    >
-                                                        {item.text}
-                                                    </a>
-                                                </li>
-                                            );
-                                        })}
-                                    </ul>
-                                </details>
-                            </div>
-                        </li>
-                    );
-                })}
+                                                              return (
+                                                                  <li
+                                                                      key={
+                                                                          href
+                                                                      }
+                                                                  >
+                                                                      <a
+                                                                          href={
+                                                                              href
+                                                                          }
+                                                                          class={{
+                                                                              "is-active":
+                                                                                  pathname ===
+                                                                                  href,
+                                                                          }}
+                                                                      >
+                                                                          {
+                                                                              item.text
+                                                                          }
+                                                                      </a>
+                                                                  </li>
+                                                              );
+                                                          },
+                                                      )
+                                                  : null}
+                                          </ul>
+                                      </details>
+                                  </div>
+                              </li>
+                          );
+                      })
+                    : null}
             </ul>
         </div>
     );
