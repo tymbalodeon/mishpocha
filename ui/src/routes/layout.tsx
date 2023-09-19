@@ -36,7 +36,7 @@ export default component$(() => {
                 <input id="drawer" type="checkbox" class="drawer-toggle" />
                 <div class="drawer-content">
                     <div class="drawer-button lg:hidden">
-                        <div class="navbar bg-base-200">
+                        <div class="navbar bg-base-200 w-screen">
                             <div class="flex-1">
                                 <Header text={menu?.text} />
                             </div>
