@@ -46,7 +46,7 @@ export const NavBarItems = component$<NavBarItemsProps>((props) => {
             id={props.navbar ? "navbar-items" : ""}
             class={`menu ${
                 props.navbar
-                    ? "menu-horizontal bg-base-200 hidden lg:hidden"
+                    ? "menu-horizontal bg-base-200 w-screen hidden lg:hidden"
                     : ""
             }`}
         >
