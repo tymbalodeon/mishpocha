@@ -22,7 +22,11 @@ export const useGetApiData = routeLoader$(async (requestEvent) => {
 export default component$(() => {
   const series = useGetApiData().value as Series;
 
-  return <>{series ? <DatabaseObject data={series} /> : <p>not found</p>}</>;
+  return (
+    <>
+      {series ? <DatabaseObject databaseObject={series} /> : <p>not found</p>}
+    </>
+  );
 });
 
 export const head: DocumentHead = {

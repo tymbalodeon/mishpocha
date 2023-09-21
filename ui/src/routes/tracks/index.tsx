@@ -20,8 +20,15 @@ export const useGetApiData = routeLoader$(async (requestEvent) => {
 
 export default component$(() => {
   const tracks = useGetApiData().value as MishpochaObject[];
+  const includedKeys = ["title", "players"];
 
-  return <DatabaseObjects objects={tracks} title="Tracks" />;
+  return (
+    <DatabaseObjects
+      title="Tracks"
+      objects={tracks}
+      includedKeys={includedKeys}
+    />
+  );
 });
 
 export const head: DocumentHead = {

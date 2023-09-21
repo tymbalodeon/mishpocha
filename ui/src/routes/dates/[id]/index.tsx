@@ -22,7 +22,9 @@ export const useGetApiData = routeLoader$(async (requestEvent) => {
 export default component$(() => {
   const date = useGetApiData().value as Date;
 
-  return <>{date ? <DatabaseObject data={date} /> : <p>not found</p>}</>;
+  return (
+    <>{date ? <DatabaseObject databaseObject={date} /> : <p>not found</p>}</>
+  );
 });
 
 export const head: DocumentHead = {

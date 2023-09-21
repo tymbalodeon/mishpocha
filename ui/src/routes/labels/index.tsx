@@ -1,7 +1,7 @@
 import { component$ } from "@builder.io/qwik";
 import { type DocumentHead, routeLoader$ } from "@builder.io/qwik-city";
-import { DatabaseObject } from "../../components/database-object";
-import { type Label } from "../../schema";
+import { DatabaseObjects } from "../../components/database-objects";
+import { MishpochaObject } from "../../schema";
 
 export const useGetApiData = routeLoader$(async (requestEvent) => {
   const apiDomain = requestEvent.env.get("API_DOMAIN");
@@ -19,29 +19,15 @@ export const useGetApiData = routeLoader$(async (requestEvent) => {
 });
 
 export default component$(() => {
-  const labels = useGetApiData().value;
+  const labels = useGetApiData().value as MishpochaObject[];
+  const includedKeys = ["name", "series"];
 
   return (
-    <>
-      <h3 class="font-bold text-xl pl-4 pt-8">Labels</h3>
-      <div class="overflow-x-auto">
-        <table class="table">
-          <tbody>
-            {labels
-              ? labels.map((label: Label) => {
-                  return (
-                    <DatabaseObject
-                      key={label.id}
-                      data={label}
-                      compact={true}
-                    />
-                  );
-                })
-              : null}
-          </tbody>
-        </table>
-      </div>
-    </>
+    <DatabaseObjects
+      title="Labels"
+      objects={labels}
+      includedKeys={includedKeys}
+    />
   );
 });
 

@@ -22,7 +22,9 @@ export const useGetApiData = routeLoader$(async (requestEvent) => {
 export default component$(() => {
   const label = useGetApiData().value as Label;
 
-  return <>{label ? <DatabaseObject data={label} /> : <p>not found</p>}</>;
+  return (
+    <>{label ? <DatabaseObject databaseObject={label} /> : <p>not found</p>}</>
+  );
 });
 
 export const head: DocumentHead = {

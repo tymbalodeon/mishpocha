@@ -24,7 +24,11 @@ export default component$(() => {
 
   return (
     <>
-      {composition ? <DatabaseObject data={composition} /> : <p>not found</p>}
+      {composition ? (
+        <DatabaseObject databaseObject={composition} />
+      ) : (
+        <p>not found</p>
+      )}
     </>
   );
 });

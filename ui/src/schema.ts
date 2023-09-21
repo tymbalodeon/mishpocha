@@ -217,8 +217,3 @@ export type MishpochaObject =
   | Track
   | Label
   | Series;
-
-export interface DatabaseProps {
-  data: MishpochaObject;
-  compact?: boolean;
-}

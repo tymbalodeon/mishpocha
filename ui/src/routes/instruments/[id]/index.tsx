@@ -23,7 +23,13 @@ export default component$(() => {
   const instrument = useGetApiData().value as Instrument;
 
   return (
-    <>{instrument ? <DatabaseObject data={instrument} /> : <p>not found</p>}</>
+    <>
+      {instrument ? (
+        <DatabaseObject databaseObject={instrument} />
+      ) : (
+        <p>not found</p>
+      )}
+    </>
   );
 });
 

@@ -22,7 +22,11 @@ export const useGetApiData = routeLoader$(async (requestEvent) => {
 export default component$(() => {
   const artist = useGetApiData().value as Artist;
 
-  return <>{artist ? <DatabaseObject data={artist} /> : <p>not found</p>}</>;
+  return (
+    <>
+      {artist ? <DatabaseObject databaseObject={artist} /> : <p>not found</p>}
+    </>
+  );
 });
 
 export const head: DocumentHead = {

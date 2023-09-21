@@ -1,5 +1,5 @@
 import { component$ } from "@builder.io/qwik";
-import type { DatabaseProps, MishpochaObject, Player } from "../schema";
+import type { MishpochaObject, Player } from "../schema";
 
 const getBaseUrl = (typeName: string): string => {
   if (!typeName) {
@@ -17,7 +17,7 @@ const getDisplayableValue = (
   mishpochaObject: MishpochaObject,
   key: string,
   typeName?: string,
-  nested?: boolean
+  nested?: boolean,
 ) => {
   let value: object | string = nested
     ? mishpochaObject
@@ -43,8 +43,8 @@ const getDisplayableValue = (
             item,
             "display",
             (item as MishpochaObject).type_name || key,
-            true
-          )
+            true,
+          ),
         )}
       </ul>
     );
@@ -71,20 +71,30 @@ const getDisplayableValue = (
   return link;
 };
 
-export function filterKeys(keys: string[]): string[] {
-  return keys.filter((key) => !["id", "type_name", "display"].includes(key));
+export function filterKeys(keys: string[], includedKeys?: string[]): string[] {
+  if (!includedKeys || !includedKeys.length) {
+    return keys;
+  }
+
+  return keys.filter((key) => includedKeys.includes(key));
+}
+
+interface DatabaseProps {
+  databaseObject: MishpochaObject;
+  includedKeys?: string[];
+  compact?: boolean;
 }
 
 export const DatabaseObject = component$<DatabaseProps>((props) => {
-  const object = props.data;
-  const keys = filterKeys(Object.keys(object));
+  const databaseObject = props.databaseObject;
+  const keys = filterKeys(Object.keys(databaseObject), props.includedKeys);
 
   if (props.compact) {
     return (
       <tr class="hover">
         {keys.map((key) => {
           const keyDisplay = key.replace("_", " ");
-          const values = getDisplayableValue(object, keyDisplay);
+          const values = getDisplayableValue(databaseObject, keyDisplay);
 
           return <td key={keyDisplay}>{values}</td>;
         })}
@@ -95,14 +105,17 @@ export const DatabaseObject = component$<DatabaseProps>((props) => {
   return (
     <div class="card bg-neutral shadow-xl m-4">
       <div class="card-body">
-        <h3 class="card-title">{object.display}</h3>
+        <h3 class="card-title">{databaseObject.display}</h3>
         {keys.map((key) => {
           const keyDisplay = key.replace("_", " ");
-          const values = getDisplayableValue(object, keyDisplay);
+          const values = getDisplayableValue(databaseObject, keyDisplay);
 
           if (values.type === "ul" && !["age", "label"].includes(keyDisplay)) {
             return (
-              <div key={keyDisplay} class="collapse collapse-arrow bg-base-200">
+              <div
+                key={keyDisplay}
+                class="collapse collapse-arrow bg-base-200"
+              >
                 <input type="checkbox" />
                 <div class="collapse-title text-xl font-medium">
                   {keyDisplay}

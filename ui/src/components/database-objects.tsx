@@ -5,19 +5,17 @@ import { DatabaseObject, filterKeys } from "./database-object";
 interface DatabaseObjectsProps {
   title: string;
   objects: MishpochaObject[];
-}
-
-function getKeys(objects: MishpochaObject[]): string[] {
-  if (!objects.length) {
-    return [];
-  }
-
-  return filterKeys(Object.keys(objects[0]));
+  includedKeys: string[];
 }
 
 export const DatabaseObjects = component$<DatabaseObjectsProps>((props) => {
   const databaseObjects = props.objects;
-  const keys = getKeys(databaseObjects);
+  const includedKeys = props.includedKeys;
+  const keys = [];
+
+  if (databaseObjects.length) {
+    keys.push(...filterKeys(Object.keys(databaseObjects[0]), includedKeys));
+  }
 
   return (
     <>
@@ -38,7 +36,8 @@ export const DatabaseObjects = component$<DatabaseObjectsProps>((props) => {
                     return (
                       <DatabaseObject
                         key={databaseObject.id}
-                        data={databaseObject}
+                        databaseObject={databaseObject}
+                        includedKeys={includedKeys}
                         compact={true}
                       />
                     );

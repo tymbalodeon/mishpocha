@@ -22,7 +22,9 @@ export const useGetApiData = routeLoader$(async (requestEvent) => {
 export default component$(() => {
   const album = useGetApiData().value as Album;
 
-  return <>{album ? <DatabaseObject data={album} /> : <p>not found</p>}</>;
+  return (
+    <>{album ? <DatabaseObject databaseObject={album} /> : <p>not found</p>}</>
+  );
 });
 
 export const head: DocumentHead = {
