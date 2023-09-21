@@ -4,33 +4,33 @@ import { DatabaseObject } from "../../../components/database-object";
 import { type Album } from "../../../schema";
 
 export const useGetApiData = routeLoader$(async (requestEvent) => {
-    const apiDomain = requestEvent.env.get("API_DOMAIN");
-    const id = requestEvent.params.id;
+  const apiDomain = requestEvent.env.get("API_DOMAIN");
+  const id = requestEvent.params.id;
 
-    if (!apiDomain) {
-        return "API_DOMAIN not specified.";
-    }
+  if (!apiDomain) {
+    return "API_DOMAIN not specified.";
+  }
 
-    try {
-        const response = await fetch(`${apiDomain}/albums/${id}`);
-        return await response.json();
-    } catch {
-        return [];
-    }
+  try {
+    const response = await fetch(`${apiDomain}/albums/${id}`);
+    return await response.json();
+  } catch {
+    return [];
+  }
 });
 
 export default component$(() => {
-    const album = useGetApiData().value as Album;
+  const album = useGetApiData().value as Album;
 
-    return <>{album ? <DatabaseObject data={album} /> : <p>not found</p>}</>;
+  return <>{album ? <DatabaseObject data={album} /> : <p>not found</p>}</>;
 });
 
 export const head: DocumentHead = {
-    title: "Mishpocha Database | Album",
-    meta: [
-        {
-            name: "Mishpocha Database | Album",
-            content: "Mishpocha Database | Album",
-        },
-    ],
+  title: "Mishpocha Database | Album",
+  meta: [
+    {
+      name: "Mishpocha Database | Album",
+      content: "Mishpocha Database | Album",
+    },
+  ],
 };

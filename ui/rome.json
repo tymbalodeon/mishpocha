@@ -1,17 +1,16 @@
 {
-    "formatter": {
-        "indentStyle": "space",
-        "indentSize": 4,
-        "lineWidth": 79
-    },
-    "linter": {
-        "rules": {
-            "security": {
-                "all": false
-            },
-            "suspicious": {
-                "noShadowRestrictedNames": "off"
-            }
-        }
+  "formatter": {
+    "indentStyle": "space",
+    "lineWidth": 79
+  },
+  "linter": {
+    "rules": {
+      "security": {
+        "all": false
+      },
+      "suspicious": {
+        "noShadowRestrictedNames": "off"
+      }
     }
+  }
 }

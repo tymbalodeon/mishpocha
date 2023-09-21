@@ -4,33 +4,33 @@ import { DatabaseObject } from "../../../components/database-object";
 import { type Artist } from "../../../schema";
 
 export const useGetApiData = routeLoader$(async (requestEvent) => {
-    const apiDomain = requestEvent.env.get("API_DOMAIN");
-    const id = requestEvent.params.id;
+  const apiDomain = requestEvent.env.get("API_DOMAIN");
+  const id = requestEvent.params.id;
 
-    if (!apiDomain) {
-        return "API_DOMAIN not specified.";
-    }
+  if (!apiDomain) {
+    return "API_DOMAIN not specified.";
+  }
 
-    try {
-        const response = await fetch(`${apiDomain}/artists/${id}`);
-        return await response.json();
-    } catch {
-        return [];
-    }
+  try {
+    const response = await fetch(`${apiDomain}/artists/${id}`);
+    return await response.json();
+  } catch {
+    return [];
+  }
 });
 
 export default component$(() => {
-    const artist = useGetApiData().value as Artist;
+  const artist = useGetApiData().value as Artist;
 
-    return <>{artist ? <DatabaseObject data={artist} /> : <p>not found</p>}</>;
+  return <>{artist ? <DatabaseObject data={artist} /> : <p>not found</p>}</>;
 });
 
 export const head: DocumentHead = {
-    title: "Mishpocha Database | Artist",
-    meta: [
-        {
-            name: "Mishpocha Database | Artist",
-            content: "Mishpocha Database | Artist",
-        },
-    ],
+  title: "Mishpocha Database | Artist",
+  meta: [
+    {
+      name: "Mishpocha Database | Artist",
+      content: "Mishpocha Database | Artist",
+    },
+  ],
 };

@@ -4,53 +4,53 @@ import { DatabaseObject } from "../../components/database-object";
 import { type Label } from "../../schema";
 
 export const useGetApiData = routeLoader$(async (requestEvent) => {
-    const apiDomain = requestEvent.env.get("API_DOMAIN");
+  const apiDomain = requestEvent.env.get("API_DOMAIN");
 
-    if (!apiDomain) {
-        return "API_DOMAIN not specified.";
-    }
+  if (!apiDomain) {
+    return "API_DOMAIN not specified.";
+  }
 
-    try {
-        const response = await fetch(`${apiDomain}/labels`);
-        return await response.json();
-    } catch {
-        return [];
-    }
+  try {
+    const response = await fetch(`${apiDomain}/labels`);
+    return await response.json();
+  } catch {
+    return [];
+  }
 });
 
 export default component$(() => {
-    const labels = useGetApiData().value;
+  const labels = useGetApiData().value;
 
-    return (
-        <>
-            <h3 class="font-bold text-xl pl-4 pt-8">Labels</h3>
-            <div class="overflow-x-auto">
-                <table class="table">
-                    <tbody>
-                        {labels
-                            ? labels.map((label: Label) => {
-                                  return (
-                                      <DatabaseObject
-                                          key={label.id}
-                                          data={label}
-                                          compact={true}
-                                      />
-                                  );
-                              })
-                            : null}
-                    </tbody>
-                </table>
-            </div>
-        </>
-    );
+  return (
+    <>
+      <h3 class="font-bold text-xl pl-4 pt-8">Labels</h3>
+      <div class="overflow-x-auto">
+        <table class="table">
+          <tbody>
+            {labels
+              ? labels.map((label: Label) => {
+                  return (
+                    <DatabaseObject
+                      key={label.id}
+                      data={label}
+                      compact={true}
+                    />
+                  );
+                })
+              : null}
+          </tbody>
+        </table>
+      </div>
+    </>
+  );
 });
 
 export const head: DocumentHead = {
-    title: "Mishpocha Database | Labels",
-    meta: [
-        {
-            name: "Mishpocha Database | Labels",
-            content: "Mishpocha Database | Labels",
-        },
-    ],
+  title: "Mishpocha Database | Labels",
+  meta: [
+    {
+      name: "Mishpocha Database | Labels",
+      content: "Mishpocha Database | Labels",
+    },
+  ],
 };
