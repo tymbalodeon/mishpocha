@@ -28,7 +28,7 @@ export const DatabaseObjects = component$<DatabaseObjectsProps>((props) => {
             <thead>
               <tr>
                 {keys.map((key) => (
-                  <th>{key}</th>
+                  <th key={key}>{key}</th>
                 ))}
               </tr>
             </thead>

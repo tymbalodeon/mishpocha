@@ -17,7 +17,7 @@ const getDisplayableValue = (
   mishpochaObject: MishpochaObject,
   key: string,
   typeName?: string,
-  nested?: boolean,
+  nested?: boolean
 ) => {
   let value: object | string = nested
     ? mishpochaObject
@@ -43,8 +43,8 @@ const getDisplayableValue = (
             item,
             "display",
             (item as MishpochaObject).type_name || key,
-            true,
-          ),
+            true
+          )
         )}
       </ul>
     );
@@ -102,10 +102,7 @@ export const DatabaseObject = component$<DatabaseProps>((props) => {
 
           if (values.type === "ul" && !["age", "label"].includes(keyDisplay)) {
             return (
-              <div
-                key={keyDisplay}
-                class="collapse collapse-arrow bg-base-200"
-              >
+              <div key={keyDisplay} class="collapse collapse-arrow bg-base-200">
                 <input type="checkbox" />
                 <div class="collapse-title text-xl font-medium">
                   {keyDisplay}
