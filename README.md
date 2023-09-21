@@ -49,7 +49,7 @@
  `open *prod` Open the applications in the browser.  
  `running *verbose` Show the container ids (or all info with "--verbose") if the
  containers are running.  
- `start *args` Run the application (optional: "--docker", "--local", "--prod", "--open").  
+ `start *args` Run the application (optional: "--cloud",  "--docker", "--local", "--prod", "--open").  
  `stop`Stop the containers.  
  `tail *log` Tail the logs for \<log\> ("api" or "ui").
  `ui *args` Run a just command for the UI.  
@@ -71,7 +71,7 @@
  `running *verbose` Show the container id (or all info with "--verbose") if the
  container is running.  
  `shell` Log into the interactive shell in Docker.  
- `start *args` Run the application (optional: "--docker", "--local", "--prod",
+ `start *args` Run the application (optional: "--cloud", "--docker", "--local", "--prod",
  "--open").  
  `stop` Stop the server.  
  `update *_from-main` Update dependencies.

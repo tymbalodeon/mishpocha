@@ -82,7 +82,7 @@ _build *prod:
         docker build --target "${target}" --tag {{image}} .
     fi
 
-# Run the application (optional: "--docker", "--local", "--prod", "--open").
+# Run the application (optional: "--cloud", "--docker", "--local", "--prod", "--open").
 start *args: stop (_build args)
     #!/usr/bin/env zsh
     instance="$({{just}} _get_instance {{args}})"
@@ -107,7 +107,9 @@ start *args: stop (_build args)
                 {{image}}
         fi
     else
-        {{just}} cloud &>/dev/null
+        if [ "${instance}" = "--cloud" ]; then
+            {{just}} cloud &>/dev/null
+        fi
         export EDGEDB_DSN="$({{just}} db dsn ${instance})"
         export EDGEDB_CLIENT_TLS_SECURITY="insecure"
         cargo run

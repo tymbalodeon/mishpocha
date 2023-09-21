@@ -22,7 +22,7 @@ export const DatabaseObjects = component$<DatabaseObjectsProps>((props) => {
   return (
     <>
       <h3 class="font-bold text-xl pl-4 py-8">{props.title}</h3>
-      <div class="w-screen">
+      <div class="w-screen sticky">
         <div class="overflow-x-auto">
           <table class="table table-pin-rows">
             <thead>

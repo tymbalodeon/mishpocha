@@ -77,7 +77,7 @@ _get_instance *instance:
         echo "--local"
     fi
 
-# Run the application (optional: "--docker", "--local", "--prod", "--open").
+# Run the application (optional: "--cloud", "--docker", "--local", "--prod", "--open").
 start *args: stop
     #!/usr/bin/env zsh
     instance="$({{just}} _get_instance {{args}})"
