@@ -1,7 +1,7 @@
 import { component$ } from "@builder.io/qwik";
 import type { MishpochaObject, Player } from "../schema";
 
-const getBaseUrl = (typeName: string): string => {
+function getBaseUrl(typeName: string): string {
   if (!typeName) {
     return "";
   } else if (typeName === "person" || typeName.includes("player")) {
@@ -11,7 +11,7 @@ const getBaseUrl = (typeName: string): string => {
   } else {
     return `/${typeName}s`;
   }
-};
+}
 
 function getBoldItem(value: string) {
   return <span class="font-bold">{value}</span>;
