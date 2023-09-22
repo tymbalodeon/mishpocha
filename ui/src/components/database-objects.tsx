@@ -20,32 +20,30 @@ export const DatabaseObjects = component$<DatabaseObjectsProps>((props) => {
   return (
     <>
       <h3 class="font-bold text-xl pl-4 py-8">{props.title}</h3>
-      <div class="w-screen sticky">
-        <div class="overflow-x-auto">
-          <table class="table table-pin-rows">
-            <thead>
-              <tr>
-                {keys.map((key) => (
-                  <th key={key}>{key}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {databaseObjects
-                ? databaseObjects.map((databaseObject: MishpochaObject) => {
-                    return (
-                      <DatabaseObject
-                        key={databaseObject.id}
-                        databaseObject={databaseObject}
-                        includedKeys={includedKeys}
-                        compact={true}
-                      />
-                    );
-                  })
-                : null}
-            </tbody>
-          </table>
-        </div>
+      <div class="overflow-x-auto">
+        <table class="table table-pin-rows">
+          <thead>
+            <tr>
+              {keys.map((key) => (
+                <th key={key}>{key}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {databaseObjects
+              ? databaseObjects.map((databaseObject: MishpochaObject) => {
+                  return (
+                    <DatabaseObject
+                      key={databaseObject.id}
+                      databaseObject={databaseObject}
+                      includedKeys={includedKeys}
+                      compact={true}
+                    />
+                  );
+                })
+              : null}
+          </tbody>
+        </table>
       </div>
     </>
   );
