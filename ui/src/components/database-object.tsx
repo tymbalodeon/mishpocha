@@ -83,10 +83,18 @@ const getDisplayableValue = (
   return link;
 };
 
-export function filterKeys(keys: string[], includedKeys?: string[]): string[] {
-  const filteredKeys = keys.filter(
-    (key) => !["id", "type_name", "display"].includes(key),
-  );
+export function filterKeys(
+  keys: string[],
+  includedKeys?: string[],
+  compact?: boolean,
+): string[] {
+  const excludedKeys = ["id", "type_nmae"];
+
+  if (!compact) {
+    excludedKeys.push("display");
+  }
+
+  const filteredKeys = keys.filter((key) => !excludedKeys.includes(key));
 
   if (!includedKeys || !includedKeys.length) {
     return filteredKeys;
@@ -103,9 +111,14 @@ interface DatabaseProps {
 
 export const DatabaseObject = component$<DatabaseProps>((props) => {
   const databaseObject = props.databaseObject;
-  const keys = filterKeys(Object.keys(databaseObject), props.includedKeys);
+  const compact = props.compact;
+  const keys = filterKeys(
+    Object.keys(databaseObject),
+    props.includedKeys,
+    compact,
+  );
 
-  if (props.compact) {
+  if (compact) {
     return (
       <tr class="hover">
         {keys.map((key) => {
