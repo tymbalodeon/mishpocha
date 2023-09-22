@@ -88,7 +88,7 @@ export function filterKeys(
   includedKeys?: string[],
   compact?: boolean,
 ): string[] {
-  const excludedKeys = ["id", "type_nmae"];
+  const excludedKeys = ["id", "type_name"];
 
   if (!compact) {
     excludedKeys.push("display");
