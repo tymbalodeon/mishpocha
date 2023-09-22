@@ -84,11 +84,15 @@ const getDisplayableValue = (
 };
 
 export function filterKeys(keys: string[], includedKeys?: string[]): string[] {
+  const filteredKeys = keys.filter(
+    (key) => !["id", "type_name", "display"].includes(key),
+  );
+
   if (!includedKeys || !includedKeys.length) {
-    return keys;
+    return filteredKeys;
   }
 
-  return keys.filter((key) => includedKeys.includes(key));
+  return filteredKeys.filter((key) => includedKeys.includes(key));
 }
 
 interface DatabaseProps {
