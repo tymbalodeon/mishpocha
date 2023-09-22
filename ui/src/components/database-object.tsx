@@ -17,6 +17,10 @@ function getBoldItem(value: string) {
   return <span class="font-bold">{value}</span>;
 }
 
+export function removeUnderscores(text: string): string {
+  return text.replace("_", " ");
+}
+
 const getDisplayableValue = (
   mishpochaObject: MishpochaObject,
   key: string,
@@ -120,9 +124,9 @@ export const DatabaseObject = component$<DatabaseProps>((props) => {
 
   if (compact) {
     return (
-      <tr class="hover">
+      <tr class="hover:bg-primary hover:text-primary-content">
         {keys.map((key) => {
-          const keyDisplay = key.replace("_", " ");
+          const keyDisplay = removeUnderscores(key);
           const values = getDisplayableValue(databaseObject, key);
           return <td key={keyDisplay}>{values}</td>;
         })}
@@ -131,34 +135,33 @@ export const DatabaseObject = component$<DatabaseProps>((props) => {
   }
 
   return (
-    <div class="card bg-neutral shadow-xl m-4">
+    <div class="card m-8">
       <div class="card-body">
-        <h3 class="card-title">{databaseObject.display}</h3>
-        {keys.map((key) => {
-          const keyDisplay = key.replace("_", " ");
-          const values = getDisplayableValue(databaseObject, key);
-
-          if (values.type === "ul" && !["age", "label"].includes(keyDisplay)) {
-            return (
-              <div
-                key={keyDisplay}
-                class="collapse collapse-arrow bg-base-200"
-              >
-                <input type="checkbox" />
-                <div class="collapse-title text-xl font-medium">
-                  {keyDisplay}
-                </div>
-                <div class="collapse-content">{values}</div>
-              </div>
-            );
-          }
-
-          return (
-            <div key={keyDisplay}>
-              {keyDisplay}: {values}
-            </div>
-          );
-        })}
+        <span class="card-title font-bold text-3xl">
+          {databaseObject.display}
+        </span>
+        <table class="table max-w-fit">
+          <thead>
+            <tr class="bg-base-200 text-base-content">
+              <th class="capitalize text-lg">Property</th>
+              <th class="capitalize text-lg">Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            {keys.map((key) => {
+              const keyDisplay = removeUnderscores(key);
+              const values = getDisplayableValue(databaseObject, key);
+              return (
+                <tr key={keyDisplay}>
+                  <td class="capitalize font-bold italic bg-secondary text-secondary-content w-10">
+                    {keyDisplay}
+                  </td>
+                  <td class="bg-primary text-primary-content">{values}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
     </div>
   );
