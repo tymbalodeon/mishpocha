@@ -111,7 +111,6 @@ export const DatabaseObject = component$<DatabaseProps>((props) => {
         {keys.map((key) => {
           const keyDisplay = key.replace("_", " ");
           const values = getDisplayableValue(databaseObject, key);
-
           return <td key={keyDisplay}>{values}</td>;
         })}
       </tr>
@@ -124,7 +123,7 @@ export const DatabaseObject = component$<DatabaseProps>((props) => {
         <h3 class="card-title">{databaseObject.display}</h3>
         {keys.map((key) => {
           const keyDisplay = key.replace("_", " ");
-          const values = getDisplayableValue(databaseObject, keyDisplay);
+          const values = getDisplayableValue(databaseObject, key);
 
           if (values.type === "ul" && !["age", "label"].includes(keyDisplay)) {
             return (
