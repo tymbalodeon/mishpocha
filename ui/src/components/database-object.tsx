@@ -106,7 +106,7 @@ export const DatabaseObject = component$<DatabaseProps>((props) => {
       <tr class="hover">
         {keys.map((key) => {
           const keyDisplay = key.replace("_", " ");
-          const values = getDisplayableValue(databaseObject, keyDisplay);
+          const values = getDisplayableValue(databaseObject, key);
 
           return <td key={keyDisplay}>{values}</td>;
         })}
