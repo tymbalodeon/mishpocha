@@ -13,6 +13,10 @@ const getBaseUrl = (typeName: string): string => {
   }
 };
 
+function getBoldItem(value: string) {
+  return <span class="font-bold">{value}</span>;
+}
+
 const getDisplayableValue = (
   mishpochaObject: MishpochaObject,
   key: string,
@@ -26,14 +30,22 @@ const getDisplayableValue = (
   if (!(value instanceof Object)) {
     if (!(typeof value === "string")) {
       value = String(value);
+      return getBoldItem(value);
     }
 
-    return <span class="font-bold">{value}</span>;
+    const baseUrl = getBaseUrl(mishpochaObject.type_name);
+    const url = `${baseUrl}/${mishpochaObject.id}`;
+
+    return (
+      <a href={url} class="link">
+        {getBoldItem(value)}
+      </a>
+    );
   }
 
   if (value instanceof Array) {
     if (!value.length) {
-      return <span class="font-bold">null</span>;
+      return getBoldItem("null");
     }
 
     return (
