@@ -34,17 +34,17 @@ update *_from-main:
 check *files: format
     #!/usr/bin/env zsh
     if [ -n "{{files}}" ]; then
-        pnpx rome check "{{files}}"
+        pnpx biome check "{{files}}"
     else
         files=(src/**/*.ts*)
-        pnpx rome check --apply "${files[@]}" \
-            || pnpx rome check "${files[@]}"
+        pnpx biome check --apply "${files[@]}" \
+            || pnpx biome check "${files[@]}"
     fi
     pnpm run build.types
 
 # Format code.
 @format:
-    pnpx rome format --write .
+    pnpx biome format --write .
 
 # Add dependencies.
 @add *packages:
