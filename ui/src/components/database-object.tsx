@@ -25,7 +25,7 @@ const getDisplayableValue = (
   mishpochaObject: MishpochaObject,
   key: string,
   typeName?: string,
-  nested?: boolean,
+  nested?: boolean
 ) => {
   let value: object | string = nested
     ? mishpochaObject
@@ -59,8 +59,8 @@ const getDisplayableValue = (
             item,
             "display",
             (item as MishpochaObject).type_name || key,
-            true,
-          ),
+            true
+          )
         )}
       </ul>
     );
@@ -90,7 +90,7 @@ const getDisplayableValue = (
 export function filterKeys(
   keys: string[],
   includedKeys?: string[],
-  compact?: boolean,
+  compact?: boolean
 ): string[] {
   const excludedKeys = ["id", "type_name"];
 
@@ -119,7 +119,7 @@ export const DatabaseObject = component$<DatabaseProps>((props) => {
   const keys = filterKeys(
     Object.keys(databaseObject),
     props.includedKeys,
-    compact,
+    compact
   );
 
   if (compact) {

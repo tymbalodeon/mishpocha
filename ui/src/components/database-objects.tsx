@@ -18,7 +18,9 @@ export const DatabaseObjects = component$<DatabaseObjectsProps>((props) => {
   const keys = [];
 
   if (databaseObjects.length) {
-    keys.push(...filterKeys(Object.keys(databaseObjects[0]), includedKeys));
+    keys.push(
+      ...filterKeys(Object.keys(databaseObjects[0]), includedKeys, true)
+    );
   }
 
   return (
