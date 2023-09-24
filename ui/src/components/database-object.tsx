@@ -137,26 +137,21 @@ export const DatabaseObject = component$<DatabaseProps>((props) => {
   return (
     <div class="card m-8">
       <div class="card-body">
-        <span class="card-title font-bold text-3xl">
-          {databaseObject.display}
+        <span class="card-title font-bold text-3xl pb-4">
+          <span class="capitalize">{databaseObject.type_name}:</span>{" "}
+          <span class="italic">{databaseObject.display}</span>
         </span>
         <table class="table max-w-fit">
-          <thead>
-            <tr class="bg-base-200 text-base-content">
-              <th class="capitalize text-lg">Property</th>
-              <th class="capitalize text-lg">Value</th>
-            </tr>
-          </thead>
           <tbody>
             {keys.map((key) => {
               const keyDisplay = removeUnderscores(key);
               const values = getDisplayableValue(databaseObject, key);
               return (
                 <tr key={keyDisplay}>
-                  <td class="capitalize font-bold italic bg-secondary text-secondary-content w-10">
+                  <td class="capitalize font-bold italic bg-secondary text-secondary-content w-10 text-right">
                     {keyDisplay}
                   </td>
-                  <td class="bg-primary text-primary-content">{values}</td>
+                  <td class="bg-neutral text-neutral-content">{values}</td>
                 </tr>
               );
             })}

@@ -26,10 +26,10 @@ export const DatabaseObjects = component$<DatabaseObjectsProps>((props) => {
   return (
     <div class="card m-8">
       <div class="card-body">
-        <span class="card-title font-bold text-3xl">{props.title}</span>
-        <table class="table overflow-x-auto table-pin-rows bg-neutral text-neutral-content">
+        <span class="card-title font-bold text-3xl pb-4">{props.title}</span>
+        <table class="table overflow-x-auto table-pin-rows bg-neutral text-neutral-content rounded-none">
           <thead>
-            <tr class="bg-base-200 text-base-content">
+            <tr class="bg-secondary text-base-content">
               {keys.map((key) => {
                 const keyDisplay = removeUnderscores(key);
                 return (
