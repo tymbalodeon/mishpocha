@@ -30,6 +30,10 @@ update *_from-main:
     fi
     pnpm update
 
+# Format code.
+@format:
+    pnpx biome format --write .
+
 # Check code for errors.
 check *files: format
     #!/usr/bin/env zsh
@@ -41,10 +45,6 @@ check *files: format
             || pnpx biome check "${files[@]}"
     fi
     pnpm run build.types
-
-# Format code.
-@format:
-    pnpx biome format --write .
 
 # Add dependencies.
 @add *packages:
